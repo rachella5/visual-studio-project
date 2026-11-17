@@ -183,9 +183,6 @@ def konfirmasi_default(pesan):
       return False
     print("⚠️ [ERROR] Tekan Enter / 'y' untuk Ya, atau ketik 't' untuk Tidak.")
 
-
-
-
 # ==========================================
 # FITUR ADMIN (PENGGUNA)
 # ==========================================
@@ -236,7 +233,7 @@ def tampilkan_data_pengguna():
 
     print(
         f"{'ID':<9} | {'NAMA':<18} | {'ROLE':<8} | {'STATUS':<9} | "
-        f"{'DATE_ADDED':<16} | {'DATE_MODIFIED':<16} | {'DATE_DELETED':<16}"
+        f"{'DATE_ADDED':<22} | {'DATE_MODIFIED':<22} | {'DATE_DELETED':<22}"
     )
     print("=" * 108)
 
@@ -246,9 +243,9 @@ def tampilkan_data_pengguna():
             f"{pengguna['nama'][:18]:<18} | "
             f"{pengguna.get('role', '-').upper():<8} | "
             f"{status:<9} | "
-            f"{pengguna.get('date_added', '-'):<16} | "
-            f"{pengguna.get('date_modified', '-'):<16} | "
-            f"{pengguna.get('date_deleted', '-'):<16}"
+            f"{pengguna.get('date_added', '-'):<22} | "
+            f"{pengguna.get('date_modified', '-'):<22} | "
+            f"{pengguna.get('date_deleted', '-'):<22}"
         )
 
     print("=" * 108)
@@ -256,10 +253,14 @@ def tampilkan_data_pengguna():
     total_nonaktif = len(data_pengguna.get("arsip_pengguna", {}))
     total_semua = total_aktif + total_nonaktif
     print(f"Total: {total_semua} Akun ({total_aktif} Aktif, {total_nonaktif} Nonaktif)")
-
+    print("=" * 108)
+    
 def tambah_pengguna():
-    print("\n--- TAMBAH DATA PENGGUNA ---")
-
+    lebar = 108
+    print("=" * 108)
+    print("--- TAMBAH DATA PENGGUNA ---".center(108)
+    print("=" * 108)
+    
     while True:
       angka_acak = random.randint(1000, 9999)
       id_pengguna = f"USR{angka_acak}"
@@ -298,22 +299,31 @@ def tambah_pengguna():
     }
 
     if simpan_data():
-        print(f"[SUKSES] Pengguna '{nama}' berhasil ditambahkan!")
+        print( "=" * lebar)
+        print(f"✅[SUKSES] Pengguna '{nama}' berhasil ditambahkan!")
+        print( "=" * lebar)
     else:
         del data_pengguna["pengguna"][id_pengguna]
 
 
 def edit_pengguna():
-    print("\n--- EDIT DATA PENGGUNA ---")
+    lebar = 55
+    print("=" * lebar)
+    print("--- EDIT DATA PENGGUNA ---".center(lebar))
+    print("=" * lebar)
+    
     id_pengguna = input("Masukkan ID pengguna yang ingin diedit: ").strip().upper()
 
     if id_pengguna in data_pengguna["pengguna"]:
         pengguna = data_pengguna["pengguna"][id_pengguna]
 
         print("Kosongkan input jika tidak ingin diubah.")
+        print("=" * lebar)
+        
         nama_baru = input(f"Nama baru [{pengguna['nama']}]: ").strip()
         username_baru = input(f"Username baru [{pengguna['username']}]: ").strip().lower()
-
+        print("=" * lebar)
+        
         if username_baru and username_terpakai(username_baru, id_pengguna):
             print("[ERROR] Username sudah digunakan pengguna lain.")
             return
@@ -331,41 +341,58 @@ def edit_pengguna():
             if role_input in MAP_ROLE:
                 pengguna['role'] = MAP_ROLE[role_input]
             else:
+                print("=" * lebar)
                 print("⚠️ [GAGAL] Role tidak valid. Gunakan A (admin), G (gudang), atau K (kasir).")
+                print("=" * lebar)
                 return
 
         pengguna['date_modified'] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
         pengguna['date_deleted'] = "-"
 
         if simpan_data():
-            print("[SUKSES] Data pengguna berhasil diedit")
+            print("=" * lebar)
+            print("✅[SUKSES] Data pengguna berhasil diedit")
+            print("=" * lebar)
     else:
+        print("=" * lebar)
         print("⚠️ [ERROR] ID pengguna tidak ditemukan.")
+        print("=" * lebar)
 
 def hapus_pengguna(admin_login):
-    print("\n--- HAPUS DATA PENGGUNA ---")
+    lebar = 55
+    print("=" * lebar)
+    print("--- HAPUS DATA PENGGUNA ---".center(lebar))
+    print("=" * lebar)
+    
     id_pengguna = input("Masukkan ID pengguna yang ingin dihapus: ").strip().upper()
 
     if id_pengguna in data_pengguna["pengguna"]:
         if id_pengguna == admin_login:
+            print("=" * lebar)
             print("⚠️ [ERROR] Tidak boleh menghapus akun admin yang sedang dipakai.")
+            print("=" * lebar)
             return
 
         pengguna_dihapus = data_pengguna["pengguna"].pop(id_pengguna)
         data_pengguna.setdefault("arsip_pengguna", {})[id_pengguna] = pengguna_dihapus
-
         pengguna_dihapus["date_deleted"] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
 
         if simpan_data():
+          print("=" * lebar)
           print(f"Data '{pengguna_dihapus['nama']}' berhasil diarsipkan.")
+          print("=" * lebar)   
           catat_log("admin", f"Menghapus pengguna {pengguna_dihapus['nama']} ({id_pengguna})")
+     
         else:
+         print("=" * lebar)
          print("⚠️ [ERROR] ID pengguna tidak ditemukan.")
-
+         print("=" * lebar)
+            
 def cari_pengguna():
- print("\n" + "=" * 50)
- print("          PENCARIAN DATA PENGGUNA")
- print("=" * 50)
+ lebar = 108
+ print( "="  * lebar )  
+ print("PENCARIAN DATA PENGGUNA".center(lebar))
+ print( "="  * lebar )  
 
  keyword = input_wajib(
      "Masukkan nama atau ID pengguna: "
@@ -376,13 +403,14 @@ def cari_pengguna():
  pengguna = data_pengguna["pengguna"].get(id_pengguna)
 
  if pengguna:
-     print("\n[DATA PENGGUNA DITEMUKAN]")
-     print("-" * 50)
+     print( "="  * lebar )  
+     print("[DATA PENGGUNA DITEMUKAN]".center(lebar))
+     print( "="  * lebar )  
      print(f"ID PENGGUNA : {id_pengguna}")
      print(f"NAMA        : {pengguna['nama']}")
      print(f"USERNAME    : @{pengguna.get('username', '-')}")
      print(f"ROLE        : {pengguna['role']}")
-     print("-" * 50)
+     print( "="  * lebar )  
      return
 
  # 2. Jika bukan ID, cari berdasarkan nama
@@ -393,19 +421,21 @@ def cari_pengguna():
  ]
 
  if not hasil:
-     print("\n[ERROR] Pengguna tidak ditemukan.")
+     print( "="  * lebar )  
+     print("[ERROR] Pengguna tidak ditemukan.")
+     print( "="  * lebar )  
      return
-
- print("\n=== HASIL PENCARIAN PENGGUNA ===")
-
+     
+ print( "="  * lebar )  
+ print("=== HASIL PENCARIAN PENGGUNA ===".center(lebar))
+ print( "="  * lebar )  
  for id_pengguna, pengguna in hasil:
-     print("-" * 50)
+     print( "="  * lebar )  
      print(f"ID PENGGUNA : {id_pengguna}")
      print(f"NAMA        : {pengguna['nama']}")
      print(f"USERNAME    : @{pengguna.get('username', '-')}")
      print(f"ROLE        : {pengguna['role']}")
-
- print("-" * 50)
+     print( "="  * lebar )  
 
 def tampilkan_data_terhapus():
     print("\n" + "=" * 55)
