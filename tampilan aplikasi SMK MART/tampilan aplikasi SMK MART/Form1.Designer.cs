@@ -40,6 +40,7 @@
             // 
             // passwordTXB
             // 
+            passwordTXB.BackColor = Color.LightCyan;
             passwordTXB.Location = new Point(271, 301);
             passwordTXB.Name = "passwordTXB";
             passwordTXB.PasswordChar = '*';
@@ -49,7 +50,7 @@
             // 
             // BTNlogin
             // 
-            BTNlogin.BackColor = Color.White;
+            BTNlogin.BackColor = Color.AliceBlue;
             BTNlogin.Location = new Point(333, 361);
             BTNlogin.Name = "BTNlogin";
             BTNlogin.Size = new Size(138, 36);
@@ -75,7 +76,7 @@
             Lblwelcomeback1.AutoSize = true;
             Lblwelcomeback1.BackColor = Color.Transparent;
             Lblwelcomeback1.Font = new Font("Times New Roman", 40.2F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            Lblwelcomeback1.ForeColor = Color.Bisque;
+            Lblwelcomeback1.ForeColor = Color.Navy;
             Lblwelcomeback1.Location = new Point(168, 115);
             Lblwelcomeback1.Name = "Lblwelcomeback1";
             Lblwelcomeback1.Size = new Size(475, 76);
@@ -87,7 +88,7 @@
             Lblwelcomeback2.AutoSize = true;
             Lblwelcomeback2.BackColor = Color.Transparent;
             Lblwelcomeback2.Font = new Font("Times New Roman", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            Lblwelcomeback2.ForeColor = SystemColors.Info;
+            Lblwelcomeback2.ForeColor = Color.Navy;
             Lblwelcomeback2.Location = new Point(201, 215);
             Lblwelcomeback2.Name = "Lblwelcomeback2";
             Lblwelcomeback2.Size = new Size(414, 23);
@@ -96,6 +97,7 @@
             // 
             // usernameTXB
             // 
+            usernameTXB.BackColor = Color.LightCyan;
             usernameTXB.Location = new Point(271, 250);
             usernameTXB.Name = "usernameTXB";
             usernameTXB.PlaceholderText = "Username";
