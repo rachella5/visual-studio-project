@@ -1,0 +1,18 @@
+C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART\tampilan aplikasi SMK MART\bin\Debug\net8.0-windows\tampilan aplikasi SMK MART.exe
+C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART\tampilan aplikasi SMK MART\bin\Debug\net8.0-windows\tampilan aplikasi SMK MART.deps.json
+C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART\tampilan aplikasi SMK MART\bin\Debug\net8.0-windows\tampilan aplikasi SMK MART.runtimeconfig.json
+C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART\tampilan aplikasi SMK MART\bin\Debug\net8.0-windows\tampilan aplikasi SMK MART.dll
+C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART\tampilan aplikasi SMK MART\bin\Debug\net8.0-windows\tampilan aplikasi SMK MART.pdb
+C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART\tampilan aplikasi SMK MART\obj\Debug\net8.0-windows\tampilan_aplikasi_SMK_MART.loginform.resources
+C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART\tampilan aplikasi SMK MART\obj\Debug\net8.0-windows\tampilan_aplikasi_SMK_MART.Properties.Resources.resources
+C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART\tampilan aplikasi SMK MART\obj\Debug\net8.0-windows\tampilan aplikasi SMK MART.csproj.GenerateResource.cache
+C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART\tampilan aplikasi SMK MART\obj\Debug\net8.0-windows\tampilan aplikasi SMK MART.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART\tampilan aplikasi SMK MART\obj\Debug\net8.0-windows\tampilan aplikasi SMK MART.AssemblyInfoInputs.cache
+C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART\tampilan aplikasi SMK MART\obj\Debug\net8.0-windows\tampilan aplikasi SMK MART.AssemblyInfo.cs
+C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART\tampilan aplikasi SMK MART\obj\Debug\net8.0-windows\tampilan aplikasi SMK MART.csproj.CoreCompileInputs.cache
+C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART\tampilan aplikasi SMK MART\obj\Debug\net8.0-windows\tampilan aplikasi SMK MART.dll
+C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART\tampilan aplikasi SMK MART\obj\Debug\net8.0-windows\refint\tampilan aplikasi SMK MART.dll
+C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART\tampilan aplikasi SMK MART\obj\Debug\net8.0-windows\tampilan aplikasi SMK MART.pdb
+C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART\tampilan aplikasi SMK MART\obj\Debug\net8.0-windows\tampilan aplikasi SMK MART.genruntimeconfig.cache
+C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART\tampilan aplikasi SMK MART\obj\Debug\net8.0-windows\ref\tampilan aplikasi SMK MART.dll
+C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART\tampilan aplikasi SMK MART\obj\Debug\net8.0-windows\tampilan.652CC88C.Up2Date
