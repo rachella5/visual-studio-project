@@ -648,11 +648,16 @@ def hapus_transaksi():
         print("[INFO] Penghapusan transaksi dibatalkan.")
 
 def riwayat_transaksi():
-    print("\n=== RIWAYAT TRANSAKSI ===")
+    lebar = 68
+    print("\n" + "=" * lebar)
+    print("RIWAYAT TRANSAKSI".center(lebar))
+    print("=" * lebar)
     if not data_barang["transaksi"]:
         print("Belum ada transaksi.")
         return
 
+    print(f"{'NO. TRX':<11} | {'TANGGAL':<19} | {'KASIR':<16} | {'TOTAL':>13}")
+    print("=" * lebar)
     for data_transaksi in data_barang["transaksi"]:
         print(
             f"{data_transaksi['nomor']:<10} | "
@@ -660,6 +665,8 @@ def riwayat_transaksi():
             f"{data_transaksi['kasir_nama'][:16]:<16} | "
             f"{rupiah(data_transaksi['total']):>12}"
         )
+
+    print("=" * lebar)
 
 def laporan_penjualan_admin():
     print("\n" + "=" * 60)
@@ -747,9 +754,10 @@ def laporan_penjualan_admin():
 
 def kelola_status_barang():
     while True:
-        print("\n" + "=" * 60)
-        print("KELOLA STATUS BARANG".center(60))
-        print("=" * 60)
+        lebar = 68
+        print("\n" + "=" * lebar)
+        print("KELOLA STATUS BARANG".center(lebar))
+        print("=" * lebar)
 
         barang_aktif = data_barang.get("barang", {})
         barang_arsip = data_barang.get("arsip_barang", {})
@@ -759,24 +767,34 @@ def kelola_status_barang():
             return
 
         print("--- [ BARANG DI ETALASE / GUDANG ] ---")
-        for id_barang, barang in barang_aktif.items():
-            status = barang.get("status", "Aktif")
-            print(
-                f"ID: {id_barang:<8} | "
-                f"Nama: {barang['nama_barang'][:22]:<22} | "
-                f"Stok: {barang['stok']:>4} | "
-                f"Status: {status:<9}"
-            )
+        if not barang_aktif:
+            print("(Kosong)")
+        else:
+            print(f"{'ID':<9} | {'NAMA BARANG':<22} | {'STOK':>6} | {'STATUS':<10}")
+            print("-" * 56)
+            for id_barang, barang in barang_aktif.items():
+                status = barang.get("status", "Aktif")
+                print(
+                    f"{id_barang:<9} | "
+                    f"{barang['nama_barang'][:22]:<22} | "
+                    f"{barang['stok']:>6} | "
+                    f"{status:<10}"
+                )
 
         print("\n--- [ BARANG NONAKTIF / RUSAK ] ---")
-        for id_barang, barang in barang_arsip.items():
-            status = barang.get("status", "Nonaktif")
-            print(
-                f"ID: {id_barang:<8} | "
-                f"Nama: {barang['nama_barang'][:22]:<22} | "
-                f"Stok: {barang['stok']:>4} | "
-                f"Status: {status:<9}"
-            )
+        if not barang_arsip:
+            print("(Kosong)")
+        else:
+            print(f"{'ID':<9} | {'NAMA BARANG':<22} | {'STOK':>6} | {'STATUS':<10}")
+            print("-" * 56)
+            for id_barang, barang in barang_arsip.items():
+                status = barang.get("status", "Nonaktif")
+                print(
+                    f"{id_barang:<9} | "
+                    f"{barang['nama_barang'][:22]:<22} | "
+                    f"{barang['stok']:>6} | "
+                    f"{status:<10}"
+                )
 
         print("\nPilih opsi:")
         print("1. Ubah status barang (Aktif/Nonaktif/Rusak)")
@@ -790,7 +808,7 @@ def kelola_status_barang():
         elif pilihan == "1":
             id_barang = input("Masukkan ID barang yang ingin diubah statusnya: ").upper()
             if id_barang not in barang_aktif:
-                print("⚠️[ERROR] ID barang tidak ditemukan di etalase/gudang.")
+                print("⚠️ [ERROR] ID barang tidak ditemukan di etalase/gudang.")
                 continue
 
             print("Pilih status baru:")
@@ -849,38 +867,59 @@ def kelola_status_barang():
 # ==========================================
 # FITUR GUDANG
 # ==========================================
-def daftar_barang():
-   print("\n" + "-" *30)
-   print("\n=== DATA BARANG ===")
-   print("-"*30)
-   if not data_barang["barang"]:
-       print("Belum ada barang.")
-       return
+def tampilkan_barang():
+    lebar = 96
+    print("\n" + "=" * lebar)
+    print("TAMPILAN DATA BARANG (TERURUT BERDASARKAN NAMA A-Z)".center(lebar))
+    print("=" * lebar)
 
-   print(
-        f"{'ID':<9}"
-        f"{'NAMA BARANG':<20}"
-        f"{'STOK':>7}"
-        f"{'HARGA PABRIK':>16}"
-        f"{'HARGA JUAL':>15}"
-        f"{'LABA':>15}"
+    if not data_barang["barang"]:
+        print("[INFO] Belum ada data barang yang tersimpan.")
+        return
+
+    semua_barang = list(data_barang["barang"].items())
+    jumlah_data = len(semua_barang)
+
+    def heapify(arr, n, i):
+        terbesar = i
+        kiri = 2 * i + 1
+        kanan = 2 * i + 2
+        if kiri < n and arr[kiri][1]["nama_barang"].casefold() > arr[terbesar][1]["nama_barang"].casefold():
+            terbesar = kiri
+        if kanan < n and arr[kanan][1]["nama_barang"].casefold() > arr[terbesar][1]["nama_barang"].casefold():
+            terbesar = kanan
+        if terbesar != i:
+            arr[i], arr[terbesar] = arr[terbesar], arr[i]
+            heapify(arr, n, terbesar)
+
+    for i in range(jumlah_data // 2 - 1, -1, -1):
+        heapify(semua_barang, jumlah_data, i)
+    for i in range(jumlah_data - 1, 0, -1):
+        semua_barang[0], semua_barang[i] = semua_barang[i], semua_barang[0]
+        heapify(semua_barang, i, 0)
+
+    print(
+        f"{'ID':<9} | {'NAMA BARANG':<22} | {'STOK':>6} | "
+        f"{'HARGA PABRIK':>14} | {'HARGA JUAL':>14} | {'LABA':>14}"
     )
+    print("=" * lebar)
 
-   for id_barang, barang in data_barang["barang"].items():
-
-        pabrik = ambil_harga_pabrik(barang)
-        jual = ambil_harga_jual(barang)
-        laba = hitung_laba(pabrik, jual)
-
+    for id_barang, barang in semua_barang:
+        harga_pabrik = ambil_harga_pabrik(barang)
+        harga_jual = ambil_harga_jual(barang)
+        laba = hitung_laba(harga_pabrik, harga_jual)
         print(
-            f"{id_barang:<9}"
-            f"{barang['nama_barang'][:19]:<20}"
-            f"{barang['stok']:>7}"
-            f"{rupiah(pabrik):>16}"
-            f"{rupiah(jual):>15}"
-            f"{rupiah(laba):>15}"
+            f"{id_barang:<9} | "
+            f"{barang['nama_barang'][:22]:<22} | "
+            f"{barang['stok']:>6} | "
+            f"{rupiah(harga_pabrik):>14} | "
+            f"{rupiah(harga_jual):>14} | "
+            f"{rupiah(laba):>14}"
         )
-   print("=" * 85)
+
+    print("=" * lebar)
+    print(f"Total Barang: {jumlah_data} Item")
+    print("=" * lebar)
 
 def tambah_barang():
     print("\n=== TAMBAH BARANG ===")
@@ -937,7 +976,7 @@ def tambah_barang():
 
 
 def edit_barang():
-    daftar_barang()
+    tampilkan_barang()
     id_barang = input_wajib("\nID barang yang diedit: ").upper()
     barang = data_barang["barang"].get(id_barang)
     if not barang:
@@ -1001,7 +1040,7 @@ def edit_barang():
         barang.update(data_lama)
 
 def hapus_barang():
-    daftar_barang()
+    tampilkan_barang()
     id_barang = input_wajib("ID barang yang dihapus: ").upper()
     if id_barang in data_barang["barang"]:
       if konfirmasi_default("Yakin hapus barang?"):
@@ -1013,54 +1052,6 @@ def hapus_barang():
           catat_log("gudang", f"Menghapus barang {barang_dihapus['nama_barang']} ({id_barang})")
     else:
         print("[ERROR] ID barang tidak ditemukan.")
-
-def urut_barang_heap_sort():
-    arr = list(data_barang["barang"].items())
-    n = len(arr)
-    if not arr:
-        print("belum ada barang")
-        return
-
-    for id_barang, barang in arr:
-        pabrik = ambil_harga_pabrik(barang)
-        jual = ambil_harga_jual(barang)
-
-        print(
-    f"{id_barang:<8} | "
-    f"{barang['nama_barang'][:20]:<20} | "
-    f"Stok: {barang['stok']:>4} | "
-    f"Pabrik: {rupiah(pabrik):>10} | "
-    f"Jual: {rupiah(jual):>10} | "
-    f"Laba: {rupiah(jual - pabrik):>9}"
-)
-    def heapify(arr, n, i):
-        terbesar = i
-        kiri, kanan = 2 * i + 1, 2 * i + 2
-        if kiri < n and arr[kiri][1]["nama_barang"].casefold() > arr[terbesar][1]["nama_barang"].casefold():
-            terbesar = kiri
-        if kanan < n and arr[kanan][1]["nama_barang"].casefold() > arr[terbesar][1]["nama_barang"].casefold():
-            terbesar = kanan
-        if terbesar != i:
-            arr[i], arr[terbesar] = arr[terbesar], arr[i]
-            heapify(arr, n, terbesar)
-
-    for i in range(n // 2 - 1, -1, -1):
-        heapify(arr, n, i)
-    for i in range(n - 1, 0, -1):
-        arr[0], arr[i] = arr[i], arr[0]
-        heapify(arr, i, 0)
-
-    print("\n=== BARANG TERURUT A-Z (HEAP SORT) ===")
-    if not arr:
-        print("Belum ada barang.")
-    else:
-       for id_barang, barang in arr:
-           print(
-        f"{id_barang:<8} | "
-        f"{barang['nama_barang'][:20]:<20} | "
-        f"Stok: {barang['stok']:>4} | "
-        f"{rupiah(barang['harga']):>10}"
-    )
 
 def cari_barang():
     print("\n" + "=" * 50)
@@ -1243,26 +1234,34 @@ def sorting_expired():
     )
 
 def riwayat_stok():
-    print("\n" + "-" * 30)
-    print("\n ---- RIWAYAT STOK ---- ")
+    lebar = 88
+    print("\n" + "=" * lebar)
+    print("RIWAYAT PERUBAHAN STOK".center(lebar))
+    print("=" * lebar)
 
     if not list_riwayat_stok:
-        print("Belum Ada Riwayat Perubahan Stok")
+        print("Belum Ada Riwayat Perubahan Stok.")
         return
+
+    print(f"{'NO':<4} | {'ID':<8} | {'NAMA BARANG':<20} | {'JENIS':<24} | {'JUMLAH':>6} | {'STOK':>11}")
+    print("-" * lebar)
     for nomor, riwayat in enumerate(list_riwayat_stok, start=1):
-        print("\n" + "-" * 35)
-        print(f"Nomor       : {nomor}")
-        print(f"ID BARANG   : {riwayat['id_barang']}")
-        print(f"Nama Barang : {riwayat['nama_barang']}")
-        print(f"Jenis       : {riwayat['jenis']}")
-        print(f"Jumlah      : {riwayat['jumlah']}")
-        print(f"Stok Sebelum: {riwayat['stok_sebelum']}")
-        print(f"Stok Sesudah: {riwayat['stok_sesudah']}")
-    print("\n" + "-" * 30)
+        perubahan_stok = f"{riwayat['stok_sebelum']} -> {riwayat['stok_sesudah']}"
+        print(
+            f"{nomor:<4} | "
+            f"{riwayat['id_barang']:<8} | "
+            f"{riwayat['nama_barang'][:20]:<20} | "
+            f"{riwayat['jenis'][:24]:<24} | "
+            f"{riwayat['jumlah']:>6} | "
+            f"{perubahan_stok:>11}"
+        )
+    print("=" * lebar)
 
 def laporan_barang():
-    print("\n" + "-" * 30)
-    print("\n ---- LAPORAN KONDISI BARANG ---- ")
+    lebar = 84
+    print("\n" + "-" * lebar)
+    print("LAPORAN KONDISI BARANG".center(lebar))
+    print("=" * lebar)
 
     if not data_barang["barang"]:
         print("Barang Belum Tersedia!")
@@ -1273,6 +1272,9 @@ def laporan_barang():
     mendekati_expired = 0
     sudah_expired = 0
     stok_menipis = 0
+
+    print(f"{'ID':<9} | {'NAMA BARANG':<22} | {'STOK':>5} | {'EXPIRED':<12} | {'SISA':>5} | {'STATUS':<18}")
+    print("=" * lebar)
 
     for id_barang, barang in data_barang["barang"].items():
         stok = int(barang["stok"])
@@ -1286,10 +1288,10 @@ def laporan_barang():
         sisa_hari = (tanggal_expired - hari_ini).days
 
         if sisa_hari <= 0:
-            status = "⚠️EXPIRED"
+            status = "⚠️ EXPIRED"
             sudah_expired += 1
         elif sisa_hari <= 5:
-            status = "⚠️MENDEKATI EXPIRED"
+            status = "⚠️ MENDEKATI EXPIRED"
             mendekati_expired += 1
         else:
             status = "NORMAL"
@@ -1299,21 +1301,24 @@ def laporan_barang():
             stok_menipis += 1
             print("⚠️ PERINGATAN: STOK BARANG MENIPIS!")
 
-        print("\n" + "-" * 35)
-        print(f"ID Barang   : {id_barang}")
-        print(f"Nama Barang : {barang['nama_barang']}")
-        print(f"Stok        : {stok}")
-        print(f"Expired     : {tanggal_str}")
-        print(f"Sisa hari   : {sisa_hari}")
-        print(f"Status      : {status}")
+        print(
+            f"{id_barang:<9} | "
+            f"{barang['nama_barang'][:22]:<22} | "
+            f"{stok:>5} | "
+            f"{tanggal_str:<12} | "
+            f"{sisa_hari:>5} | "
+            f"{status:<18}"
+        )
 
-    print("\n" + "=" * 35)
-    print("--- RINGKASAN LAPORAN ---")
-    print(f"Barang normal             : {normal}")
-    print(f"Barang mendekati expired  : {mendekati_expired}")
-    print(f"Barang sudah expired      : {sudah_expired}")
-    print(f"Barang dengan stok <= 5   : {stok_menipis}")
-    print("=" * 35)
+    print("=" * lebar)
+    print("RINGKASAN LAPORAN KONDISI BARANG".center(lebar))
+    print("-" * lebar)
+    print(f"{'Total Jenis Barang':<28} : {len(data_barang['barang'])} item")
+    print(f"{'Barang Kondisi Normal':<28} : {normal} item")
+    print(f"{'Barang Mendekati Expired':<28} : {mendekati_expired} item")
+    print(f"{'Barang Sudah Expired':<28} : {sudah_expired} item")
+    print(f"{'Barang Stok Menipis (<= 5)':<28} : {stok_menipis} item")
+    print("=" * lebar)
 
 def notifikasi_barang():
     print("\n" + "-" * 30)
@@ -1414,7 +1419,7 @@ def catat_barang_masuk(id_login):
         print("⚠️[ERROR] Belum ada data barang. Minta Admin menambahkan barang terlebih dahulu.")
         return
 
-    daftar_barang()
+    tampilkan_barang()
     id_barang = input_wajib("Masukkan kode barang (contoh BRG001): ").upper()
     if id_barang not in data_barang["barang"]:
         print("⚠️[ERROR] Kode barang tidak ditemukan.")
@@ -1459,7 +1464,7 @@ def catat_barang_keluar(id_login):
         print("⚠️[ERROR] Belum ada data barang.")
         return
 
-    daftar_barang()
+    tampilkan_barang()
     id_barang = input_wajib("Masukkan kode barang (contoh BRG001): ").upper()
     if id_barang not in data_barang["barang"]:
         print("⚠️[ERROR] Kode barang tidak ditemukan.")
@@ -1543,18 +1548,26 @@ def kartu_stok_barang():
                 riwayat.append((tanggal_iso, "TERJUAL", f"-{item['jumlah']}", transaksi["nomor"]))
 
     riwayat.sort(key=lambda data: data[0])
-    print(f"\n=== KARTU STOK: {id_barang} - {barang['nama_barang']} ===")
+    lebar = 68
+    print("\n" + "=" * lebar)
+    print(f"KARTU STOK: {id_barang} - {barang['nama_barang']}".center(lebar))
+    print("=" * lebar)
     print(f"Stok Saat Ini: {barang['stok']} | Status: {status_stok_barang(barang)}")
-    print("-" * 60)
+    print("-" * lebar)
     if not riwayat:
         print("Belum ada riwayat masuk, keluar, atau penjualan untuk barang ini.")
+        print("=" * lebar)
         return
+
+    print(f"{'TANGGAL':<12} | {'JENIS':<10} | {'JUMLAH':>8} | {'KETERANGAN':<29}")
+    print("-" * lebar)
     for tanggal_iso, jenis_aktivitas, jumlah_unit, keterangan_detail in riwayat:
         try:
             tanggal_tampil = datetime.strptime(tanggal_iso, "%Y-%m-%d").strftime("%d-%m-%Y")
         except ValueError:
             tanggal_tampil = tanggal_iso
-        print(f"{tanggal_tampil} | {jenis_aktivitas:<8} | {jumlah_unit:>6} | {keterangan_detail}")
+        print(f"{tanggal_tampil:<12} | {jenis_aktivitas:<10} | {jumlah_unit:>8} | {keterangan_detail[:29]:<29}")
+    print("=" * lebar)
 
 def analisis_spldv_harga_barang():
     print("\n=== ANALISIS HARGA BARANG (SPLDV) ===")
@@ -1614,7 +1627,7 @@ def hitung_laba_kotor_transaksi(transaksi):
 
         total_laba += laba_item
 
-        return total_laba
+    return total_laba
 
 def ambil_harga_pabrik(barang):
     return barang.get("harga_pabrik",barang.get("harga",0))
@@ -1759,7 +1772,7 @@ def transaksi_penjualan(kasir):
     print("\n=== TRANSAKSI PENJUALAN ===")
     print("Masukkan ID barang, ketik 'selesai' untuk bayar, 'batal' untuk membatalkan.")
     while True:
-        daftar_barang()
+        tampilkan_barang()
         tampil_keranjang(keranjang)
         id_barang = input("ID barang / selesai / batal: ").strip().upper()
 
@@ -1926,7 +1939,8 @@ def riwayat_transaksi_tanggal():
         return
 
     print(f"\n=== RIWAYAT TRANSAKSI {tanggal_cari} ===")
-    print("-" * 75)
+    lebar = 68
+    print("-" * lebar)
 
     total_penjualan = 0
 
@@ -1940,17 +1954,19 @@ def riwayat_transaksi_tanggal():
 
         total_penjualan += data_transaksi["total"]
 
-    print("-" * 75)
+    print("-" * lebar)
     print(f"Jumlah transaksi : {len(hasil)}")
     print(f"Total penjualan  : {rupiah(total_penjualan)}")
 
 
 def rekomendasi_barang_terlaris():
-    print("\n" + "=" * 65)
-    print("  REKOMENDASI BARANG TERLARIS  ")
-    print("=" * 65)
+    lebar = 70
+    print("\n" + "=" * lebar)
+    print(" REKOMENDASI BARANG TERLARIS".center(lebar))
+    print("=" * lebar)
+
     if not data_barang["transaksi"]:
-        print("[INFO] Belum ada transaksi penjualan.")
+        print("❗[INFO] Belum ada transaksi penjualan.")
         print("Belum tersedia data untuk rekomendasi barang.")
         return
 
@@ -2010,7 +2026,7 @@ def rekomendasi_barang_terlaris():
         f"{'TRANSAKSI':>12}"
     )
 
-    print("-" * 65)
+    print("-" * lebar)
 
    #sing ditampilan 5 barang teratas sing paling laris terbeli (ikin panggone ngurutke )
     for peringkat, (id_barang, barang) in enumerate(
@@ -2024,7 +2040,7 @@ def rekomendasi_barang_terlaris():
             f"{barang['jumlah_transaksi']:>12}"
         )
 
-    print("-" * 65)
+    print("-" * lebar)
 
     #iki sing digawe nampilke
     print("\n=== DETAIL REKOMENDASI BARANG ===")
@@ -2062,9 +2078,9 @@ def rekomendasi_barang_terlaris():
         else:
             print("REKOMENDASI        : PERLU RESTOCK")
 
-    print("\n" + "=" * 65)
+    print("\n" + "=" * lebar)
     print("Data rekomendasi berdasarkan seluruh riwayat transaksi.")
-    print("=" * 65)
+    print("=" * lebar)
 
 
 # ==========================================
@@ -2165,7 +2181,7 @@ def submenu_kelola_pengguna(id_login):
 def submenu_kelola_barang_admin():
     while True:
         print("\n=== KELOLA DATA BARANG ===")
-        print("1. Tampilkan & Urutkan Barang (Heap Sort)")
+        print("1. Tampilkan Data Barang")
         print("2. Tambah Barang")
         print("3. Edit Barang")
         print("4. Hapus Barang")
@@ -2175,8 +2191,7 @@ def submenu_kelola_barang_admin():
         if pilih == "0":
             break
         elif pilih == "1":
-            daftar_barang()
-            urut_barang_heap_sort()
+            tampilkan_barang()
         elif pilih == "2":
             tambah_barang()
         elif pilih == "3":
@@ -2191,19 +2206,16 @@ def submenu_kelola_barang_admin():
 def submenu_lihat_cari_barang():
     while True:
         print("\n=== LIHAT & CARI BARANG ===")
-        print("1. Daftar Semua Barang")
+        print("1. Tampilkan Data Barang")
         print("2. Cari Barang (Kode / Nama)")
-        print("3. Urutkan Barang A-Z (Heap Sort)")
         print("0. Kembali")
-        pilih = input("Pilih fitur (0-3): ").strip()
+        pilih = input("Pilih fitur (0-2): ").strip()
         if pilih == "0":
             break
         elif pilih == "1":
             tampilkan_barang()
         elif pilih == "2":
             cari_barang()
-        elif pilih == "3":
-            urut_barang_heap_sort()
         else:
             print("Pilihan tidak valid.")
 
@@ -2243,6 +2255,8 @@ def menu_admin(id_login):
         print("5. Laporan Penjualan & Gudang")
         print("6. Log Aktivitas")
         print("7. Ganti Password")
+        print("8. Menu Gudang")
+        print("9. Menu Kasir")
         print("0. Logout")
         pilih = input("Pilih fitur yang ingin digunakan (0-7): ").strip()
         if pilih == "1":
@@ -2260,8 +2274,15 @@ def menu_admin(id_login):
             lihat_log_aktivitas()
         elif pilih == "7":
             ganti_password_sendiri(id_login)
+        elif pilih == "8":
+            menu_gudang(id_login)
+        elif pilih == "9":
+            menu_kasir(id_login)
         elif pilih == "0":
             catat_log("admin", "Logout dari sistem", data_pengguna["pengguna"][id_login]["username"])
+            print("\n" + "=" * 64)
+            print("BERHASIL LOGOUT DARI AKUN".center(64))
+            print("=" * 64)
             break
         else:
             print("Pilihan tidak valid.")
@@ -2298,6 +2319,9 @@ def menu_gudang(id_login):
             ganti_password_sendiri(id_login)
         elif pilih == "0":
             catat_log("gudang", "Logout dari sistem", data_pengguna["pengguna"][id_login]["username"])
+            print("\n" + "=" * 64)
+            print("BERHASIL LOGOUT DARI AKUN".center(64))
+            print("=" * 64)
             break
         else:
             print("Pilihan tidak valid.")
@@ -2326,31 +2350,45 @@ def menu_kasir(id_login):
             ganti_password_sendiri(id_login)
         elif pilih == "0":
             catat_log("kasir", "Logout dari sistem", kasir[1]["username"])
+            print("\n" + "=" * 64)
+            print("=" * 64)
             break
         else:
             print("Pilihan tidak valid.")
 
 def main():
-    print("\n=== SELAMAT DATANG DI SMK MART ===")
+    lebar = 64
+    print("\n" + "=" * lebar)
+    print("SELAMAT DATANG DI APLIKASI KASIR & GUDANG SMK MART".center(lebar))
+    print("SMKN 1 BOYOLANGU - SISTEM MANAJEMEN RITEL TERPADU".center(lebar))
+    print("=" * lebar)
+
     global data_pengguna
     data_pengguna = muat_data()
 
     percobaan_gagal = 0
     while True:
-        print("\n=== LOGIN SMK MART ===")
-        username = input_wajib("Username (0 untuk keluar): ").strip().lower()
+        print("\n" + "=" * lebar)
+        print("LOGIN PENGGUNA SMK MART".center(lebar))
+        print("=" * lebar)
+        username = input_wajib("Username (ketik 0 untuk keluar): ").strip().lower()
         if username == "0":
-            print("Terima kasih. Program selesai.")
+            print("\n" + "=" * lebar)
+            print("TERIMA KASIH TELAH MENGGUNAKAN SMK MART".center(lebar))
+            print("Program selesai. Sampai jumpa kembali!".center(lebar))
+            print("=" * lebar)
             break
 
-        password = getpass.getpass("Masukkan password anda: ").strip()
+        password = getpass.getpass("Masukkan password anda          : ").strip()
 
         akun_nonaktif = any(
             pengguna["username"] == username
             for pengguna in data_pengguna.get("arsip_pengguna", {}).values()
         )
         if akun_nonaktif:
+            print("-" * lebar)
             print("⚠️ [DITOLAK] Akun Anda berstatus NONAKTIF. Hubungi Admin.")
+            print("-" * lebar)
             continue
 
         login = next(
@@ -2364,16 +2402,23 @@ def main():
 
         if not login:
             percobaan_gagal += 1
+            print("-" * lebar)
             print(f"⚠️ [ERROR] Username atau password salah ({percobaan_gagal}/3).")
             if percobaan_gagal >= 3:
                 print("⚠️ [DITOLAK] Salah 3 kali. Akses ditolak dan program berhenti.")
+                print("=" * lebar)
+                print("PROGRAM DIHENTIKAN DEMI KEAMANAN SISTEM".center(lebar))
+                print("=" * lebar)
                 break
+            print("-" * lebar)
             continue
 
         percobaan_gagal = 0
         id_login, pengguna = login
         catat_log(pengguna["role"], "Login ke sistem", pengguna["username"])
-        print(f"✅[SUKSES] Halo, {pengguna['nama']}! Login sebagai {pengguna['role']}.")
+        print("-" * lebar)
+        print(f"✅ [SUKSES] Halo, {pengguna['nama']}! Login sebagai {pengguna['role'].upper()}.")
+        print("-" * lebar)
 
         if pengguna["role"] == "admin":
             menu_admin(id_login)
@@ -2385,4 +2430,7 @@ def main():
 try:
     main()
 except (KeyboardInterrupt, EOFError):
-    print("\nProgram dihentikan.")
+    lebar = 64
+    print("\n" + "=" * lebar)
+    print("PROGRAM SMK MART DIHENTIKAN".center(lebar))
+    print("=" * lebar)
