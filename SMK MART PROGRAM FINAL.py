@@ -1032,129 +1032,130 @@ def cari_barang():
     
     print("-" * 50)
 
-def cek_expired():
-    hari_ini = datetime.now().date()
-    hasil_tabel = []
 
-    print(f"\n Tanggal hari ini  : {hari_ini}")
+def cek_dan_urutkan_expired():
+    lebar = 115
 
+    print("\n" + "=" * lebar)
+    print("LAPORAN CEK DAN URUTAN EXPIRED BARANG".center(lebar))
+    print("=" * lebar)
     if not data_barang["barang"]:
-        print("Belum ada data barang.")
+        print("[INFO] Belum ada data barang.")
+        print("=" * lebar)
         return
-
-        hasil_tabel = []
-
+    hari_ini = datetime.now().date()
+    daftar_expired = []
+    # 1. Mengambil data dan menghitung sisa hari expired
     for id_barang, barang in data_barang["barang"].items():
-        print("\n --- CEK EXPIRED BARANG ---")
-        harga = barang['harga']
-        tanggal_str = barang.get('expired', '31-12-2099')
-
+        tanggal_str = barang.get("expired", "31-12-2099")
         try:
-            tanggal_expired = datetime.strptime(tanggal_str, "%d-%m-%Y").date()
+            tanggal_expired = datetime.strptime(
+                tanggal_str, "%d-%m-%Y"
+            ).date()
         except ValueError:
-            print(f"Data tanggal untuk {barang['nama_barang']} error.")
+            print(
+                f"[PERINGATAN] Tanggal expired barang "
+                f"{barang['nama_barang']} tidak valid."
+            )
             continue
-
         sisa_hari = (tanggal_expired - hari_ini).days
-
+        # 2. Menentukan status barang
         if sisa_hari <= 0:
-            status = "⚠️EXPIRED"
+            status = "EXPIRED"
             diskon = 0
-            print("\n --- ⚠️PERINGATAN! BARANG TIDAK BOLEH DI JUAL SUDAH EXPIRED --- ")
         elif sisa_hari <= 5:
-            status = "⚠️BAHAYA"
-            diskon = 0.04
-            print("\n⚠️PERINGATAN! BARANG MENDEKATI TANGGAL EXPIRED!")
+            status = "MENDEKATI"
+            diskon = 4
+
         else:
             status = "NORMAL"
             diskon = 0
-
-        diskon_expired = harga * diskon
-        harga_akhir = harga - diskon_expired
-
-        hasil_tabel.append([
-            id_barang,
-            barang['nama_barang'],
-            tanggal_str,
-            status,
-            f"{diskon * 100:.0f}%",
-            f"Rp{harga:,.0f}",
-            f"Rp{harga_akhir:,.0f}"
-        ])
-
-    if hasil_tabel:
-        print("\n" + "=" * 120)
-        print("                 LAPORAN CEK EXPIRED BARANG")
-        print("=" * 120)
-
-        header = [
-            "ID BARANG", "NAMA BARANG", "TANGGAL EXPIRED",
-            "STATUS", "DISKON", "HARGA AWAL", "HARGA AKHIR"
-        ]
-
-        lebar = [12, 22, 18, 18, 10, 18, 18]
-
-        print(" | ".join(
-            f"{judul:<{ukuran}}"
-            for judul, ukuran in zip(header, lebar)
-        ))
-
-        print("-" * 130)
-
-        for baris in hasil_tabel:
-            print(" | ".join(
-                f"{str(nilai):<{ukuran}}"
-                for nilai, ukuran in zip(baris, lebar)
-            ))
-
-        print("=" * 130)
-
-
-def sorting_expired():
-    print("\n" + "-" * 30)
-    print("\n --- Heap Sort Barang Expired --- ")
-
-    if not data_barang["barang"]:
-        print("\n BELUM ADA DATA BARANG")
+        # 3. tempat penghitungan harga setelah diskon
+        harga = ambil_harga_jual(barang)
+        potongan = round(harga * diskon / 100)
+        harga_akhir = harga - potongan
+        # 4. hasile disempen nang list
+        daftar_expired.append({
+            "id": id_barang,
+            "nama": barang["nama_barang"],
+            "tanggal": tanggal_expired,
+            "sisa_hari": sisa_hari,
+            "status": status,
+            "diskon": diskon,
+            "harga_awal": harga,
+            "potongan": potongan,
+            "harga_akhir": harga_akhir
+        })
+    if not daftar_expired:
+        print("[INFO] Tidak ada tanggal expired yang valid.")
         return
-
-    barang_urut = list(data_barang["barang"].items())
-    n = len(barang_urut)
-
+    # 5. pengurutan barang e katek heapsrot 
+    n = len(daftar_expired)
     def heapify(arr, n, i):
         terbesar = i
         kiri = 2 * i + 1
         kanan = 2 * i + 2
-
-        def get_date(barang_item):
-            tgl_str = barang_item.get('expired', '31-12-2099')
-            try:
-                return datetime.strptime(tgl_str, "%d-%m-%Y").date()
-            except ValueError:
-                return datetime.strptime('31-12-2099', "%d-%m-%Y").date()
-
-        if kiri < n and get_date(arr[kiri][1]) > get_date(arr[terbesar][1]):
-             terbesar = kiri
-        if kanan < n and get_date(arr[kanan][1]) > get_date(arr[terbesar][1]):
-             terbesar = kanan
-
+        if kiri < n and arr[kiri]["tanggal"] > arr[terbesar]["tanggal"]:
+            terbesar = kiri
+        if kanan < n and arr[kanan]["tanggal"] > arr[terbesar]["tanggal"]:
+            terbesar = kanan
         if terbesar != i:
-             arr[i], arr[terbesar] = arr[terbesar], arr[i]
-             heapify(arr, n, terbesar)
-
+            arr[i], arr[terbesar] = arr[terbesar], arr[i]
+            heapify(arr, n, terbesar)
+    # Membentuk Max Heap
     for i in range(n // 2 - 1, -1, -1):
-        heapify(barang_urut, n, i)
+        heapify(daftar_expired, n, i)
+    # Proses Heap Sort
     for i in range(n - 1, 0, -1):
-        barang_urut[0], barang_urut[i] = barang_urut[i], barang_urut[0]
-        heapify(barang_urut, i, 0)
+        daftar_expired[0], daftar_expired[i] = (
+            daftar_expired[i], daftar_expired[0]
+        )
+        heapify(daftar_expired, i, 0)
+    # 6. Menampilkan hasil pengurutan
+    print("\nURUTAN BARANG DARI EXPIRED TERDEKAT")
+    print("=" * lebar)
 
-    for id_barang, barang in barang_urut:
-        print(
-        f"{id_barang:<8} | "
-        f"{barang['nama_barang'][:20]:<20} | "
-        f"{barang.get('expired', '31-12-2099'):<10}"
+    print(
+        f"{'ID BARANG':<11} | "
+        f"{'NAMA BARANG':<20} | "
+        f"{'TANGGAL EXPIRED':<17} | "
+        f"{'SISA HARI':<11} | "
+        f"{'STATUS':<12} | "
+        f"{'DISKON':<8} | "
+        f"{'HARGA AKHIR':>13}"
     )
 
+    print("-" * lebar)
+
+    for barang in daftar_expired:
+        print(
+            f"{barang['id']:<11} | "
+            f"{barang['nama'][:20]:<20} | "
+            f"{barang['tanggal'].strftime('%d-%m-%Y'):<17} | "
+            f"{barang['sisa_hari']:>11} | "
+            f"{barang['status']:<12} | "
+            f"{str(barang['diskon']) + '%':<8} | "
+            f"{rupiah(barang['harga_akhir']):>13}"
+        )
+    print("=" * lebar)
+    # 7. Ringkasane kondisi barang
+    total_expired = sum(
+        1 for b in daftar_expired if b["status"] == "EXPIRED"
+    )
+    total_mendekati = sum(
+        1 for b in daftar_expired if b["status"] == "MENDEKATI"
+    )
+    total_normal = sum(
+        1 for b in daftar_expired if b["status"] == "NORMAL"
+    )
+    print("\nRINGKASAN KONDISI BARANG")
+    print("-" * 40)
+    print(f"Total barang diperiksa : {len(daftar_expired)}")
+    print(f"Barang sudah expired   : {total_expired}")
+    print(f"Mendekati expired      : {total_mendekati}")
+    print(f"Barang normal          : {total_normal}")
+    print("=" * lebar)
+          
 def riwayat_stok():
     print("\n" + "-" * 30)
     print("\n ---- RIWAYAT STOK ---- ")
