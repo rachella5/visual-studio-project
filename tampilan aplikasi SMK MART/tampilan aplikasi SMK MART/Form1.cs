@@ -5,6 +5,8 @@ namespace tampilan_aplikasi_SMK_MART
         public loginForm()
         {
             InitializeComponent();
+            this.Load += (s, e) => PosisikanPanelLogin();
+            this.Resize += (s, e) => PosisikanPanelLogin();
         }
 
         private void loginform_Load(object sender, EventArgs e)
@@ -36,6 +38,25 @@ namespace tampilan_aplikasi_SMK_MART
         private void pictBlogin_Click_1(object sender, EventArgs e)
         {
 
+        }
+
+        private void passwordTXB_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void panel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void PosisikanPanelLogin()
+        {
+            int tengahKartuPutihX = (int)(this.ClientSize.Width * 0.779);
+            int posisiY = (int)(this.ClientSize.Height * 0.47);
+
+            panel1.Left = tengahKartuPutihX - (panel1.Width / 2);
+            panel1.Top = posisiY - (panel1.Height / 2);
         }
     }
 }

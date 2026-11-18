@@ -16,3 +16,4 @@ C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART
 C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART\tampilan aplikasi SMK MART\obj\Debug\net8.0-windows\tampilan aplikasi SMK MART.genruntimeconfig.cache
 C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART\tampilan aplikasi SMK MART\obj\Debug\net8.0-windows\ref\tampilan aplikasi SMK MART.dll
 C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART\tampilan aplikasi SMK MART\obj\Debug\net8.0-windows\tampilan.652CC88C.Up2Date
+C:\Users\rache\OneDrive\Dokumen\visual studio project\tampilan aplikasi SMK MART\tampilan aplikasi SMK MART\obj\Debug\net8.0-windows\tampilan aplikasi SMK MART.sourcelink.json

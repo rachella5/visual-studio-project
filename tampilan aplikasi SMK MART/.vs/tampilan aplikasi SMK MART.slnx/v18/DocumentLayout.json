@@ -21,8 +21,18 @@
           "SelectedChildIndex": 1,
           "Children": [
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Form1.cs",
+              "DocumentMoniker": "C:\\Users\\rache\\OneDrive\\Dokumen\\visual studio project\\tampilan aplikasi SMK MART\\tampilan aplikasi SMK MART\\Form1.cs",
+              "RelativeDocumentMoniker": "tampilan aplikasi SMK MART\\Form1.cs",
+              "ToolTip": "C:\\Users\\rache\\OneDrive\\Dokumen\\visual studio project\\tampilan aplikasi SMK MART\\tampilan aplikasi SMK MART\\Form1.cs",
+              "RelativeToolTip": "tampilan aplikasi SMK MART\\Form1.cs",
+              "ViewState": "AgIAACAAAAAAAAAAAAAkwDcAAAA9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-10-20T03:28:02.938Z",
+              "IsPinned": true,
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -33,20 +43,13 @@
               "ToolTip": "C:\\Users\\rache\\OneDrive\\Dokumen\\visual studio project\\tampilan aplikasi SMK MART\\tampilan aplikasi SMK MART\\Form1.cs [Design]",
               "RelativeToolTip": "tampilan aplikasi SMK MART\\Form1.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-20T00:40:26.9Z",
+              "WhenOpened": "2026-11-17T12:51:18.413Z",
+              "IsPinned": true,
               "EditorCaption": " [Design]"
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Form1.cs",
-              "DocumentMoniker": "C:\\Users\\rache\\OneDrive\\Dokumen\\visual studio project\\tampilan aplikasi SMK MART\\tampilan aplikasi SMK MART\\Form1.cs",
-              "RelativeDocumentMoniker": "tampilan aplikasi SMK MART\\Form1.cs",
-              "ToolTip": "C:\\Users\\rache\\OneDrive\\Dokumen\\visual studio project\\tampilan aplikasi SMK MART\\tampilan aplikasi SMK MART\\Form1.cs",
-              "RelativeToolTip": "tampilan aplikasi SMK MART\\Form1.cs",
-              "ViewState": "AgIAABIAAAAAAAAAAAAYwBoAAAAyAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-20T03:28:02.938Z"
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
             }
           ]
         }

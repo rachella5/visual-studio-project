@@ -31,108 +31,87 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(loginForm));
             passwordTXB = new TextBox();
             BTNlogin = new Button();
-            pictBlogin = new PictureBox();
-            Lblwelcomeback1 = new Label();
-            Lblwelcomeback2 = new Label();
             usernameTXB = new TextBox();
-            ((System.ComponentModel.ISupportInitialize)pictBlogin).BeginInit();
+            panel1 = new Panel();
+            panel1.SuspendLayout();
             SuspendLayout();
             // 
             // passwordTXB
             // 
-            passwordTXB.BackColor = Color.LightCyan;
-            passwordTXB.Location = new Point(271, 301);
+            passwordTXB.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            passwordTXB.BackColor = Color.White;
+            passwordTXB.Font = new Font("Segoe UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            passwordTXB.Location = new Point(45, 298);
+            passwordTXB.Multiline = true;
             passwordTXB.Name = "passwordTXB";
             passwordTXB.PasswordChar = '*';
             passwordTXB.PlaceholderText = "Password";
-            passwordTXB.Size = new Size(258, 27);
+            passwordTXB.Size = new Size(434, 50);
             passwordTXB.TabIndex = 2;
+            passwordTXB.TextChanged += passwordTXB_TextChanged;
             // 
             // BTNlogin
             // 
+            BTNlogin.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             BTNlogin.BackColor = Color.AliceBlue;
-            BTNlogin.Location = new Point(333, 361);
+            BTNlogin.Font = new Font("Segoe UI", 13.8F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            BTNlogin.Location = new Point(45, 427);
             BTNlogin.Name = "BTNlogin";
-            BTNlogin.Size = new Size(138, 36);
+            BTNlogin.Size = new Size(434, 50);
             BTNlogin.TabIndex = 2;
             BTNlogin.Text = "LOGIN";
             BTNlogin.UseVisualStyleBackColor = false;
             BTNlogin.Click += BTNlogin_Click;
             // 
-            // pictBlogin
-            // 
-            pictBlogin.BackColor = Color.Transparent;
-            pictBlogin.Image = (Image)resources.GetObject("pictBlogin.Image");
-            pictBlogin.Location = new Point(294, -8);
-            pictBlogin.Name = "pictBlogin";
-            pictBlogin.Size = new Size(218, 148);
-            pictBlogin.SizeMode = PictureBoxSizeMode.Zoom;
-            pictBlogin.TabIndex = 3;
-            pictBlogin.TabStop = false;
-            pictBlogin.Click += pictBlogin_Click_1;
-            // 
-            // Lblwelcomeback1
-            // 
-            Lblwelcomeback1.AutoSize = true;
-            Lblwelcomeback1.BackColor = Color.Transparent;
-            Lblwelcomeback1.Font = new Font("Times New Roman", 40.2F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            Lblwelcomeback1.ForeColor = Color.Navy;
-            Lblwelcomeback1.Location = new Point(168, 115);
-            Lblwelcomeback1.Name = "Lblwelcomeback1";
-            Lblwelcomeback1.Size = new Size(475, 76);
-            Lblwelcomeback1.TabIndex = 4;
-            Lblwelcomeback1.Text = "Welcome Back!";
-            // 
-            // Lblwelcomeback2
-            // 
-            Lblwelcomeback2.AutoSize = true;
-            Lblwelcomeback2.BackColor = Color.Transparent;
-            Lblwelcomeback2.Font = new Font("Times New Roman", 12F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            Lblwelcomeback2.ForeColor = Color.Navy;
-            Lblwelcomeback2.Location = new Point(201, 215);
-            Lblwelcomeback2.Name = "Lblwelcomeback2";
-            Lblwelcomeback2.Size = new Size(414, 23);
-            Lblwelcomeback2.TabIndex = 5;
-            Lblwelcomeback2.Text = "Silakan masukkan username dan password Anda";
-            // 
             // usernameTXB
             // 
-            usernameTXB.BackColor = Color.LightCyan;
-            usernameTXB.Location = new Point(271, 250);
+            usernameTXB.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            usernameTXB.BackColor = Color.White;
+            usernameTXB.Font = new Font("Segoe UI", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            usernameTXB.Location = new Point(45, 227);
+            usernameTXB.Multiline = true;
             usernameTXB.Name = "usernameTXB";
             usernameTXB.PlaceholderText = "Username";
-            usernameTXB.Size = new Size(258, 27);
+            usernameTXB.Size = new Size(434, 50);
             usernameTXB.TabIndex = 1;
             usernameTXB.TextChanged += usernameTXB_TextChanged;
             // 
+            // panel1
+            // 
+            panel1.Anchor = AnchorStyles.Right;
+            panel1.BackColor = Color.Transparent;
+            panel1.Controls.Add(BTNlogin);
+            panel1.Controls.Add(usernameTXB);
+            panel1.Controls.Add(passwordTXB);
+            panel1.Location = new Point(815, 159);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(521, 516);
+            panel1.TabIndex = 3;
+            panel1.Paint += panel1_Paint;
+            // 
             // loginForm
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
-            AutoScaleMode = AutoScaleMode.Font;
-            AutoSize = true;
+            AutoScaleMode = AutoScaleMode.None;
             BackgroundImage = (Image)resources.GetObject("$this.BackgroundImage");
             BackgroundImageLayout = ImageLayout.Stretch;
-            ClientSize = new Size(800, 450);
-            Controls.Add(Lblwelcomeback2);
-            Controls.Add(Lblwelcomeback1);
-            Controls.Add(pictBlogin);
-            Controls.Add(BTNlogin);
-            Controls.Add(passwordTXB);
-            Controls.Add(usernameTXB);
+            ClientSize = new Size(1348, 721);
+            Controls.Add(panel1);
+            DoubleBuffered = true;
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            MaximizeBox = false;
             Name = "loginForm";
             Text = "login";
+            WindowState = FormWindowState.Maximized;
             Load += loginform_Load;
-            ((System.ComponentModel.ISupportInitialize)pictBlogin).EndInit();
+            panel1.ResumeLayout(false);
+            panel1.PerformLayout();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
         private TextBox passwordTXB;
         private Button BTNlogin;
-        private PictureBox pictBlogin;
-        private Label Lblwelcomeback1;
-        private Label Lblwelcomeback2;
         private TextBox usernameTXB;
+        private Panel panel1;
     }
 }
