@@ -585,32 +585,42 @@ def cari_pengguna():
      print( "="  * lebar )  
 
 def tampilkan_data_terhapus():
-    print("\n" + "=" * 55)
-    print(" " + "=" * 12 + "--- DATA YANG TELAH DIHAPUS --- ")
+    lebar = 108
+    print( "=" *lebar)
+    print(--- DATA YANG TELAH DIHAPUS --- ".center(lebar))
+    print( "=" * lebar )   
+          
     for id_pengguna, pengguna in data_pengguna.get("arsip_pengguna", {}).items():
         print(
             f"ID: {id_pengguna:<8} | "
             f"Nama: {pengguna['nama'][:18]:<18} | "
             f"Role: {pengguna['role']:<7}"
         )
-
+        print( "=" * lebar )
     for id_barang, barang in data_barang.get("arsip_barang", {}).items():
+     
         print(
             f"ID: {id_barang:<8} | "
             f"Nama: {barang['nama_barang'][:20]:<20} | "
             f"Stok: {barang['stok']:>4} | "
             f"Harga: {rupiah(barang['harga']):>10}"
         )
-    print("\n" + "=" * 55)
+    print("=" * lebar)
 
 def hapus_transaksi():
-    print("\n=== HAPUS DATA TRANSAKSI ===")
+    lebar = 88
+    print ( "=" * lebar )
+    print("=== HAPUS DATA TRANSAKSI ===".center(lebar))
+    print ( "=" * lebar )
+
     if not data_barang["transaksi"]:
+        print ( "=" * lebar )
         print("[INFO] Belum ada riwayat transaksi yang tersimpan.")
+        print ( "=" * lebar )
         return
 
     riwayat_transaksi()
-    nomor = input_wajib("Masukkan Nomor Transaksi yang ingin dihapus (contoh: TRX000001): ").upper()
+    nomor = input_wajib("Masukkan Nomor Transaksi yang ingin dihapus(contoh: TRX000001): ").upper()
 
     transaksi_ditemukan = None
     for t in data_barang["transaksi"]:
@@ -621,12 +631,15 @@ def hapus_transaksi():
     if not transaksi_ditemukan:
         print(f"[ERROR] Transaksi dengan nomor '{nomor}' tidak ditemukan.")
         return
-
-    print(f"\n--- DETAIL TRANSAKSI ---")
+        
+    print( "=" * lebar ) 
+    print(f"--- DETAIL TRANSAKSI ---".center(lebar))
+    print ( "-" * lebar )
     print(f"No. Transaksi : {transaksi_ditemukan['nomor']}")
     print(f"Tanggal       : {transaksi_ditemukan['tanggal']}")
     print(f"Kasir         : {transaksi_ditemukan['kasir_nama']}")
     print(f"Total         : {rupiah(transaksi_ditemukan['total'])}")
+    print( "=" * lebar )
 
     kembalikan_stok = konfirmasi_default("Kembalikan stok pada transaksi ini ke gudang?")
     if konfirmasi_default(f"Yakin ingin menghapus transaksi {nomor}?"):
@@ -636,25 +649,39 @@ def hapus_transaksi():
                 jml = item["jumlah"]
                 if id_brg in data_barang["barang"]:
                     data_barang["barang"][id_brg]["stok"] += jml
+            print( "=" * lebar )        
             print("[INFO] Stok barang berhasil dikembalikan ke gudang.")
-
+            print( "=" * lebar ) 
+            
         data_barang["transaksi"].remove(transaksi_ditemukan)
 
-        if simpan_data():
-            print(f"[SUKSES] Transaksi {nomor} berhasil dihapus dari database.")
+        if simpan_data(): 
+            print(f"✅[SUKSES] Transaksi {nomor} berhasil dihapus dari database.")
         else:
-            print("[ERROR] Gagal menyimpan perubahan ke database.")
+            print("❌[ERROR] Gagal menyimpan perubahan ke database.")
     else:
         print("[INFO] Penghapusan transaksi dibatalkan.")
+    print( "=" * lebar ) 
 
 def riwayat_transaksi():
+<<<<<<< HEAD
     lebar = 68
     print("\n" + "=" * lebar)
     print("RIWAYAT TRANSAKSI".center(lebar))
     print("=" * lebar)
+=======
+    lebar = 66
+    print( "=" * lebar )
+    print("=== RIWAYAT TRANSAKSI ===".center(lebar))
+    print( "=" * lebar )
+
+>>>>>>> aa13074d6dd9fb11edb782ef7dc902d24a17b1be
     if not data_barang["transaksi"]:
-        print("Belum ada transaksi.")
+        print("😕Belum ada transaksi.")
         return
+        
+    print(f"{'NO. TRX':<10} | {'TANGGAL':<19} | {'KASIR':<16} | {'TOTAL':>12}")
+    print("-" * lebar)
 
     print(f"{'NO. TRX':<11} | {'TANGGAL':<19} | {'KASIR':<16} | {'TOTAL':>13}")
     print("=" * lebar)
@@ -665,25 +692,27 @@ def riwayat_transaksi():
             f"{data_transaksi['kasir_nama'][:16]:<16} | "
             f"{rupiah(data_transaksi['total']):>12}"
         )
+    print( "=" * lebar )
 
     print("=" * lebar)
 
 def laporan_penjualan_admin():
-    print("\n" + "=" * 60)
-    print("                 LAPORAN PENJUALAN")
-    print("=" * 60)
+    lebar = 66
+    print( "=" * lebar)
+    print("LAPORAN PENJUALAN".center(lebar))
+    
 
     if not data_barang["transaksi"]:
         print("[INFO] Belum ada transaksi penjualan.")
         return
-
+        
     hari_ini = datetime.now().date()
     awal_minggu = hari_ini.fromordinal(
         hari_ini.toordinal() - hari_ini.weekday()
     )
     awal_bulan = hari_ini.replace(day=1)
 
-    # Mengelompokkan transaksi berdasarkan tanggal
+    # Mengelompokkan transaksi berdasarkan tanggal   
     periode = {
         "PENJUALAN HARI INI": [],
         "PENJUALAN MINGGU INI": [],
@@ -723,10 +752,10 @@ def laporan_penjualan_admin():
                for transaksi in transaksi_lengkap
         )
 
-        print("\n" + "-" * 60)
-        print(f" {judul}")
-        print("-" * 60)
-
+        print("=" * lebar)
+        print(f" {judul}".center(lebar))
+        print( "-" * lebar )
+    
         if not daftar_transaksi:
             print("Belum ada transaksi pada periode ini.")
         else:
@@ -738,7 +767,7 @@ def laporan_penjualan_admin():
                     f"{rupiah(transaksi['total'])}"
                 )
 
-        print("-" * 60)
+        print("=" * lebar)
         print(f"Jumlah transaksi : {len(daftar_transaksi)}")
         print(f"Total penjualan  : {rupiah(total_penjualan)}")
         print(f"Laba kotor       : {rupiah(total_laba_kotor)}")
@@ -747,15 +776,19 @@ def laporan_penjualan_admin():
                "[PERINGATAN] Sebagian transaksi lama "
                "belum memiliki data modal."
                 )
-    print("\n" + "=" * 60)
-    print("             LAPORAN SELESAI")
-    print("=" * 60)
-
+    print("=" * lebar)        
+    print("LAPORAN SELESAI".center(lebar))
+    print("=" * lebar)
 
 def kelola_status_barang():
+    lebar = 66
     while True:
+<<<<<<< HEAD
         lebar = 68
         print("\n" + "=" * lebar)
+=======
+        print("=" * lebar)
+>>>>>>> aa13074d6dd9fb11edb782ef7dc902d24a17b1be
         print("KELOLA STATUS BARANG".center(lebar))
         print("=" * lebar)
 
@@ -764,18 +797,31 @@ def kelola_status_barang():
 
         if not barang_aktif and not barang_arsip:
             print("❗[INFO] Belum ada data barang yang tersimpan.")
+            print("=" * lebar)
             return
 
+<<<<<<< HEAD
         print("--- [ BARANG DI ETALASE / GUDANG ] ---")
         if not barang_aktif:
             print("(Kosong)")
         else:
             print(f"{'ID':<9} | {'NAMA BARANG':<22} | {'STOK':>6} | {'STATUS':<10}")
             print("-" * 56)
+=======
+        # --- TABEL 1: BARANG DI ETALASE / GUDANG ---
+        print("--- [ BARANG DI ETALASE / GUDANG ] ---".center(lebar))
+        print("-" * lebar)
+        if not barang_aktif:
+            print("(Tidak ada barang di etalase/gudang)".center(lebar))
+        else:
+            print(f"{'ID':<9} | {'NAMA BARANG':<25} | {'STOK':>6} | {'STATUS':<12}")
+            print("-" * lebar)
+>>>>>>> aa13074d6dd9fb11edb782ef7dc902d24a17b1be
             for id_barang, barang in barang_aktif.items():
                 status = barang.get("status", "Aktif")
                 print(
                     f"{id_barang:<9} | "
+<<<<<<< HEAD
                     f"{barang['nama_barang'][:22]:<22} | "
                     f"{barang['stok']:>6} | "
                     f"{status:<10}"
@@ -787,86 +833,130 @@ def kelola_status_barang():
         else:
             print(f"{'ID':<9} | {'NAMA BARANG':<22} | {'STOK':>6} | {'STATUS':<10}")
             print("-" * 56)
+=======
+                    f"{barang['nama_barang'][:25]:<25} | "
+                    f"{barang['stok']:>6} | "
+                    f"{status:<12}"
+                )
+        print("=" * lebar)
+
+        # --- TABEL 2: BARANG NONAKTIF / RUSAK ---
+        print("--- [ BARANG NONAKTIF / RUSAK ] ---".center(lebar))
+        print("-" * lebar)
+        if not barang_arsip:
+            print("(Tidak ada barang di arsip)".center(lebar))
+        else:
+            print(f"{'ID':<9} | {'NAMA BARANG':<25} | {'STOK':>6} | {'STATUS':<12}")
+            print("-" * lebar)
+>>>>>>> aa13074d6dd9fb11edb782ef7dc902d24a17b1be
             for id_barang, barang in barang_arsip.items():
                 status = barang.get("status", "Nonaktif")
                 print(
                     f"{id_barang:<9} | "
+<<<<<<< HEAD
                     f"{barang['nama_barang'][:22]:<22} | "
                     f"{barang['stok']:>6} | "
                     f"{status:<10}"
                 )
+=======
+                    f"{barang['nama_barang'][:25]:<25} | "
+                    f"{barang['stok']:>6} | "
+                    f"{status:<12}"
+                )
+        print("=" * lebar)
+>>>>>>> aa13074d6dd9fb11edb782ef7dc902d24a17b1be
 
-        print("\nPilih opsi:")
+        print("MENU STATUS BARANG".center(lebar))
+        print("-" * lebar)
         print("1. Ubah status barang (Aktif/Nonaktif/Rusak)")
         print("2. Aktifkan kembali barang dari arsip")
         print("0. Kembali ke menu admin")
+        print("=" * lebar)
 
         pilihan = input("Masukkan pilihan (0-2): ").strip()
         if pilihan == "0":
             break
 
         elif pilihan == "1":
-            id_barang = input("Masukkan ID barang yang ingin diubah statusnya: ").upper()
+            id_barang = input("Masukkan ID barang yang ingin diubah statusnya: ").strip().upper()
             if id_barang not in barang_aktif:
                 print("⚠️ [ERROR] ID barang tidak ditemukan di etalase/gudang.")
                 continue
 
+            print("-" * lebar)
             print("Pilih status baru:")
             print("1. Aktif (layak jual)")
             print("2. Rusak (tidak layak jual)")
             print("3. Nonaktif (pindahkan ke arsip / off)")
             print("0. Batal")
+            print("-" * lebar)
             pilihan_status = input("Masukkan pilihan status (0-3): ").strip()
 
             if pilihan_status == "0":
                 print("❗[INFO] Perubahan status dibatalkan.")
                 continue
 
-            if  pilihan_status == "1":
+            if pilihan_status == "1":
+                status_lama = barang_aktif[id_barang].get("status", "Aktif")
                 barang_aktif[id_barang]["status"] = "Aktif"
                 if simpan_data():
-                    print(f"[SUKSES] Status barang '{barang_aktif[id_barang]['nama_barang']}' diubah menjadi Aktif.")
-                    catat_log(f"admin", f"Mengubah status barang {barang_aktif[id_barang]['nama_barang']} ({id_barang}) menjadi Aktif")
+                    print(f"✅ [SUKSES] Status '{barang_aktif[id_barang]['nama_barang']}' diubah menjadi Aktif.")
+                    catat_log("admin", f"Mengubah status barang {barang_aktif[id_barang]['nama_barang']} ({id_barang}) menjadi Aktif")
+                else:
+                    barang_aktif[id_barang]["status"] = status_lama
+                    print("⚠️ [ERROR] Gagal menyimpan perubahan ke database.")
 
             elif pilihan_status == "2":
+                status_lama = barang_aktif[id_barang].get("status", "Aktif")
                 barang_aktif[id_barang]["status"] = "Rusak"
                 if simpan_data():
-                    print(f"[SUKSES] Status barang '{barang_aktif[id_barang]['nama_barang']}' diubah menjadi Rusak.")
-                    catat_log(f"admin", f"Mengubah status barang {barang_aktif[id_barang]['nama_barang']} ({id_barang}) menjadi Rusak")
+                    print(f"✅ [SUKSES] Status '{barang_aktif[id_barang]['nama_barang']}' diubah menjadi Rusak.")
+                    catat_log("admin", f"Mengubah status barang {barang_aktif[id_barang]['nama_barang']} ({id_barang}) menjadi Rusak")
+                else:
+                    barang_aktif[id_barang]["status"] = status_lama
+                    print("⚠️ [ERROR] Gagal menyimpan perubahan ke database.")
 
             elif pilihan_status == "3":
+                status_lama = barang_aktif[id_barang].get("status", "Aktif")
                 barang_dihapus = barang_aktif.pop(id_barang)
                 barang_dihapus["status"] = "Nonaktif"
                 data_barang.setdefault("arsip_barang", {})[id_barang] = barang_dihapus
                 if simpan_data():
-                    print(f"[SUKSES] Barang '{barang_dihapus['nama_barang']}' dipindahkan ke arsip (Nonaktif).")
-                    catat_log(f"admin", f"Memindahkan barang {barang_dihapus['nama_barang']} ({id_barang}) ke arsip (Nonaktif)")
+                    print(f"✅ [SUKSES] Barang '{barang_dihapus['nama_barang']}' dipindahkan ke arsip (Nonaktif).")
+                    catat_log("admin", f"Memindahkan barang {barang_dihapus['nama_barang']} ({id_barang}) ke arsip (Nonaktif)")
+                else:
+                    # Rollback jika gagal simpan
+                    barang_dihapus["status"] = status_lama
+                    barang_aktif[id_barang] = data_barang["arsip_barang"].pop(id_barang)
+                    print("⚠️ [ERROR] Gagal menyimpan perubahan ke database.")
 
-            elif pilihan_status not in ("1", "2", "3"):
-                print("⚠️[ERROR] Pilihan status tidak valid.")
-
+            else:
+                print("⚠️ [ERROR] Pilihan status tidak valid.")
 
         elif pilihan == "2":
-            id_barang = input("Masukkan ID barang yang ingin diaktifkan kembali dari arsip: ").upper()
+            id_barang = input("Masukkan ID barang yang ingin diaktifkan kembali dari arsip: ").strip().upper()
             if id_barang not in barang_arsip:
-                print("⚠️[ERROR] ID barang tidak ditemukan di arsip.")
+                print("⚠️ [ERROR] ID barang tidak ditemukan di arsip.")
                 continue
 
+            status_lama = barang_arsip[id_barang].get("status", "Nonaktif")
             barang_aktif[id_barang] = barang_arsip.pop(id_barang)
             barang_aktif[id_barang]["status"] = "Aktif"
             if simpan_data():
-                print(f"[SUKSES] Barang '{barang_aktif[id_barang]['nama_barang']}' diaktifkan kembali dari arsip.")
-                catat_log(f"admin", f"Mengaktifkan kembali barang {barang_aktif[id_barang]['nama_barang']} ({id_barang}) dari arsip")
-
+                print(f"✅ [SUKSES] Barang '{barang_aktif[id_barang]['nama_barang']}' diaktifkan kembali dari arsip.")
+                catat_log("admin", f"Mengaktifkan kembali barang {barang_aktif[id_barang]['nama_barang']} ({id_barang}) dari arsip")
             else:
-                print("⚠️[ERROR] Gagal menyimpan perubahan ke database.")
-
-
-
+                # Rollback jika gagal simpan
+                barang_aktif[id_barang]["status"] = status_lama
+                barang_arsip[id_barang] = barang_aktif.pop(id_barang)
+                print("⚠️ [ERROR] Gagal menyimpan perubahan ke database.")
+        else:
+            print("⚠️ [ERROR] Pilihan menu tidak valid (pilih 0-2).")
 
 # ==========================================
 # FITUR GUDANG
 # ==========================================
+<<<<<<< HEAD
 def tampilkan_barang():
     lebar = 96
     print("\n" + "=" * lebar)
@@ -920,9 +1010,42 @@ def tampilkan_barang():
     print("=" * lebar)
     print(f"Total Barang: {jumlah_data} Item")
     print("=" * lebar)
+=======
+def daftar_barang():
+   lebar = 108
+   print ("=" * lebar)
+   print("=== DATA BARANG ===".center(lebar))
+   print ("=" * lebar)
+   if not data_barang["barang"]:
+       print("Belum ada barang.")
+       print ("=" * lebar) 
+       return
+       
+   print(
+    f"{'ID':<9} | {'NAMA BARANG':<25} | {'STOK':<6} | "
+    f"{'HARGA PABRIK':<16} | {'HARGA JUAL':<16} | {'LABA':<16} | "
+     )
+   print("-" * lebar)
+   for id_barang, barang in data_barang["barang"].items():
+        pabrik = ambil_harga_pabrik(barang)
+        jual = ambil_harga_jual(barang)
+        laba = hitung_laba(pabrik, jual)
+        print(
+            f"{id_barang:<9} | "
+            f"{barang['nama_barang'][:19]:<25} | "
+            f"{barang['stok']:<6} | "
+            f"{rupiah(pabrik):<16} | "
+            f"{rupiah(jual):<16} | "
+            f"{rupiah(laba):<16} | "
+            )
+        print("=" * lebar)
+>>>>>>> aa13074d6dd9fb11edb782ef7dc902d24a17b1be
 
 def tambah_barang():
-    print("\n=== TAMBAH BARANG ===")
+    lebar = 77
+    print("=" * lebar)
+    print("=== TAMBAH BARANG ===".center(lebar))
+    print("=" * lebar)
 
     while True:
         angka_acak = random.randint(1000, 9999)
@@ -933,23 +1056,21 @@ def tambah_barang():
         ):
             break
 
-    print(f"❗[INFO] ID Barang berhasil dibuat otomatis: {id_barang}")
+    print(f"❗[INFO] ID Barang otomatis: {id_barang}")
+    print("-" * lebar)
 
-    nama = input_wajib("Nama barang: ")
-    stok = input_angka("Stok awal: ")
-    harga_pabrik = input_angka("Harga dari pabrik (Rp): ", 1)
-    harga_jual = input_angka("Harga jual (Rp): ", 1)
+    nama = input_wajib("Nama barang                 : ").strip()
+    stok = input_angka("Stok awal                   : ")
+    harga_pabrik = input_angka("Harga dari pabrik (Rp)      : ", 1)
+    harga_jual = input_angka("Harga jual (Rp)             : ", 1)
 
     while True:
-        tanggal_str = input_wajib(
-            "Tanggal expired (DD-MM-YYYY): "
-        )
-
+        tanggal_str = input_wajib("Tanggal expired (DD-MM-YYYY): ").strip()
         try:
             datetime.strptime(tanggal_str, "%d-%m-%Y")
             break
         except ValueError:
-            print("⚠️[ERROR] Format tanggal tidak valid.")
+            print("⚠️ [ERROR] Format tanggal tidak valid (contoh: 25-12-2026).")
 
     laba = hitung_laba(harga_pabrik, harga_jual)
 
@@ -965,15 +1086,17 @@ def tambah_barang():
     }
 
     if simpan_data():
-        print("\n[BERHASIL] Barang berhasil ditambahkan.")
-        print("-" * 55)
-        print("Harga pabrik :", rupiah(harga_pabrik))
-        print("Harga jual   :", rupiah(harga_jual))
-        print("Laba per unit:", rupiah(laba))
-        print("-" * 55)
+        print("=" * lebar)
+        print(f"✅ [BERHASIL] '{nama}' ({id_barang}) ditambahkan.")
+        print("-" * lebar)
+        print(f"Harga pabrik  : {rupiah(harga_pabrik)}")
+        print(f"Harga jual    : {rupiah(harga_jual)}")
+        print(f"Laba per unit : {rupiah(laba)}")
+        print("=" * lebar)
     else:
         del data_barang["barang"][id_barang]
-
+        print("⚠️ [ERROR] Gagal menyimpan data barang ke database.")
+        print("=" * lebar)
 
 def edit_barang():
     tampilkan_barang()
@@ -1110,129 +1233,130 @@ def cari_barang():
     
     print("-" * 50)
 
-def cek_expired():
-    hari_ini = datetime.now().date()
-    hasil_tabel = []
 
-    print(f"\n Tanggal hari ini  : {hari_ini}")
+def cek_dan_urutkan_expired():
+    lebar = 115
 
+    print("\n" + "=" * lebar)
+    print("LAPORAN CEK DAN URUTAN EXPIRED BARANG".center(lebar))
+    print("=" * lebar)
     if not data_barang["barang"]:
-        print("Belum ada data barang.")
+        print("[INFO] Belum ada data barang.")
+        print("=" * lebar)
         return
-
-        hasil_tabel = []
-
+    hari_ini = datetime.now().date()
+    daftar_expired = []
+    # 1. Mengambil data dan menghitung sisa hari expired
     for id_barang, barang in data_barang["barang"].items():
-        print("\n --- CEK EXPIRED BARANG ---")
-        harga = barang['harga']
-        tanggal_str = barang.get('expired', '31-12-2099')
-
+        tanggal_str = barang.get("expired", "31-12-2099")
         try:
-            tanggal_expired = datetime.strptime(tanggal_str, "%d-%m-%Y").date()
+            tanggal_expired = datetime.strptime(
+                tanggal_str, "%d-%m-%Y"
+            ).date()
         except ValueError:
-            print(f"Data tanggal untuk {barang['nama_barang']} error.")
+            print(
+                f"[PERINGATAN] Tanggal expired barang "
+                f"{barang['nama_barang']} tidak valid."
+            )
             continue
-
         sisa_hari = (tanggal_expired - hari_ini).days
-
+        # 2. Menentukan status barang
         if sisa_hari <= 0:
-            status = "⚠️EXPIRED"
+            status = "EXPIRED"
             diskon = 0
-            print("\n --- ⚠️PERINGATAN! BARANG TIDAK BOLEH DI JUAL SUDAH EXPIRED --- ")
         elif sisa_hari <= 5:
-            status = "⚠️BAHAYA"
-            diskon = 0.04
-            print("\n⚠️PERINGATAN! BARANG MENDEKATI TANGGAL EXPIRED!")
+            status = "MENDEKATI"
+            diskon = 4
+
         else:
             status = "NORMAL"
             diskon = 0
-
-        diskon_expired = harga * diskon
-        harga_akhir = harga - diskon_expired
-
-        hasil_tabel.append([
-            id_barang,
-            barang['nama_barang'],
-            tanggal_str,
-            status,
-            f"{diskon * 100:.0f}%",
-            f"Rp{harga:,.0f}",
-            f"Rp{harga_akhir:,.0f}"
-        ])
-
-    if hasil_tabel:
-        print("\n" + "=" * 120)
-        print("                 LAPORAN CEK EXPIRED BARANG")
-        print("=" * 120)
-
-        header = [
-            "ID BARANG", "NAMA BARANG", "TANGGAL EXPIRED",
-            "STATUS", "DISKON", "HARGA AWAL", "HARGA AKHIR"
-        ]
-
-        lebar = [12, 22, 18, 18, 10, 18, 18]
-
-        print(" | ".join(
-            f"{judul:<{ukuran}}"
-            for judul, ukuran in zip(header, lebar)
-        ))
-
-        print("-" * 130)
-
-        for baris in hasil_tabel:
-            print(" | ".join(
-                f"{str(nilai):<{ukuran}}"
-                for nilai, ukuran in zip(baris, lebar)
-            ))
-
-        print("=" * 130)
-
-
-def sorting_expired():
-    print("\n" + "-" * 30)
-    print("\n --- Heap Sort Barang Expired --- ")
-
-    if not data_barang["barang"]:
-        print("\n BELUM ADA DATA BARANG")
+        # 3. tempat penghitungan harga setelah diskon
+        harga = ambil_harga_jual(barang)
+        potongan = round(harga * diskon / 100)
+        harga_akhir = harga - potongan
+        # 4. hasile disempen nang list
+        daftar_expired.append({
+            "id": id_barang,
+            "nama": barang["nama_barang"],
+            "tanggal": tanggal_expired,
+            "sisa_hari": sisa_hari,
+            "status": status,
+            "diskon": diskon,
+            "harga_awal": harga,
+            "potongan": potongan,
+            "harga_akhir": harga_akhir
+        })
+    if not daftar_expired:
+        print("[INFO] Tidak ada tanggal expired yang valid.")
         return
-
-    barang_urut = list(data_barang["barang"].items())
-    n = len(barang_urut)
-
+    # 5. pengurutan barang e katek heapsrot 
+    n = len(daftar_expired)
     def heapify(arr, n, i):
         terbesar = i
         kiri = 2 * i + 1
         kanan = 2 * i + 2
-
-        def get_date(barang_item):
-            tgl_str = barang_item.get('expired', '31-12-2099')
-            try:
-                return datetime.strptime(tgl_str, "%d-%m-%Y").date()
-            except ValueError:
-                return datetime.strptime('31-12-2099', "%d-%m-%Y").date()
-
-        if kiri < n and get_date(arr[kiri][1]) > get_date(arr[terbesar][1]):
-             terbesar = kiri
-        if kanan < n and get_date(arr[kanan][1]) > get_date(arr[terbesar][1]):
-             terbesar = kanan
-
+        if kiri < n and arr[kiri]["tanggal"] > arr[terbesar]["tanggal"]:
+            terbesar = kiri
+        if kanan < n and arr[kanan]["tanggal"] > arr[terbesar]["tanggal"]:
+            terbesar = kanan
         if terbesar != i:
-             arr[i], arr[terbesar] = arr[terbesar], arr[i]
-             heapify(arr, n, terbesar)
-
+            arr[i], arr[terbesar] = arr[terbesar], arr[i]
+            heapify(arr, n, terbesar)
+    # Membentuk Max Heap
     for i in range(n // 2 - 1, -1, -1):
-        heapify(barang_urut, n, i)
+        heapify(daftar_expired, n, i)
+    # Proses Heap Sort
     for i in range(n - 1, 0, -1):
-        barang_urut[0], barang_urut[i] = barang_urut[i], barang_urut[0]
-        heapify(barang_urut, i, 0)
+        daftar_expired[0], daftar_expired[i] = (
+            daftar_expired[i], daftar_expired[0]
+        )
+        heapify(daftar_expired, i, 0)
+    # 6. Menampilkan hasil pengurutan
+    print("\nURUTAN BARANG DARI EXPIRED TERDEKAT")
+    print("=" * lebar)
 
-    for id_barang, barang in barang_urut:
-        print(
-        f"{id_barang:<8} | "
-        f"{barang['nama_barang'][:20]:<20} | "
-        f"{barang.get('expired', '31-12-2099'):<10}"
+    print(
+        f"{'ID BARANG':<11} | "
+        f"{'NAMA BARANG':<20} | "
+        f"{'TANGGAL EXPIRED':<17} | "
+        f"{'SISA HARI':<11} | "
+        f"{'STATUS':<12} | "
+        f"{'DISKON':<8} | "
+        f"{'HARGA AKHIR':>13}"
     )
 
+    print("-" * lebar)
+
+    for barang in daftar_expired:
+        print(
+            f"{barang['id']:<11} | "
+            f"{barang['nama'][:20]:<20} | "
+            f"{barang['tanggal'].strftime('%d-%m-%Y'):<17} | "
+            f"{barang['sisa_hari']:>11} | "
+            f"{barang['status']:<12} | "
+            f"{str(barang['diskon']) + '%':<8} | "
+            f"{rupiah(barang['harga_akhir']):>13}"
+        )
+    print("=" * lebar)
+    # 7. Ringkasane kondisi barang
+    total_expired = sum(
+        1 for b in daftar_expired if b["status"] == "EXPIRED"
+    )
+    total_mendekati = sum(
+        1 for b in daftar_expired if b["status"] == "MENDEKATI"
+    )
+    total_normal = sum(
+        1 for b in daftar_expired if b["status"] == "NORMAL"
+    )
+    print("\nRINGKASAN KONDISI BARANG")
+    print("-" * 40)
+    print(f"Total barang diperiksa : {len(daftar_expired)}")
+    print(f"Barang sudah expired   : {total_expired}")
+    print(f"Mendekati expired      : {total_mendekati}")
+    print(f"Barang normal          : {total_normal}")
+    print("=" * lebar)
+          
 def riwayat_stok():
     lebar = 88
     print("\n" + "=" * lebar)
@@ -2291,6 +2415,7 @@ def menu_gudang(id_login):
     peringatan_stok_otomatis()
     while True:
         print("\n=== MENU GUDANG ===")
+<<<<<<< HEAD
         print("1. Lihat & Cari Barang")
         print("2. Catat Barang Masuk")
         print("3. Catat Barang Keluar")
@@ -2325,6 +2450,25 @@ def menu_gudang(id_login):
             break
         else:
             print("Pilihan tidak valid.")
+=======
+        print("1. Tambah barang\n2. Edit barang\n3. Hapus barang\n4. Tampilkan barang\n5. Urutkan barang (Heap Sort)")
+        print("6. Cari barang\n7. Update stok barang\n8. Cek expired barang\n9. Laporan kondisi barang \n10. Notifikasi barang\n11. Riwayat perubahan stok\n12. Harga satuan barang\n13. logout")
+        pilih = input("Pilih fitur yang ingin digunakan (1-14): ").strip()
+        if pilih == "1": tambah_barang()
+        elif pilih == "2": edit_barang()
+        elif pilih == "3": hapus_barang()
+        elif pilih == "4": tampilkan_barang()
+        elif pilih == "5": urut_barang_heap_sort()
+        elif pilih == "6": cari_barang()
+        elif pilih == "7": update_stok()
+        elif pilih == "8": cek_dan_urutkan_expired()
+        elif pilih == "9": laporan_barang()
+        elif pilih == "10":notifikasi_barang()
+        elif pilih == "11": riwayat_stok()
+        elif pilih == "12": analisis_spldv_harga_barang()
+        elif pilih == "13": break
+        else: print("Pilihan tidak valid.")
+>>>>>>> aa13074d6dd9fb11edb782ef7dc902d24a17b1be
 
 def menu_kasir(id_login):
     while True:
