@@ -1907,7 +1907,7 @@ def menu_gudang():
     while True:
         print("\n=== MENU GUDANG ===")
         print("1. Tambah barang\n2. Edit barang\n3. Hapus barang\n4. Tampilkan barang\n5. Urutkan barang (Heap Sort)")
-        print("6. Cari barang\n7. Update stok barang\n8. cek expired barang\n9. sorting barang expired\n10. Laporan kondisi barang\n11. Notifikasi barang\n12. Riwayat perubahan stok\n13. Harga satuan barang\n14. logout")
+        print("6. Cari barang\n7. Update stok barang\n8. Cek expired barang\n9. Laporan kondisi barang \n10. Notifikasi barang\n11. Riwayat perubahan stok\n12. Harga satuan barang\n13. logout")
         pilih = input("Pilih fitur yang ingin digunakan (1-14): ").strip()
         if pilih == "1": tambah_barang()
         elif pilih == "2": edit_barang()
@@ -1916,13 +1916,12 @@ def menu_gudang():
         elif pilih == "5": urut_barang_heap_sort()
         elif pilih == "6": cari_barang()
         elif pilih == "7": update_stok()
-        elif pilih == "8": cek_expired()
-        elif pilih == "9": sorting_expired()
-        elif pilih == "10": laporan_barang()
-        elif pilih == "11": notifikasi_barang()
-        elif pilih == "12": riwayat_stok()
-        elif pilih == "13": analisis_spldv_harga_barang()
-        elif pilih == "14": break
+        elif pilih == "8": cek_dan_urutkan_expired()
+        elif pilih == "9": laporan_barang()
+        elif pilih == "10":notifikasi_barang()
+        elif pilih == "11": riwayat_stok()
+        elif pilih == "12": analisis_spldv_harga_barang()
+        elif pilih == "13": break
         else: print("Pilihan tidak valid.")
 
 def menu_kasir(id_login):
