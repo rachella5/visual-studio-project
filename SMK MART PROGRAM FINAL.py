@@ -438,32 +438,42 @@ def cari_pengguna():
      print( "="  * lebar )  
 
 def tampilkan_data_terhapus():
-    print("\n" + "=" * 55)
-    print(" " + "=" * 12 + "--- DATA YANG TELAH DIHAPUS --- ")
+    lebar = 108
+    print( "=" *lebar)
+    print(--- DATA YANG TELAH DIHAPUS --- ".center(lebar))
+    print( "=" * lebar )   
+          
     for id_pengguna, pengguna in data_pengguna.get("arsip_pengguna", {}).items():
         print(
             f"ID: {id_pengguna:<8} | "
             f"Nama: {pengguna['nama'][:18]:<18} | "
             f"Role: {pengguna['role']:<7}"
         )
-
+        print( "=" * lebar )
     for id_barang, barang in data_barang.get("arsip_barang", {}).items():
+     
         print(
             f"ID: {id_barang:<8} | "
             f"Nama: {barang['nama_barang'][:20]:<20} | "
             f"Stok: {barang['stok']:>4} | "
             f"Harga: {rupiah(barang['harga']):>10}"
         )
-    print("\n" + "=" * 55)
+    print("=" * lebar)
 
 def hapus_transaksi():
-    print("\n=== HAPUS DATA TRANSAKSI ===")
+    lebar = 88
+    print ( "=" * lebar )
+    print("=== HAPUS DATA TRANSAKSI ===".center(lebar))
+    print ( "=" * lebar )
+
     if not data_barang["transaksi"]:
+        print ( "=" * lebar )
         print("[INFO] Belum ada riwayat transaksi yang tersimpan.")
+        print ( "=" * lebar )
         return
 
     riwayat_transaksi()
-    nomor = input_wajib("Masukkan Nomor Transaksi yang ingin dihapus (contoh: TRX000001): ").upper()
+    nomor = input_wajib("Masukkan Nomor Transaksi yang ingin dihapus(contoh: TRX000001): ").upper()
 
     transaksi_ditemukan = None
     for t in data_barang["transaksi"]:
@@ -474,12 +484,15 @@ def hapus_transaksi():
     if not transaksi_ditemukan:
         print(f"[ERROR] Transaksi dengan nomor '{nomor}' tidak ditemukan.")
         return
-
-    print(f"\n--- DETAIL TRANSAKSI ---")
+        
+    print( "=" * lebar ) 
+    print(f"--- DETAIL TRANSAKSI ---".center(lebar))
+    print ( "-" * lebar )
     print(f"No. Transaksi : {transaksi_ditemukan['nomor']}")
     print(f"Tanggal       : {transaksi_ditemukan['tanggal']}")
     print(f"Kasir         : {transaksi_ditemukan['kasir_nama']}")
     print(f"Total         : {rupiah(transaksi_ditemukan['total'])}")
+    print( "=" * lebar )
 
     kembalikan_stok = konfirmasi_default("Kembalikan stok pada transaksi ini ke gudang?")
     if konfirmasi_default(f"Yakin ingin menghapus transaksi {nomor}?"):
@@ -489,22 +502,32 @@ def hapus_transaksi():
                 jml = item["jumlah"]
                 if id_brg in data_barang["barang"]:
                     data_barang["barang"][id_brg]["stok"] += jml
+            print( "=" * lebar )        
             print("[INFO] Stok barang berhasil dikembalikan ke gudang.")
-
+            print( "=" * lebar ) 
+            
         data_barang["transaksi"].remove(transaksi_ditemukan)
 
-        if simpan_data():
-            print(f"[SUKSES] Transaksi {nomor} berhasil dihapus dari database.")
+        if simpan_data(): 
+            print(f"✅[SUKSES] Transaksi {nomor} berhasil dihapus dari database.")
         else:
-            print("[ERROR] Gagal menyimpan perubahan ke database.")
+            print("❌[ERROR] Gagal menyimpan perubahan ke database.")
     else:
         print("[INFO] Penghapusan transaksi dibatalkan.")
+    print( "=" * lebar ) 
 
 def riwayat_transaksi():
-    print("\n=== RIWAYAT TRANSAKSI ===")
+    lebar = 66
+    print( "=" * lebar )
+    print("=== RIWAYAT TRANSAKSI ===".center(lebar))
+    print( "=" * lebar )
+
     if not data_barang["transaksi"]:
-        print("Belum ada transaksi.")
+        print("😕Belum ada transaksi.")
         return
+        
+    print(f"{'NO. TRX':<10} | {'TANGGAL':<19} | {'KASIR':<16} | {'TOTAL':>12}")
+    print("-" * lebar)
 
     for data_transaksi in data_barang["transaksi"]:
         print(
@@ -513,23 +536,25 @@ def riwayat_transaksi():
             f"{data_transaksi['kasir_nama'][:16]:<16} | "
             f"{rupiah(data_transaksi['total']):>12}"
         )
+    print( "=" * lebar )
 
 def laporan_penjualan_admin():
-    print("\n" + "=" * 60)
-    print("                 LAPORAN PENJUALAN")
-    print("=" * 60)
+    lebar = 66
+    print( "=" * lebar)
+    print("LAPORAN PENJUALAN".center(lebar))
+    
 
     if not data_barang["transaksi"]:
         print("[INFO] Belum ada transaksi penjualan.")
         return
-
+        
     hari_ini = datetime.now().date()
     awal_minggu = hari_ini.fromordinal(
         hari_ini.toordinal() - hari_ini.weekday()
     )
     awal_bulan = hari_ini.replace(day=1)
 
-    # Mengelompokkan transaksi berdasarkan tanggal
+    # Mengelompokkan transaksi berdasarkan tanggal   
     periode = {
         "PENJUALAN HARI INI": [],
         "PENJUALAN MINGGU INI": [],
@@ -569,10 +594,10 @@ def laporan_penjualan_admin():
                for transaksi in transaksi_lengkap
         )
 
-        print("\n" + "-" * 60)
-        print(f" {judul}")
-        print("-" * 60)
-
+        print("=" * lebar)
+        print(f" {judul}".center(lebar))
+        print( "-" * lebar )
+    
         if not daftar_transaksi:
             print("Belum ada transaksi pada periode ini.")
         else:
@@ -584,7 +609,7 @@ def laporan_penjualan_admin():
                     f"{rupiah(transaksi['total'])}"
                 )
 
-        print("-" * 60)
+        print("=" * lebar)
         print(f"Jumlah transaksi : {len(daftar_transaksi)}")
         print(f"Total penjualan  : {rupiah(total_penjualan)}")
         print(f"Laba kotor       : {rupiah(total_laba_kotor)}")
@@ -593,48 +618,62 @@ def laporan_penjualan_admin():
                "[PERINGATAN] Sebagian transaksi lama "
                "belum memiliki data modal."
                 )
-    print("\n" + "=" * 60)
-    print("             LAPORAN SELESAI")
-    print("=" * 60)
-
+    print("=" * lebar)        
+    print("LAPORAN SELESAI".center(lebar))
+    print("=" * lebar)
 
 def kelola_status_barang():
+    lebar = 88
     while True:
-        print("\n" + "=" * 60)
-        print("KELOLA STATUS BARANG".center(60))
-        print("=" * 60)
+        print("=" * lebar)
+        print("KELOLA STATUS BARANG".center(lebar))
+        print("=" * lebar)
 
         barang_aktif = data_barang.get("barang", {})
         barang_arsip = data_barang.get("arsip_barang", {})
 
         if not barang_aktif and not barang_arsip:
             print("❗[INFO] Belum ada data barang yang tersimpan.")
+            print("=" * lebar)
             return
 
-        print("--- [ BARANG DI ETALASE / GUDANG ] ---")
+        print("--- [ BARANG DI ETALASE / GUDANG ] ---".center(lebar))
+        print("=" * lebar)
         for id_barang, barang in barang_aktif.items():
             status = barang.get("status", "Aktif")
+            
+            print(f"{'ID':<9} | {'NAMA BARANG':<25} | {'STOK':>6} | {'STATUS':<12}")
+            print("-" * lebar)
             print(
                 f"ID: {id_barang:<8} | "
-                f"Nama: {barang['nama_barang'][:22]:<22} | "
-                f"Stok: {barang['stok']:>4} | "
-                f"Status: {status:<9}"
+                f"{barang['nama_barang'][:22]:<22} | "
+                f"{barang['stok']:>4} | "
+                f"{status:<9}"
             )
+            print("-" * lebar)
 
-        print("\n--- [ BARANG NONAKTIF / RUSAK ] ---")
+        print("--- [ BARANG NONAKTIF / RUSAK ] ---".center(lebar))
+        print("=" * lebar)
         for id_barang, barang in barang_arsip.items():
             status = barang.get("status", "Nonaktif")
+            print(f"{'ID':<9} | {'NAMA BARANG':<25} | {'STOK':>6} | {'STATUS':<12}")
+            print("-" * lebar)
+            
             print(
-                f"ID: {id_barang:<8} | "
-                f"Nama: {barang['nama_barang'][:22]:<22} | "
-                f"Stok: {barang['stok']:>4} | "
-                f"Status: {status:<9}"
+                f"{id_barang:<8} | "
+                f"{barang['nama_barang'][:22]:<22} | "
+                f"{barang['stok']:>4} | "
+                f"{status:<9}"
             )
-
-        print("\nPilih opsi:")
+            print("-" * lebar)
+            
+        print(" STATUS BARANG ".center(lebar))
+        print("=" * lebar)
+        print("Pilih opsi:")
         print("1. Ubah status barang (Aktif/Nonaktif/Rusak)")
         print("2. Aktifkan kembali barang dari arsip")
         print("0. Kembali ke menu admin")
+        print("=" * lebar)
 
         pilihan = input("Masukkan pilihan (0-2): ").strip()
         if pilihan == "0":
@@ -651,6 +690,7 @@ def kelola_status_barang():
             print("2. Rusak (tidak layak jual)")
             print("3. Nonaktif (pindahkan ke arsip / off)")
             print("0. Batal")
+            print("=" * lebar)
             pilihan_status = input("Masukkan pilihan status (0-3): ").strip()
 
             if pilihan_status == "0":
@@ -696,8 +736,7 @@ def kelola_status_barang():
             else:
                 print("⚠️[ERROR] Gagal menyimpan perubahan ke database.")
 
-
-
+            print("=" * lebar)
 
 # ==========================================
 # FITUR GUDANG
