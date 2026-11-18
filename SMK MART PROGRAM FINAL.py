@@ -328,6 +328,27 @@ def konfirmasi_default(pesan):
             return False
         print("⚠️[ERROR] Tekan Enter / 'y' untuk Ya, atau ketik 't' untuk Tidak.")
 
+def input_rentang_tanggal():
+    while True:
+        tgl_awal_str = input_wajib("Tanggal awal (DD-MM-YYYY): ")
+        tgl_akhir_str = input_wajib("Tanggal akhir (DD-MM-YYYY): ")
+        try:
+            tgl_awal = datetime.strptime(tgl_awal_str, "%d-%m-%Y").date()
+            tgl_akhir = datetime.strptime(tgl_akhir_str, "%d-%m-%Y").date()
+            if tgl_awal > tgl_akhir:
+                print("⚠️[ERROR] Tanggal awal tidak boleh lebih besar dari tanggal akhir!")
+                continue
+            return tgl_awal, tgl_akhir
+        except ValueError:
+            print("⚠️[ERROR] Format tanggal harus DD-MM-YYYY.")
+
+def simpan_teks_laporan(nama_file, isi_laporan):
+    if konfirmasi_default("Simpan laporan ini ke file .txt di folder laporan?"):
+        FOLDER_LAPORAN.mkdir(parents=True, exist_ok=True)
+        path_file = FOLDER_LAPORAN / nama_file
+        path_file.write_text(isi_laporan, encoding="utf-8")
+        print(f"✅[SUKSES] Laporan disimpan ke: {path_file}")
+
 # ==========================================
 # FITUR ADMIN (PENGGUNA)
 # ==========================================
@@ -407,8 +428,9 @@ def tambah_pengguna():
     print("=" * 108)
     
     while True:
-      angka_acak = random.randint(1000, 9999)
-      id_pengguna = f"USR{angka_acak}"
+      id_pengguna = buat_id_dict_otomatis(
+        data_pengguna["pengguna"], data_pengguna.get("arsip_pengguna", {}), "USR"
+    )
       if (
             id_pengguna not in data_pengguna["pengguna"]
             and id_pengguna not in data_pengguna.get("arsip_pengguna", {})
@@ -425,30 +447,32 @@ def tambah_pengguna():
       break
 
     password = input_password_simple("Masukkan password anda : ")
+    
+    while len(password) < 6:
 
-    while True:
-        kode_role = input_wajib("Pilih role ([A]dmin / [G]udang / [K]asir): ").strip().lower()
-        if kode_role in MAP_ROLE:
-            role = MAP_ROLE[kode_role]
-            break
-        print("⚠️ [ERROR] Role tidak valid. Ketik A, G, atau K.")
+        while True:
+            kode_role = input_wajib("Pilih role ([A]dmin / [G]udang / [K]asir): ").strip().lower()
+            if kode_role in MAP_ROLE:
+                role = MAP_ROLE[kode_role]
+                break
+            print("⚠️ [ERROR] Role tidak valid. Ketik A, G, atau K.")
 
-    data_pengguna["pengguna"][id_pengguna] = {
-        "nama" : nama,
-        "username" : username,
-        "password" : buat_hash_password(password),
-        "role" : role,
-        "date_added": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
-        "date_modified": "-",
-        "date_deleted": "-"
-    }
+        data_pengguna["pengguna"][id_pengguna] = {
+            "nama" : nama,
+            "username" : username,
+            "password" : buat_hash_password(password),
+            "role" : role,
+            "date_added": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+            "date_modified": "-",
+            "date_deleted": "-"
+        }
 
-    if simpan_data():
-        print( "=" * lebar)
-        print(f"✅[SUKSES] Pengguna '{nama}' berhasil ditambahkan!")
-        print( "=" * lebar)
-    else:
-        del data_pengguna["pengguna"][id_pengguna]
+        if simpan_data():
+            print( "=" * lebar)
+            print(f"✅[SUKSES] Pengguna '{nama}' berhasil ditambahkan!")
+            print( "=" * lebar)
+        else:
+            del data_pengguna["pengguna"][id_pengguna]
 
 
 def edit_pengguna():
@@ -903,6 +927,24 @@ def kelola_status_barang():
         else:
             print("⚠️ [ERROR] Pilihan menu tidak valid (pilih 0-2).")
 
+def reset_password_pengguna(admin_login):
+    tampilkan_data_pengguna()
+    id_pengguna = input_wajib("Masukkan ID pengguna yang akan di-reset passwordnya: ").upper()
+    if id_pengguna not in data_pengguna["pengguna"]:
+        print("⚠️[ERROR] ID pengguna tidak ditemukan.")
+        return
+    while True:
+        password_baru = input_password_simple("Masukkan password baru (minimal 6 karakter): ")
+        if len(password_baru) >= 6:
+            break
+        print("⚠️[ERROR] Password minimal 6 karakter.")
+    data_pengguna["pengguna"][id_pengguna]["password"] = buat_hash_password(password_baru)
+    data_pengguna["pengguna"][id_pengguna]["date_modified"] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    if simpan_data():
+        pelaku = data_pengguna["pengguna"][admin_login]["username"]
+        catat_log("admin", f"Reset password pengguna {id_pengguna}", pelaku)
+        print(f"✅[SUKSES] Password untuk {id_pengguna} berhasil di-reset.")
+
 # ==========================================
 # FITUR GUDANG
 # ==========================================
@@ -967,8 +1009,9 @@ def tambah_barang():
     print("=" * lebar)
 
     while True:
-        angka_acak = random.randint(1000, 9999)
-        id_barang = f"BRG{angka_acak}"
+        id_barang = buat_id_dict_otomatis(
+        data_barang["barang"], data_barang.get("arsip_barang", {}), "BRG"
+    )
         if (
             id_barang not in data_barang["barang"]
             and id_barang not in data_barang.get("arsip_barang", {})
@@ -978,10 +1021,12 @@ def tambah_barang():
     print(f"❗[INFO] ID Barang otomatis: {id_barang}")
     print("-" * lebar)
 
-    nama = input_wajib("Nama barang                 : ").strip()
-    stok = input_angka("Stok awal                   : ")
-    harga_pabrik = input_angka("Harga dari pabrik (Rp)      : ", 1)
-    harga_jual = input_angka("Harga jual (Rp)             : ", 1)
+    nama = input_wajib("Nama barang: ")
+    kategori = input_wajib("Kategori barang (Sembako/Minuman/Makanan/Snack/Kebersihan): ")
+    stok = 0  
+    stok_min = input_angka("Stok minimum (minimal 0): ", 0)
+    harga_pabrik = input_angka("Harga dari pabrik (Rp): ", 1)
+    harga_jual = input_angka("Harga jual (Rp): ", 1)
 
     while True:
         tanggal_str = input_wajib("Tanggal expired (DD-MM-YYYY): ").strip()
@@ -995,8 +1040,9 @@ def tambah_barang():
 
     data_barang["barang"][id_barang] = {
         "nama_barang": nama,
-        "stok": stok,
-        "harga": harga_jual,
+        "kategori": kategori,
+        "stok": 0,
+        "stok_min": stok_min
         "harga_pabrik": harga_pabrik,
         "harga_jual": harga_jual,
         "laba_per_barang": laba,
@@ -1085,10 +1131,29 @@ def hapus_barang():
     tampilkan_barang()
     id_barang = input_wajib("ID barang yang dihapus: ").upper()
     if id_barang in data_barang["barang"]:
+      
+      if barang_pernah_dipakai(id_barang):
+                  print("⚠️[DITOLAK] Barang sudah pernah tercatat di transaksi atau riwayat gudang, tidak dapat dihapus!")
+                  return
+      
       if konfirmasi_default("Yakin hapus barang?"):
+
+        def barang_pernah_dipakai(id_barang):
+            for trx in data_barang["transaksi"]:
+                if any(item["id_barang"] == id_barang for item in trx.get("item", [])):
+                    return True
+            for file_cek in (FILE_MASUK, FILE_KELUAR):
+                if file_cek.exists():
+                    for baris in file_cek.read_text(encoding="utf-8").splitlines():
+                        kolom = baris.split("|")
+                        if len(kolom) >= 3 and kolom[2] == id_barang:
+                            return True
+            return False
+        
         barang_dihapus = data_barang["barang"].pop(id_barang)
         barang_dihapus["status"] = "Nonaktif"
         data_barang.setdefault("arsip_barang", {})[id_barang] = barang_dihapus
+
         if simpan_data():
           print(f"[SUKSES] barang diarsipkan.")
           catat_log("gudang", f"Menghapus barang {barang_dihapus['nama_barang']} ({id_barang})")
@@ -1151,6 +1216,20 @@ def cari_barang():
         print(f"EXPIRED         : {barang.get('expired', '-')}")
     
     print("-" * 50)
+
+def filter_kategori_barang():
+    kategori_dicari = input_wajib("Masukkan nama kategori (Sembako/Minuman/Makanan): ").casefold()
+    hasil = [
+        (kode, barang) for kode, barang in data_barang["barang"].items()
+        if kategori_dicari in barang.get("kategori", "Umum").casefold()
+    ]
+    if not hasil:
+        print("⚠️[INFO] Tidak ada barang pada kategori tersebut.")
+        return
+    print(f"\n{'ID':<8} | {'NAMA BARANG':<22} | {'KATEGORI':<12} | {'HARGA':>12} | {'STOK':>5}")
+    print("-" * 68)
+    for kode, barang in hasil:
+        print(f"{kode:<8} | {barang['nama_barang'][:22]:<22} | {barang.get('kategori','Umum'):<12} | {rupiah(barang['harga']):>12} | {barang['stok']:>5}")
 
 
 def cek_dan_urutkan_expired():
@@ -1804,6 +1883,7 @@ def cetak_struk(data_transaksi):
         lokasi_struk = FOLDER_STRUK / f"{data_transaksi['nomor']}.txt"
         lokasi_struk.write_text(isi + "\n", encoding="utf-8")
         print(f"[SUKSES] File nota disimpan: {lokasi_struk}")
+      
     except OSError as error:
         print(f"[PERINGATAN] Struk tampil, tetapi gagal tersimpan: {error}")
 
@@ -1822,11 +1902,38 @@ def transaksi_penjualan(kasir):
         if id_barang == "BATAL":
             print("Transaksi dibatalkan. Stok tidak berubah.")
             return
+        
         if id_barang == "SELESAI":
             if not keranjang:
                 print("⚠️[ERROR] Keranjang kosong.")
                 continue
             break
+
+        if id_barang == "HAPUS":
+            hapus_id = input_wajib("Masukkan ID barang di keranjang yang ingin dihapus: ").upper()
+            if keranjang.pop(hapus_id, None):
+                print("✅[SUKSES] Item dihapus dari keranjang.")
+            else:
+                print("⚠️[ERROR] Item tidak ada di keranjang.")
+            continue
+
+        if id_barang == "UBAH":
+            ubah_id = input_wajib("Masukkan ID barang di keranjang yang ingin diubah: ").upper()
+            if ubah_id not in keranjang:
+                print("⚠️[ERROR] Item tidak ada di keranjang.")
+                continue
+            
+            maks_stok = data_barang["barang"][ubah_id]["stok"]
+            jumlah_baru = input_angka(f"Jumlah baru (0 untuk hapus, maks {maks_stok}): ", 0)
+
+            if jumlah_baru == 0:
+                del keranjang[ubah_id]
+            elif jumlah_baru <= maks_stok:
+                keranjang[ubah_id] = jumlah_baru
+            else:
+                print("⚠️[ERROR] Jumlah melebihi stok tersedia.")
+            continue
+
         if id_barang not in data_barang["barang"]:
             print("⚠️[ERROR] ID barang tidak ditemukan.")
             continue
@@ -1920,7 +2027,7 @@ def transaksi_penjualan(kasir):
 )
         })
 
-    data_transaksi = {"nomor": f"TRX{baru['nomor_berikutnya']:06d}",
+    data_transaksi = {"nomor": f"TRX{baru['nomor_berikutnya']:03d}",
            "tanggal": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
            "kasir_id": kasir[0], "kasir_nama": kasir[1]["nama"],
            "kasir_username": kasir[1]["username"], "item": daftar_item,
@@ -1931,6 +2038,11 @@ def transaksi_penjualan(kasir):
     if not simpan_data(baru):
         print("⚠️[ERROR] Transaksi gagal disimpan. Stok belum dikurangi.")
         return
+
+    for item in daftar_item:
+                barang = data_barang["barang"][item["id_barang"]]
+                if barang["stok"] <= barang.get("stok_min", 5):
+                    print(f"⚠️[PERINGATAN STOK] '{barang['nama_barang']}' tersisa {barang['stok']} (batas minimum: {barang.get('stok_min', 5)})!")
 
     data_barang.clear()
     data_barang.update(baru)
@@ -2287,6 +2399,59 @@ def submenu_laporan_admin():
 # ==========================================
 # MENU UTAMA PER ROLE (SUDAH DISATUKAN)
 # ==========================================
+def tampilkan_ringkasan_login(id_login):
+    pengguna = data_pengguna["pengguna"][id_login]
+    hari_ini_tampil = datetime.now().strftime("%d-%m-%Y")
+
+    # 1. Mengumpulkan semua transaksi yang terjadi hari ini
+    transaksi_hari_ini = []
+    for transaksi in data_barang["transaksi"]:
+        if transaksi["tanggal"].startswith(hari_ini_tampil):
+            transaksi_hari_ini.append(transaksi)
+
+    print("\n" + "=" * 56)
+    print(f"Pengguna : {pengguna['nama']} ({pengguna['role']})")
+    print(f"Tanggal  : {hari_ini_tampil}")
+    print("-" * 56)
+
+    # 2. Tampilan ringkasan khusus untuk Admin dan Gudang
+    if pengguna["role"] == "admin" or pengguna["role"] == "gudang":
+        jumlah_jenis_barang = len(data_barang["barang"])
+        jumlah_stok_minimum = 0
+        jumlah_stok_habis = 0
+
+        # Menghitung barang yang stoknya menipis atau habis
+        for barang in data_barang["barang"].values():
+            batas_minimum = barang.get("stok_min", 5)
+            if barang["stok"] == 0:
+                jumlah_stok_habis += 1
+            elif barang["stok"] <= batas_minimum:
+                jumlah_stok_minimum += 1
+
+        # Menghitung total uang penjualan hari ini
+        total_penjualan_hari_ini = 0
+        for transaksi in transaksi_hari_ini:
+            total_penjualan_hari_ini += transaksi["total"]
+
+        print(f"Jenis barang         : {jumlah_jenis_barang}")
+        print(f"Stok minimum / habis : {jumlah_stok_minimum} / {jumlah_stok_habis}")
+        print(f"Penjualan hari ini   : {len(transaksi_hari_ini)} transaksi, {rupiah(total_penjualan_hari_ini)}")
+
+    # 3. Tampilan ringkasan khusus untuk Kasir
+    else:
+        jumlah_transaksi_kasir = 0
+        total_penjualan_kasir = 0
+
+        # Menghitung transaksi hari ini milik kasir yang sedang login saja
+        for transaksi in transaksi_hari_ini:
+            if transaksi.get("kasir_username") == pengguna["username"]:
+                jumlah_transaksi_kasir += 1
+                total_penjualan_kasir += transaksi["total"]
+
+        print(f"Transaksi Anda hari ini : {jumlah_transaksi_kasir} transaksi ({rupiah(total_penjualan_kasir)})")
+
+    print("=" * 56)
+
 def menu_admin(id_login):
     peringatan_stok_otomatis()
     while True:
