@@ -1,13 +1,10 @@
 from pathlib import Path
 import hashlib
 import hmac
-import json
-import os
 import secrets
 from datetime import datetime
 import copy
 import getpass
-import random
 
 
 LOKASI_SCRIPT_INI = Path.cwd()
@@ -109,6 +106,15 @@ def buat_id_dict_otomatis(dict_aktif, dict_arsip, prefix):
     for kode in semua_kode:
         if kode.startswith(prefix) and kode[len(prefix):].isdigit():
             nomor_terakhir = max(nomor_terakhir, int(kode[len(prefix):]))
+    return f"{prefix}{nomor_terakhir + 1:03d}"
+
+def buat_id_file_otomatis(path_file, prefix):
+    nomor_terakhir = 0
+    if path_file.exists():
+        for baris in path_file.read_text(encoding="utf-8").splitlines():
+            kode = baris.split("|")[0].strip()
+            if kode.startswith(prefix) and kode[len(prefix):].isdigit():
+                nomor_terakhir = max(nomor_terakhir, int(kode[len(prefix):]))
     return f"{prefix}{nomor_terakhir + 1:03d}"
 
 def input_password():
@@ -445,17 +451,19 @@ def tambah_pengguna():
           print("⚠️ [ERROR] Username sudah dipakai.")
           continue
       break
-
-    password = input_password_simple("Masukkan password anda : ")
     
-    while len(password) < 6:
+    while True:
+        password = input_password_simple("Masukkan password anda : ")
+        if len(password) >= 6:
+            break
+        print("⚠️ [ERROR] Password minimal 6 karakter!")
 
-        while True:
-            kode_role = input_wajib("Pilih role ([A]dmin / [G]udang / [K]asir): ").strip().lower()
-            if kode_role in MAP_ROLE:
-                role = MAP_ROLE[kode_role]
-                break
-            print("⚠️ [ERROR] Role tidak valid. Ketik A, G, atau K.")
+    while True:
+        kode_role = input_wajib("Pilih role ([A]dmin / [G]udang / [K]asir): ").strip().lower()
+        if kode_role in MAP_ROLE:
+            role = MAP_ROLE[kode_role]
+            break
+        print("⚠️ [ERROR] Role tidak valid. Ketik A, G, atau K.")
 
         data_pengguna["pengguna"][id_pengguna] = {
             "nama" : nama,
@@ -978,25 +986,31 @@ def tampilkan_barang():
     for i in range(jumlah_data - 1, 0, -1):
         semua_barang[0], semua_barang[i] = semua_barang[i], semua_barang[0]
         heapify(semua_barang, i, 0)
+    
+    for id_barang, barang in data_barang["barang"].items():
+        pabrik = ambil_harga_pabrik(barang)
+        jual = ambil_harga_jual(barang)
 
-    print(
-        f"{'ID':<9} | {'NAMA BARANG':<22} | {'STOK':>6} | "
-        f"{'HARGA PABRIK':>14} | {'HARGA JUAL':>14} | {'LABA':>14}"
-    )
-    print("=" * lebar)
+        print("\n" + "-" * lebar)
+        print(f"ID BARANG       : {id_barang}")
+        print(f"NAMA BARANG     : {barang['nama_barang']}")
+        print(f"STOK            : {barang['stok']}")
+        print(f"HARGA PABRIK    : {rupiah(pabrik)}")
+        print(f"HARGA JUAL      : {rupiah(jual)}")
+        print(f"LABA PER UNIT   : {rupiah(jual - pabrik)}")
+        print(f"TANGGAL EXPIRED : {barang.get('expired', '-')}")
 
-    for id_barang, barang in semua_barang:
-        harga_pabrik = ambil_harga_pabrik(barang)
-        harga_jual = ambil_harga_jual(barang)
-        laba = hitung_laba(harga_pabrik, harga_jual)
-        print(
-            f"{id_barang:<9} | "
-            f"{barang['nama_barang'][:22]:<22} | "
-            f"{barang['stok']:>6} | "
-            f"{rupiah(harga_pabrik):>14} | "
-            f"{rupiah(harga_jual):>14} | "
-            f"{rupiah(laba):>14}"
-        )
+        # masuk potongan hargae
+        sisa_hari, potongan, harga_akhir = hitung_diskon_expired(barang)
+
+        if sisa_hari is not None and 1 <= sisa_hari <= 5:
+            print("STATUS DISKON  : MENDAPAT DISKON 4%")
+            print(f"POTONGAN HARGA : {rupiah(potongan)}")
+            print(f"HARGA PROMO    : {rupiah(harga_akhir)}")
+        elif sisa_hari is not None and sisa_hari <= 0:
+            print("STATUS DISKON  : BARANG SUDAH EXPIRED")
+        else:
+            print("STATUS DISKON  : TIDAK ADA DISKON")
 
     print("=" * lebar)
     print(f"Total Barang: {jumlah_data} Item")
@@ -1042,7 +1056,7 @@ def tambah_barang():
         "nama_barang": nama,
         "kategori": kategori,
         "stok": 0,
-        "stok_min": stok_min
+        "stok_min": stok_min,
         "harga_pabrik": harga_pabrik,
         "harga_jual": harga_jual,
         "laba_per_barang": laba,
@@ -1075,25 +1089,24 @@ def edit_barang():
     print("\nKosongkan input jika tidak ingin mengubah data.")
 
     nama = input(f"Nama barang [{barang['nama_barang']}]: ").strip()
-    stok = input(f"Stok [{barang['stok']}]: ").strip()
     harga_pabrik = input(f"Harga pabrik [{ambil_harga_pabrik(barang)}]: ").strip()
     harga_jual = input(f"Harga jual [{ambil_harga_jual(barang)}]: ").strip()
     expired = input(f"Expired [{barang.get('expired', '')}]: ").strip()
 
     try:
-        stok_baru = int(stok) if stok else int(barang["stok"])
-
         pabrik_baru = (
             int(harga_pabrik)
             if harga_pabrik
-            else ambil_harga_pabrik(barang) )
+            else ambil_harga_pabrik(barang)
+        )
 
         jual_baru = (
             int(harga_jual)
             if harga_jual
-            else ambil_harga_jual(barang) )
+            else ambil_harga_jual(barang)
+        )
 
-        if stok_baru < 0 or pabrik_baru < 1 or jual_baru < 1:
+        if pabrik_baru < 1 or jual_baru < 1:
             raise ValueError
 
     except ValueError:
@@ -1111,7 +1124,6 @@ def edit_barang():
 
     barang.update({
         "nama_barang": nama or barang["nama_barang"],
-        "stok": stok_baru,
         "harga_pabrik": pabrik_baru,
         "harga_jual": jual_baru,
         "harga": jual_baru,
@@ -1131,24 +1143,24 @@ def hapus_barang():
     tampilkan_barang()
     id_barang = input_wajib("ID barang yang dihapus: ").upper()
     if id_barang in data_barang["barang"]:
+
+      def barang_pernah_dipakai(id_barang):
+                  for trx in data_barang["transaksi"]:
+                      if any(item["id_barang"] == id_barang for item in trx.get("item", [])):
+                          return True
+                  for file_cek in (FILE_MASUK, FILE_KELUAR):
+                      if file_cek.exists():
+                          for baris in file_cek.read_text(encoding="utf-8").splitlines():
+                              kolom = baris.split("|")
+                              if len(kolom) >= 3 and kolom[2] == id_barang:
+                                  return True
+                  return False
       
       if barang_pernah_dipakai(id_barang):
                   print("⚠️[DITOLAK] Barang sudah pernah tercatat di transaksi atau riwayat gudang, tidak dapat dihapus!")
                   return
       
       if konfirmasi_default("Yakin hapus barang?"):
-
-        def barang_pernah_dipakai(id_barang):
-            for trx in data_barang["transaksi"]:
-                if any(item["id_barang"] == id_barang for item in trx.get("item", [])):
-                    return True
-            for file_cek in (FILE_MASUK, FILE_KELUAR):
-                if file_cek.exists():
-                    for baris in file_cek.read_text(encoding="utf-8").splitlines():
-                        kolom = baris.split("|")
-                        if len(kolom) >= 3 and kolom[2] == id_barang:
-                            return True
-            return False
         
         barang_dihapus = data_barang["barang"].pop(id_barang)
         barang_dihapus["status"] = "Nonaktif"
@@ -1488,30 +1500,6 @@ def tampilkan_barang():
         return
 
 
-    for id_barang, barang in data_barang["barang"].items():
-        pabrik = ambil_harga_pabrik(barang)
-        jual = ambil_harga_jual(barang)
-
-        print("\n" + "-" * 55)
-        print(f"ID BARANG       : {id_barang}")
-        print(f"NAMA BARANG     : {barang['nama_barang']}")
-        print(f"STOK            : {barang['stok']}")
-        print(f"HARGA PABRIK    : {rupiah(pabrik)}")
-        print(f"HARGA JUAL      : {rupiah(jual)}")
-        print(f"LABA PER UNIT   : {rupiah(jual - pabrik)}")
-        print(f"TANGGAL EXPIRED : {barang.get('expired', '-')}")
-
-        # masuk potongan hargae
-        sisa_hari, potongan, harga_akhir = hitung_diskon_expired(barang)
-
-        if sisa_hari is not None and 1 <= sisa_hari <= 5:
-            print("STATUS DISKON  : MENDAPAT DISKON 4%")
-            print(f"POTONGAN HARGA : {rupiah(potongan)}")
-            print(f"HARGA PROMO    : {rupiah(harga_akhir)}")
-        elif sisa_hari is not None and sisa_hari <= 0:
-            print("STATUS DISKON  : BARANG SUDAH EXPIRED")
-        else:
-            print("STATUS DISKON  : TIDAK ADA DISKON")
 
     print("\n" + "-" * 30)
 
@@ -1554,7 +1542,7 @@ def catat_barang_masuk(id_login):
     jumlah = input_angka("Jumlah barang masuk (> 0): ", minimum=1)
     pemasok = input_wajib("Nama pemasok: ")
 
-    id_masuk = buat_id_dict_otomatis(FILE_MASUK, "MSK")
+    id_masuk = buat_id_file_otomatis(FILE_MASUK, "MASUK")
     tanggal_iso = datetime.now().strftime("%Y-%m-%d")
     petugas = data_pengguna["pengguna"][id_login]["username"]
 
@@ -1613,7 +1601,7 @@ def catat_barang_keluar(id_login):
 
     keterangan = input_wajib("Keterangan detail: ")
 
-    id_keluar = buat_id_dict_otomatis(FILE_KELUAR, "KLR")
+    id_keluar = buat_id_file_otomatis(FILE_KELUAR, "KELUAR")
     tanggal_iso = datetime.now().strftime("%Y-%m-%d")
     petugas = data_pengguna["pengguna"][id_login]["username"]
 
@@ -2039,13 +2027,14 @@ def transaksi_penjualan(kasir):
         print("⚠️[ERROR] Transaksi gagal disimpan. Stok belum dikurangi.")
         return
 
+    data_barang.clear()
+    data_barang.update(baru)
+
     for item in daftar_item:
                 barang = data_barang["barang"][item["id_barang"]]
                 if barang["stok"] <= barang.get("stok_min", 5):
                     print(f"⚠️[PERINGATAN STOK] '{barang['nama_barang']}' tersisa {barang['stok']} (batas minimum: {barang.get('stok_min', 5)})!")
 
-    data_barang.clear()
-    data_barang.update(baru)
     print("\n[SUKSES] Pembayaran berhasil dan stok otomatis berkurang.")
     cetak_struk(data_transaksi)
 
@@ -2314,6 +2303,7 @@ def submenu_kelola_pengguna(id_login):
         print("4. Nonaktifkan Pengguna")
         print("5. Aktifkan Kembali Pengguna")
         print("6. Cari Pengguna")
+        print("7. Reset Password Pengguna")
         print("0. Kembali")
         pilih = input("Pilih fitur (0-6): ").strip()
         if pilih == "0":
@@ -2330,6 +2320,8 @@ def submenu_kelola_pengguna(id_login):
             aktifkan_pengguna(id_login)
         elif pilih == "6":
             cari_pengguna()
+        elif pilih == "7":
+            reset_password_pengguna()
         else:
             print("Pilihan tidak valid.")
 
@@ -2363,6 +2355,7 @@ def submenu_lihat_cari_barang():
         print("\n=== LIHAT & CARI BARANG ===")
         print("1. Tampilkan Data Barang")
         print("2. Cari Barang (Kode / Nama)")
+        print("3. Kategori Barang")
         print("0. Kembali")
         pilih = input("Pilih fitur (0-2): ").strip()
         if pilih == "0":
@@ -2371,6 +2364,8 @@ def submenu_lihat_cari_barang():
             tampilkan_barang()
         elif pilih == "2":
             cari_barang()
+        elif pilih == "3":
+            filter_kategori_barang()
         else:
             print("Pilihan tidak valid.")
 
@@ -2456,35 +2451,38 @@ def menu_admin(id_login):
     peringatan_stok_otomatis()
     while True:
         print("\n=== MENU ADMIN ===")
-        print("1. Kelola Pengguna")
-        print("2. Kelola Data Barang")
-        print("3. Lihat & Cari Barang")
-        print("4. Daftar Stok & Kartu Stok")
-        print("5. Laporan Penjualan & Gudang")
-        print("6. Log Aktivitas")
-        print("7. Ganti Password")
-        print("8. Menu Gudang")
-        print("9. Menu Kasir")
+        print("1. Ringkasan Login")
+        print("2. Kelola Pengguna")
+        print("3. Kelola Data Barang")
+        print("4. Lihat & Cari Barang")
+        print("5. Daftar Stok & Kartu Stok")
+        print("6. Laporan Penjualan & Gudang")
+        print("7. Log Aktivitas")
+        print("8. Ganti Password")
+        print("9. Menu Gudang")
+        print("10. Menu Kasir")
         print("0. Logout")
-        pilih = input("Pilih fitur yang ingin digunakan (0-7): ").strip()
+        pilih = input("Pilih fitur yang ingin digunakan (0-10): ").strip()
         if pilih == "1":
-            submenu_kelola_pengguna(id_login)
+            tampilkan_ringkasan_login(id_login)
         elif pilih == "2":
-            submenu_kelola_barang_admin()
+            submenu_kelola_pengguna(id_login)
         elif pilih == "3":
-            submenu_lihat_cari_barang()
+            submenu_kelola_barang_admin()
         elif pilih == "4":
+            submenu_lihat_cari_barang()
+        elif pilih == "5":
             peringatan_stok_otomatis()
             kartu_stok_barang()
-        elif pilih == "5":
-            submenu_laporan_admin()
         elif pilih == "6":
-            lihat_log_aktivitas()
+            submenu_laporan_admin()
         elif pilih == "7":
-            ganti_password_sendiri(id_login)
+            lihat_log_aktivitas()
         elif pilih == "8":
-            menu_gudang(id_login)
+            ganti_password_sendiri(id_login)
         elif pilih == "9":
+            menu_gudang(id_login)
+        elif pilih == "10":
             menu_kasir(id_login)
         elif pilih == "0":
             catat_log("admin", "Logout dari sistem", data_pengguna["pengguna"][id_login]["username"])
@@ -2499,30 +2497,33 @@ def menu_gudang(id_login):
     peringatan_stok_otomatis()
     while True:
         print("\n=== MENU GUDANG ===")
-        print("1. Lihat & Cari Barang")
-        print("2. Catat Barang Masuk")
-        print("3. Catat Barang Keluar")
-        print("4. Daftar Stok, Kartu Stok & Cek Expired")
-        print("5. Laporan Stok & Analisis Harga (SPLDV)")
-        print("6. Ganti Password")
+        print("1. Ringkasan Login")
+        print("2. Lihat & Cari Barang")
+        print("3. Catat Barang Masuk")
+        print("4. Catat Barang Keluar")
+        print("5. Daftar Stok, Kartu Stok & Cek Expired")
+        print("6. Laporan Stok & Analisis Harga (SPLDV)")
+        print("7. Ganti Password")
         print("0. Logout")
-        pilih = input("Pilih fitur yang ingin digunakan (0-6): ").strip()
+        pilih = input("Pilih fitur yang ingin digunakan (0-7): ").strip()
         if pilih == "1":
-            submenu_lihat_cari_barang()
+            tampilkan_ringkasan_login(id_login)
         elif pilih == "2":
-            catat_barang_masuk(id_login)
+            submenu_lihat_cari_barang()
         elif pilih == "3":
-            catat_barang_keluar(id_login)
+            catat_barang_masuk(id_login)
         elif pilih == "4":
+            catat_barang_keluar(id_login)
+        elif pilih == "5":
             peringatan_stok_otomatis()
             kartu_stok_barang()
-            cek_dan_urutkan_expired
-        elif pilih == "5":
+            cek_dan_urutkan_expired()
+        elif pilih == "6":
             laporan_barang()
             notifikasi_barang()
             if konfirmasi_default("Jalankan analisis harga satuan SPLDV?"):
                 analisis_spldv_harga_barang()
-        elif pilih == "6":
+        elif pilih == "7":
             ganti_password_sendiri(id_login)
         elif pilih == "0":
             catat_log("gudang", "Logout dari sistem", data_pengguna["pengguna"][id_login]["username"])
@@ -2537,27 +2538,31 @@ def menu_kasir(id_login):
     while True:
         kasir = (id_login, data_pengguna["pengguna"][id_login])
         print(f"\n=== MENU KASIR | {kasir[1]['nama']} ===")
-        print("1. Transaksi Penjualan dan Cetak Nota")
-        print("2. Lihat & Cari Barang")
-        print("3. Cetak Ulang Struk & Riwayat Tanggal")
-        print("4. Rekomendasi 5 Barang Terlaris")
-        print("5. Ganti Password")
+        print("1. Ringkasan Login")
+        print("2. Transaksi Penjualan dan Cetak Nota")
+        print("3. Lihat & Cari Barang")
+        print("4. Cetak Ulang Struk & Riwayat Tanggal")
+        print("5. Rekomendasi 5 Barang Terlaris")
+        print("6. Ganti Password")
         print("0. Logout")
-        pilih = input("Pilih fitur yang ingin digunakan (0-5): ").strip()
+        pilih = input("Pilih fitur yang ingin digunakan (0-6): ").strip()
         if pilih == "1":
-            transaksi_penjualan(kasir)
+            tampilkan_ringkasan_login(id_login)
         elif pilih == "2":
-            submenu_lihat_cari_barang()
+            transaksi_penjualan(kasir)
         elif pilih == "3":
+            submenu_lihat_cari_barang()
+        elif pilih == "4":
             cetak_ulang_struk()
             riwayat_transaksi_tanggal()
-        elif pilih == "4":
-            rekomendasi_barang_terlaris()
         elif pilih == "5":
+            rekomendasi_barang_terlaris()
+        elif pilih == "6":
             ganti_password_sendiri(id_login)
         elif pilih == "0":
             catat_log("kasir", "Logout dari sistem", kasir[1]["username"])
             print("\n" + "=" * 64)
+            print("BERHASIL LOGOUT DARI AKUN".center(64))
             print("=" * 64)
             break
         else:
