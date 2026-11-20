@@ -5,6 +5,7 @@ import secrets
 from datetime import datetime
 import copy
 import getpass
+import shutil
 
 
 LOKASI_SCRIPT_INI = Path.cwd()
@@ -12,6 +13,7 @@ BASE_DIR = LOKASI_SCRIPT_INI / "SMK_MART_Python"
 DATA_DIR = BASE_DIR / "data"
 FOLDER_STRUK = BASE_DIR / "struk"
 FOLDER_LAPORAN = BASE_DIR / "laporan"
+FOLDER_BACKUP = BASE_DIR / "backup_data"
 
 BASE_DIR.mkdir(parents=True, exist_ok=True)
 DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -142,7 +144,7 @@ def muat_data():
     if not baris_pengguna:
         pengguna_aktif["ADM001"] = {
             "nama": "Administrator SMK MART",
-            "username": "admin",
+            "username": "admin utama",
             "password": buat_hash_password("admin123"),
             "role": "admin",
             "date_added": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
@@ -155,7 +157,7 @@ def muat_data():
             if len(kolom) < 5:
                 continue
             username_data, password_data, nama_data, role_data, status_data = kolom[:5]
-            id_pengguna = "ADM001" if username_data == "admin" else f"USR{indeks:03d}"
+            id_pengguna = "ADM001" if username_data == "admin utama" else f"USR{indeks:03d}"
             password_tersimpan = password_data if "$" in password_data else buat_hash_password(password_data)
             objek_pengguna = {
                 "nama": nama_data,
@@ -465,23 +467,23 @@ def tambah_pengguna():
             break
         print("⚠️ [ERROR] Role tidak valid. Ketik A, G, atau K.")
 
-        data_pengguna["pengguna"][id_pengguna] = {
-            "nama" : nama,
-            "username" : username,
-            "password" : buat_hash_password(password),
-            "role" : role,
-            "date_added": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
-            "date_modified": "-",
-            "date_deleted": "-"
-        }
+    data_pengguna["pengguna"][id_pengguna] = {
+        "nama" : nama,
+        "username" : username,
+        "password" : buat_hash_password(password),
+        "role" : role,
+        "date_added": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+        "date_modified": "-",
+        "date_deleted": "-"
+            }
 
-        if simpan_data():
-            print( "=" * lebar)
-            print(f"✅[SUKSES] Pengguna '{nama}' berhasil ditambahkan!")
-            print( "=" * lebar)
-        else:
-            del data_pengguna["pengguna"][id_pengguna]
-
+    if simpan_data():
+        print( "=" * lebar)
+        print(f"✅[SUKSES] Pengguna '{nama}' berhasil ditambahkan!")
+        print( "=" * lebar)
+    else:
+        del data_pengguna["pengguna"][id_pengguna]
+    
 
 def edit_pengguna():
     lebar = 55
@@ -987,7 +989,7 @@ def tampilkan_barang():
         semua_barang[0], semua_barang[i] = semua_barang[i], semua_barang[0]
         heapify(semua_barang, i, 0)
     
-    for id_barang, barang in data_barang["barang"].items():
+    for id_barang, barang in semua_barang:
         pabrik = ambil_harga_pabrik(barang)
         jual = ambil_harga_jual(barang)
 
@@ -1491,17 +1493,6 @@ def notifikasi_barang():
         print("Semua barang dalam kondisi aman!")
     print("-" * 35)
 
-def tampilkan_barang():
-    print("\n" + "-" * 30)
-    print("\n --- Daftar Barang --- ")
-
-    if not data_barang["barang"]:
-        print("\n --- Barang Tidak Ditemukan --- ")
-        return
-
-
-
-    print("\n" + "-" * 30)
 
 def status_stok_barang(barang):
     stok = int(barang["stok"])
@@ -2305,7 +2296,7 @@ def submenu_kelola_pengguna(id_login):
         print("6. Cari Pengguna")
         print("7. Reset Password Pengguna")
         print("0. Kembali")
-        pilih = input("Pilih fitur (0-6): ").strip()
+        pilih = input("Pilih fitur (0-7): ").strip()
         if pilih == "0":
             break
         elif pilih == "1":
@@ -2321,7 +2312,7 @@ def submenu_kelola_pengguna(id_login):
         elif pilih == "6":
             cari_pengguna()
         elif pilih == "7":
-            reset_password_pengguna()
+            reset_password_pengguna(id_login)
         else:
             print("Pilihan tidak valid.")
 
@@ -2376,6 +2367,7 @@ def submenu_laporan_admin():
         print("2. Rekomendasi 5 Barang Terlaris")
         print("3. Laporan Kondisi Stok & Expired")
         print("4. Riwayat Perubahan Stok")
+        print("5. Hapus Transaksi Penjualan")
         print("0. Kembali")
         pilih = input("Pilih fitur (0-4): ").strip()
         if pilih == "0":
@@ -2388,6 +2380,8 @@ def submenu_laporan_admin():
             laporan_barang()
         elif pilih == "4":
             riwayat_stok()
+        elif pilih == "5":
+            hapus_transaksi()
         else:
             print("Pilihan tidak valid.")
 
@@ -2447,6 +2441,97 @@ def tampilkan_ringkasan_login(id_login):
 
     print("=" * 56)
 
+def backup_data_sistem(id_login):
+    lebar = 64
+    print("\n" + "=" * lebar)
+    print("BACKUP DATA SISTEM".center(lebar))
+    print("=" * lebar)
+
+    if not simpan_data():
+        print("⚠️ [ERROR] Gagal menyimpan data terbaru sebelum backup.")
+        return
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    tujuan_backup = FOLDER_BACKUP / f"backup_{timestamp}"
+
+    try:
+        FOLDER_BACKUP.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(DATA_DIR, tujuan_backup / "data")
+        if FOLDER_STRUK.exists():
+            shutil.copytree(FOLDER_STRUK, tujuan_backup / "struk")
+
+        pelaku = data_pengguna["pengguna"][id_login]["username"]
+        catat_log("admin", f"Membuat backup data ke tujuan {tujuan_backup.name}", pelaku)
+        print(f"✅ [SUKSES] Seluruh data berhasil di-backup ke:\n   {tujuan_backup}")
+        
+    except Exception as error:
+        print(f"⚠️ [ERROR] Gagal membuat backup: {error}")
+
+def restore_data_sistem(id_login):
+    lebar = 64
+    print("\n" + "=" * lebar)
+    print("RESTORE DATA SISTEM (SHUTIL)".center(lebar))
+    print("=" * lebar)
+
+    if not FOLDER_BACKUP.exists():
+        print("[INFO] Belum ada folder backup yang tersimpan.")
+        return
+
+    daftar_backup = sorted(
+        [folder for folder in FOLDER_BACKUP.iterdir() if folder.is_dir()],
+        reverse=True
+    )
+
+    if not daftar_backup:
+        print("[INFO] Belum ada folder backup yang tersedia.")
+        return
+
+    print("Daftar Backup Tersedia:")
+    for idx, folder in enumerate(daftar_backup, start=1):
+        print(f"{idx}. {folder.name}")
+
+    pilih = input("\nPilih nomor backup yang ingin di-restore (0 untuk batal): ").strip()
+    if pilih == "0" or not pilih:
+        print("[INFO] Restore dibatalkan.")
+        return
+
+    try:
+        indeks = int(pilih) - 1
+        if indeks < 0 or indeks >= len(daftar_backup):
+            raise ValueError
+    except ValueError:
+        print("⚠️ [ERROR] Nomor backup tidak valid.")
+        return
+
+    sumber_backup = daftar_backup[indeks]
+    if not konfirmasi_default(f"Yakin menimpa data saat ini dengan '{sumber_backup.name}'?"):
+        print("[INFO] Restore dibatalkan.")
+        return
+
+    try:
+        sumber_data = sumber_backup / "data"
+        if sumber_data.exists():
+            DATA_DIR.mkdir(parents=True, exist_ok=True)
+            for item in sumber_data.iterdir():
+                if item.is_file():
+                    shutil.copy2(item, DATA_DIR / item.name)
+
+        sumber_struk = sumber_backup / "struk"
+        if sumber_struk.exists():
+            FOLDER_STRUK.mkdir(parents=True, exist_ok=True)
+            for item in sumber_struk.iterdir():
+                if item.is_file():
+                    shutil.copy2(item, FOLDER_STRUK / item.name)
+
+        global data_pengguna
+        data_pengguna = muat_data()
+
+        pelaku = data_pengguna["pengguna"][id_login]["username"]
+        catat_log("admin", f"Melakukan restore data dari {sumber_backup.name}", pelaku)
+        print(f"✅ [SUKSES] Data berhasil dipulihkan dari '{sumber_backup.name}'.")
+    except Exception as error:
+        print(f"⚠️ [ERROR] Gagal melakukan restore data: {error}")
+
 def menu_admin(id_login):
     peringatan_stok_otomatis()
     while True:
@@ -2461,8 +2546,10 @@ def menu_admin(id_login):
         print("8. Ganti Password")
         print("9. Menu Gudang")
         print("10. Menu Kasir")
+        print("11. Backup Data Sistem")
+        print("12. Restore Data Sistem")
         print("0. Logout")
-        pilih = input("Pilih fitur yang ingin digunakan (0-10): ").strip()
+        pilih = input("Pilih fitur yang ingin digunakan (0-12): ").strip()
         if pilih == "1":
             tampilkan_ringkasan_login(id_login)
         elif pilih == "2":
@@ -2484,6 +2571,10 @@ def menu_admin(id_login):
             menu_gudang(id_login)
         elif pilih == "10":
             menu_kasir(id_login)
+        elif pilih == "11":
+            backup_data_sistem(id_login)
+        elif pilih == "12":
+            restore_data_sistem(id_login)
         elif pilih == "0":
             catat_log("admin", "Logout dari sistem", data_pengguna["pengguna"][id_login]["username"])
             print("\n" + "=" * 64)
@@ -2617,14 +2708,31 @@ def main():
             print("-" * lebar)
             print(f"⚠️ [ERROR] Username atau password salah ({percobaan_gagal}/3).")
             if percobaan_gagal >= 3:
-                print("⚠️ [DITOLAK] Salah 3 kali. Akses ditolak dan program berhenti.")
+                id_target = next(
+                (
+                        id_pengguna
+                        for id_pengguna, data_akun in data_pengguna["pengguna"].items()
+                        if data_akun["username"] == username
+                    ),
+                    None
+                )
+
+                if id_target and username != "admin utama":
+                    akun_nonaktif = data_pengguna["pengguna"].pop(id_target)
+                    akun_nonaktif["date_deleted"] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+                    data_pengguna.setdefault("arsip_pengguna", {})[id_target] = akun_nonaktif
+                    simpan_data()
+                    catat_log("sistem", f"Akun {username} dinonaktifkan otomatis (3x gagal login)", username)
+                    print(f"⚠️ [DITOLAK] Salah 3 kali. Akun '{username}' telah DINONAKTIFKAN otomatis. Hubungi Admin Utama.")
+                else:
+                    print("⚠️ [DITOLAK] Salah 3 kali. Akses ditolak dan program berhenti.")
                 print("=" * lebar)
                 print("PROGRAM DIHENTIKAN DEMI KEAMANAN SISTEM".center(lebar))
                 print("=" * lebar)
                 break
             print("-" * lebar)
             continue
-
+            
         percobaan_gagal = 0
         id_login, pengguna = login
         catat_log(pengguna["role"], "Login ke sistem", pengguna["username"])
