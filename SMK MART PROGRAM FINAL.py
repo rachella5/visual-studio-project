@@ -157,6 +157,9 @@ def muat_data():
             if len(kolom) < 5:
                 continue
             username_data, password_data, nama_data, role_data, status_data = kolom[:5]
+            tanggal_tambah = kolom[5] if len(kolom) > 5 else datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+            tanggal_ubah = kolom[6] if len(kolom) > 6 else "-"
+            tanggal_hapus = kolom[7] if len(kolom) > 7 else "-"
             id_pengguna = "ADM001" if username_data == "admin utama" else f"USR{indeks:03d}"
             password_tersimpan = password_data if "$" in password_data else buat_hash_password(password_data)
             objek_pengguna = {
@@ -164,9 +167,9 @@ def muat_data():
                 "username": username_data,
                 "password": password_tersimpan,
                 "role": role_data,
-                "date_added": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
-                "date_modified": "-",
-                "date_deleted": "-"
+                "date_added": tanggal_tambah,
+                "date_modified": tanggal_ubah,
+                "date_deleted": tanggal_hapus
             }
             if status_data.lower() == "aktif":
                 pengguna_aktif[id_pengguna] = objek_pengguna
@@ -257,11 +260,13 @@ def simpan_data(data_baru=None):
         baris_pengguna = []
         for pengguna in data_pengguna.get("pengguna", {}).values():
             baris_pengguna.append(
-                f"{pengguna['username']}|{pengguna['password']}|{pengguna['nama']}|{pengguna['role']}|aktif"
+                f"{pengguna['username']}|{pengguna['password']}|{pengguna['nama']}|{pengguna['role']}|aktif|"
+                f"{pengguna.get('date_added', '-')}|{pengguna.get('date_modified', '-')}|{pengguna.get('date_deleted', '-')}"
             )
         for pengguna in data_pengguna.get("arsip_pengguna", {}).values():
             baris_pengguna.append(
-                f"{pengguna['username']}|{pengguna['password']}|{pengguna['nama']}|{pengguna['role']}|nonaktif"
+                f"{pengguna['username']}|{pengguna['password']}|{pengguna['nama']}|{pengguna['role']}|nonaktif|"
+                f"{pengguna.get('date_added', '-')}|{pengguna.get('date_modified', '-')}|{pengguna.get('date_deleted', '-')}"
             )
         FILE_PENGGUNA.write_text("\n".join(baris_pengguna) + ("\n" if baris_pengguna else ""), encoding="utf-8")
 
@@ -270,7 +275,7 @@ def simpan_data(data_baru=None):
             kategori = barang.get("kategori", "Umum")
             stok_minimum = barang.get("stok_min", 5)
             baris_barang.append(
-                f"{kode_barang}|{barang['nama_barang']}|{kategori}|{int(barang['harga'])}|{int(barang['stok'])}|{int(stok_minimum)}"
+                f"{kode_barang}|{barang['nama_barang']}|{kategori}|{int(ambil_harga_jual(barang))}|{int(barang['stok'])}|{int(stok_minimum)}"
             )
         FILE_BARANG.write_text("\n".join(baris_barang) + ("\n" if baris_barang else ""), encoding="utf-8")
 
@@ -361,9 +366,9 @@ def simpan_teks_laporan(nama_file, isi_laporan):
 # FITUR ADMIN (PENGGUNA)
 # ==========================================
 def tampilkan_data_pengguna():
-    print("\n" + "=" * 108)
-    print("TAMPILAN SEMUA AKUN / USER (TERURUT BERDASARKAN ROLE)".center(108))
-    print("=" * 108)
+    print("\n" + "=" * 128)
+    print("TAMPILAN SEMUA AKUN / USER (TERURUT BERDASARKAN ROLE)".center(128))
+    print("=" * 128)
 
     semua_akun = []
     for id_pengguna, pengguna in data_pengguna.get("pengguna", {}).items():
@@ -409,7 +414,7 @@ def tampilkan_data_pengguna():
         f"{'ID':<9} | {'NAMA':<18} | {'ROLE':<8} | {'STATUS':<9} | "
         f"{'DATE_ADDED':<22} | {'DATE_MODIFIED':<22} | {'DATE_DELETED':<22}"
     )
-    print("=" * 108)
+    print("=" * 128)
 
     for id_pengguna, pengguna, status in semua_akun:
         print(
@@ -422,12 +427,12 @@ def tampilkan_data_pengguna():
             f"{pengguna.get('date_deleted', '-'):<22}"
         )
 
-    print("=" * 108)
+    print("=" * 128)
     total_aktif = len(data_pengguna.get("pengguna", {}))
     total_nonaktif = len(data_pengguna.get("arsip_pengguna", {}))
     total_semua = total_aktif + total_nonaktif
     print(f"Total: {total_semua} Akun ({total_aktif} Aktif, {total_nonaktif} Nonaktif)")
-    print("=" * 108)
+    print("=" * 128)
     
 def tambah_pengguna():
     lebar = 108
@@ -722,11 +727,13 @@ def riwayat_transaksi():
 
 def laporan_penjualan_admin():
     lebar = 66
-    print( "=" * lebar)
-    print("LAPORAN PENJUALAN".center(lebar))
-    
+    baris_laporan = [
+        "=" * lebar,
+        "LAPORAN PENJUALAN".center(lebar)
+    ]
 
     if not data_barang["transaksi"]:
+        print("\n".join(baris_laporan))
         print("[INFO] Belum ada transaksi penjualan.")
         return
         
@@ -776,33 +783,40 @@ def laporan_penjualan_admin():
                for transaksi in transaksi_lengkap
         )
 
-        print("=" * lebar)
-        print(f" {judul}".center(lebar))
-        print( "-" * lebar )
-    
+        baris_laporan.append("=" * lebar)
+        baris_laporan.append(f" {judul}".center(lebar))
+        baris_laporan.append("-" * lebar)
+
         if not daftar_transaksi:
-            print("Belum ada transaksi pada periode ini.")
+            baris_laporan.append("Belum ada transaksi pada periode ini.")
         else:
             for transaksi in daftar_transaksi:
-                print(
+                baris_laporan.append(
                     f"{transaksi['nomor']} | "
                     f"{transaksi['tanggal']} | "
                     f"{transaksi['kasir_nama']} | "
                     f"{rupiah(transaksi['total'])}"
                 )
 
-        print("=" * lebar)
-        print(f"Jumlah transaksi : {len(daftar_transaksi)}")
-        print(f"Total penjualan  : {rupiah(total_penjualan)}")
-        print(f"Laba kotor       : {rupiah(total_laba_kotor)}")
+        baris_laporan.append("=" * lebar)
+        baris_laporan.append(f"Jumlah transaksi : {len(daftar_transaksi)}")
+        baris_laporan.append(f"Total penjualan  : {rupiah(total_penjualan)}")
+        baris_laporan.append(f"Laba kotor       : {rupiah(total_laba_kotor)}")
         if len(transaksi_lengkap) < len(daftar_transaksi):
-           print(
-               "[PERINGATAN] Sebagian transaksi lama "
-               "belum memiliki data modal."
-                )
-    print("=" * lebar)        
-    print("LAPORAN SELESAI".center(lebar))
-    print("=" * lebar)
+            baris_laporan.append(
+                "[PERINGATAN] Sebagian transaksi lama "
+                "belum memiliki data modal."
+            )
+
+    baris_laporan.append("=" * lebar)
+    baris_laporan.append("LAPORAN SELESAI".center(lebar))
+    baris_laporan.append("=" * lebar)
+
+    isi_laporan = "\n".join(baris_laporan)
+    print("\n" + isi_laporan)
+
+    nama_file = f"laporan_penjualan_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+    simpan_teks_laporan(nama_file, isi_laporan)
 
 def kelola_status_barang():
     lebar = 66
@@ -959,7 +973,7 @@ def reset_password_pengguna(admin_login):
 # FITUR GUDANG
 # ==========================================
 def tampilkan_barang():
-    lebar = 96
+    lebar = 135
     print("\n" + "=" * lebar)
     print("TAMPILAN DATA BARANG (TERURUT BERDASARKAN NAMA A-Z)".center(lebar))
     print("=" * lebar)
@@ -988,31 +1002,30 @@ def tampilkan_barang():
     for i in range(jumlah_data - 1, 0, -1):
         semua_barang[0], semua_barang[i] = semua_barang[i], semua_barang[0]
         heapify(semua_barang, i, 0)
-    
+
+    print(
+        f"{'ID BARANG':<10} | {'NAMA BARANG':<18} | {'STOK':>5} | {'HARGA PABRIK':>13} | "
+        f"{'HARGA JUAL':>13} | {'LABA PER UNIT':>13} | {'TANGGAL EXPIRED':<15} | {'STATUS DISKON':<28}"
+    )
+    print("-" * lebar)
+
     for id_barang, barang in semua_barang:
         pabrik = ambil_harga_pabrik(barang)
         jual = ambil_harga_jual(barang)
-
-        print("\n" + "-" * lebar)
-        print(f"ID BARANG       : {id_barang}")
-        print(f"NAMA BARANG     : {barang['nama_barang']}")
-        print(f"STOK            : {barang['stok']}")
-        print(f"HARGA PABRIK    : {rupiah(pabrik)}")
-        print(f"HARGA JUAL      : {rupiah(jual)}")
-        print(f"LABA PER UNIT   : {rupiah(jual - pabrik)}")
-        print(f"TANGGAL EXPIRED : {barang.get('expired', '-')}")
-
-        # masuk potongan hargae
         sisa_hari, potongan, harga_akhir = hitung_diskon_expired(barang)
 
         if sisa_hari is not None and 1 <= sisa_hari <= 5:
-            print("STATUS DISKON  : MENDAPAT DISKON 4%")
-            print(f"POTONGAN HARGA : {rupiah(potongan)}")
-            print(f"HARGA PROMO    : {rupiah(harga_akhir)}")
+            status_diskon = f"MENDAPAT DISKON 4% ({rupiah(harga_akhir)})"
         elif sisa_hari is not None and sisa_hari <= 0:
-            print("STATUS DISKON  : BARANG SUDAH EXPIRED")
+            status_diskon = "BARANG SUDAH EXPIRED"
         else:
-            print("STATUS DISKON  : TIDAK ADA DISKON")
+            status_diskon = "TIDAK ADA DISKON"
+
+        print(
+            f"{id_barang:<10} | {barang['nama_barang'][:18]:<18} | {barang['stok']:>5} | "
+            f"{rupiah(pabrik):>13} | {rupiah(jual):>13} | {rupiah(jual - pabrik):>13} | "
+            f"{barang.get('expired', '-'):<15} | {status_diskon:<28}"
+        )
 
     print("=" * lebar)
     print(f"Total Barang: {jumlah_data} Item")
@@ -1059,6 +1072,7 @@ def tambah_barang():
         "kategori": kategori,
         "stok": 0,
         "stok_min": stok_min,
+        "harga": harga_jual,
         "harga_pabrik": harga_pabrik,
         "harga_jual": harga_jual,
         "laba_per_barang": laba,
@@ -2712,29 +2726,34 @@ def main():
                 (
                         id_pengguna
                         for id_pengguna, data_akun in data_pengguna["pengguna"].items()
-                        if data_akun["username"] == username
+                        if data_akun["username"].strip().lower() == username
                     ),
                     None
                 )
 
-                if id_target and username != "admin utama":
+                if id_target and username not in ("admin utama", "admin_utama"):
                     akun_nonaktif = data_pengguna["pengguna"].pop(id_target)
                     akun_nonaktif["date_deleted"] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
                     data_pengguna.setdefault("arsip_pengguna", {})[id_target] = akun_nonaktif
                     simpan_data()
                     catat_log("sistem", f"Akun {username} dinonaktifkan otomatis (3x gagal login)", username)
                     print(f"⚠️ [DITOLAK] Salah 3 kali. Akun '{username}' telah DINONAKTIFKAN otomatis. Hubungi Admin Utama.")
+                    percobaan_gagal = 0
+                    print("=" * lebar)
+                    continue
                 else:
                     print("⚠️ [DITOLAK] Salah 3 kali. Akses ditolak dan program berhenti.")
-                print("=" * lebar)
-                print("PROGRAM DIHENTIKAN DEMI KEAMANAN SISTEM".center(lebar))
-                print("=" * lebar)
-                break
-            print("-" * lebar)
+                    print("=" * lebar)
+                    print("PROGRAM DIHENTIKAN DEMI KEAMANAN SISTEM".center(lebar))
+                    print("=" * lebar)
+                    break
+                
+            print("=" * lebar)
             continue
             
         percobaan_gagal = 0
         id_login, pengguna = login
+
         catat_log(pengguna["role"], "Login ke sistem", pengguna["username"])
         print("-" * lebar)
         print(f"✅ [SUKSES] Halo, {pengguna['nama']}! Login sebagai {pengguna['role'].upper()}.")
