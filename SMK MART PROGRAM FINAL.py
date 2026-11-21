@@ -657,7 +657,7 @@ def hapus_transaksi():
         return
 
     riwayat_transaksi()
-    nomor = input_wajib("Masukkan Nomor Transaksi yang ingin dihapus(contoh: TRX000001): ").upper()
+    nomor = input_wajib("Masukkan Nomor Transaksi yang ingin dihapus(contoh: TRX001): ").upper()
 
     transaksi_ditemukan = None
     for t in data_barang["transaksi"]:
