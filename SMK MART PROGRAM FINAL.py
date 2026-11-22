@@ -1051,7 +1051,7 @@ def tambah_barang():
     print("-" * lebar)
 
     nama = input_wajib("Nama barang: ")
-    kategori = input_wajib("Kategori barang (Sembako/Minuman/Makanan/Snack/Kebersihan): ")
+    kategori = input_wajib("Kategori barang (Sembako/Minuman/Makanan): ")
     stok = 0  
     stok_min = input_angka("Stok minimum (minimal 0): ", 0)
     harga_pabrik = input_angka("Harga dari pabrik (Rp): ", 1)
