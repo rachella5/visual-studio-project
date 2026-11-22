@@ -201,16 +201,20 @@ def muat_data():
         if len(kolom) < 6:
             continue
         kode_barang, nama_barang, kategori_barang, harga_barang, stok_barang, stok_minimum = kolom[:6]
+        harga_pabrik_val = int(kolom[6]) if len(kolom) > 6 and kolom[6].isdigit() else int(harga_barang)
+        expired_val = kolom[7].strip() if len(kolom) > 7 and kolom[7].strip() else "31-12-2099"
+        status_val = kolom[8].strip() if len(kolom) > 8 and kolom[8].strip() else "Aktif"
+
         barang_aktif[kode_barang] = {
             "nama_barang": nama_barang,
             "kategori": kategori_barang,
             "stok": int(stok_barang),
             "stok_min": int(stok_minimum),
             "harga": int(harga_barang),
-            "harga_pabrik": int(harga_barang),
+            "harga_pabrik": harga_pabrik_val,
             "harga_jual": int(harga_barang),
-            "expired": "31-12-2099",
-            "status": "Aktif"
+            "expired": expired_val,
+            "status": status_val
         }
 
     detail_per_transaksi = {}
@@ -221,10 +225,12 @@ def muat_data():
         if len(kolom) < 6:
             continue
         nomor_trx, kode_brg, nama_brg, harga_satuan, jumlah_beli, subtotal_beli = kolom[:6]
+        harga_modal = int(kolom[6]) if len(kolom) > 6 and kolom[6].isdigit() else int(harga_satuan)
         detail_per_transaksi.setdefault(nomor_trx, []).append({
             "id_barang": kode_brg,
             "nama_barang": nama_brg,
             "harga": int(harga_satuan),
+            "harga_pabrik": harga_modal,
             "jumlah": int(jumlah_beli),
             "subtotal": int(subtotal_beli)
         })
@@ -286,8 +292,12 @@ def simpan_data(data_baru=None):
         for kode_barang, barang in sumber_barang.get("barang", {}).items():
             kategori = barang.get("kategori", "Umum")
             stok_minimum = barang.get("stok_min", 5)
+            harga_pabrik = int(ambil_harga_pabrik(barang))
+            expired = barang.get("expired", "31-12-2099")
+            status = barang.get("status", "Aktif")
             baris_barang.append(
-                f"{kode_barang}|{barang['nama_barang']}|{kategori}|{int(ambil_harga_jual(barang))}|{int(barang['stok'])}|{int(stok_minimum)}"
+                f"{kode_barang}|{barang['nama_barang']}|{kategori}|{int(ambil_harga_jual(barang))}|"
+                f"{int(barang['stok'])}|{int(stok_minimum)}|{harga_pabrik}|{expired}|{status}"
             )
         FILE_BARANG.write_text("\n".join(baris_barang) + ("\n" if baris_barang else ""), encoding="utf-8")
 
@@ -307,9 +317,10 @@ def simpan_data(data_baru=None):
                 f"{int(transaksi['total'])}|{int(transaksi['bayar'])}|{int(transaksi['kembalian'])}"
             )
             for item in transaksi.get("item", []):
+                harga_modal = int(item.get("harga_pabrik", item["harga"]))
                 baris_detail.append(
                     f"{transaksi['nomor']}|{item['id_barang']}|{item['nama_barang']}|"
-                    f"{int(item['harga'])}|{int(item['jumlah'])}|{int(item['subtotal'])}"
+                    f"{int(item['harga'])}|{int(item['jumlah'])}|{int(item['subtotal'])}|{harga_modal}"
                 )
         FILE_TRANSAKSI.write_text("\n".join(baris_transaksi) + ("\n" if baris_transaksi else ""), encoding="utf-8")
         FILE_DETAIL.write_text("\n".join(baris_detail) + ("\n" if baris_detail else ""), encoding="utf-8")
