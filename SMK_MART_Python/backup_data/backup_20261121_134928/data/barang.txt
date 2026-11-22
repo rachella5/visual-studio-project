@@ -1,0 +1,3 @@
+BRG9508|biskuit gandum|makanan|4500|300|5
+BRG9509|sprite lemon|minuman|3500|135|5
+BRG9510|mie samyang buldak|makanan|16000|185|3

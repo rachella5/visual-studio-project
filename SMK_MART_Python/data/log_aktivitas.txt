@@ -1,0 +1,59 @@
+2026-11-18|09:02:28|admin|Login ke sistem
+2026-11-18|09:03:39|admin|Logout dari sistem
+2026-11-18|09:04:07|usrasel|Login ke sistem
+2026-11-18|09:05:53|usrasel|Logout dari sistem
+2026-11-18|09:06:00|admin|Login ke sistem
+2026-11-18|09:07:14|admin|Logout dari sistem
+2026-11-18|09:07:49|admin|Login ke sistem
+2026-11-18|09:14:30|admin|Logout dari sistem
+2026-11-18|11:47:41|admin|LOGIN
+2026-11-19|08:47:54|admin|LOGIN
+2026-11-21|12:22:06|admin|Login ke sistem
+2026-11-21|12:25:29|sistem|Menghapus pengguna Nana (USR003)
+2026-11-21|12:25:51|admin|Mengaktifkan kembali pengguna melinana (USR003)
+2026-11-21|12:26:51|admin|Reset password pengguna USR002
+2026-11-21|12:46:17|admin|Login ke sistem
+2026-11-21|12:53:03|admin|Logout dari sistem
+2026-11-21|12:54:06|admin|Login ke sistem
+2026-11-21|12:55:18|admin|Logout dari sistem
+2026-11-21|12:56:11|admin|Login ke sistem
+2026-11-21|13:11:46|usrasel|Akun usrasel dinonaktifkan otomatis (3x gagal login)
+2026-11-21|13:12:12|admin|Login ke sistem
+2026-11-21|13:17:43|admin|Membuat backup data ke tujuan backup_20261121_131743
+2026-11-21|13:18:54|admin|Logout dari sistem
+2026-11-21|13:19:51|melinana|Akun melinana dinonaktifkan otomatis (3x gagal login)
+2026-11-21|13:20:47|blackwood|Akun blackwood dinonaktifkan otomatis (3x gagal login)
+2026-11-21|13:20:52|admin|Login ke sistem
+2026-11-21|13:21:26|admin|Mengaktifkan kembali pengguna blackwood (USR003)
+2026-11-21|13:21:36|admin|Mengaktifkan kembali pengguna usrasel (USR002)
+2026-11-21|13:21:46|admin|Mengaktifkan kembali pengguna melinana (USR004)
+2026-11-21|13:22:05|admin|Reset password pengguna USR002
+2026-11-21|13:22:27|admin|Reset password pengguna USR003
+2026-11-21|13:23:05|admin|Reset password pengguna USR004
+2026-11-21|13:23:14|admin|Logout dari sistem
+2026-11-21|13:23:22|usrasel|Login ke sistem
+2026-11-21|13:25:38|usrasel|Logout dari sistem
+2026-11-21|13:25:43|admin|Login ke sistem
+2026-11-21|13:29:44|admin|Logout dari sistem
+2026-11-21|13:29:55|usrasel|Login ke sistem
+2026-11-21|13:30:35|usrasel|BARANG MASUK MASUK001 BRG9509 +150 dari pt. anugerah indah
+2026-11-21|13:31:12|usrasel|BARANG MASUK MASUK002 BRG9510 +200 dari pt. south asean
+2026-11-21|13:32:05|usrasel|BARANG MASUK MASUK003 BRG9508 +300 dari pt. pencari cinta sejati
+2026-11-21|13:32:42|usrasel|BARANG KELUAR KELUAR001 BRG9508 -15 (RUSAK)
+2026-11-21|13:34:01|usrasel|BARANG KELUAR KELUAR002 BRG9508 -285 (KADALUARSA)
+2026-11-21|13:34:23|usrasel|BARANG MASUK MASUK004 BRG9508 +300 dari pt. anugerah indah
+2026-11-21|13:35:14|usrasel|Logout dari sistem
+2026-11-21|13:35:35|blackwood|Login ke sistem
+2026-11-21|13:39:38|blackwood|Logout dari sistem
+2026-11-21|13:39:53|admin|Login ke sistem
+2026-11-21|13:45:17|admin|Logout dari sistem
+2026-11-21|13:45:26|admin|Login ke sistem
+2026-11-21|13:46:03|admin|Logout dari sistem
+2026-11-21|13:46:14|sheila2013|Login ke sistem
+2026-11-21|13:46:23|sheila2013|Logout dari sistem
+2026-11-21|13:48:03|admin|Login ke sistem
+2026-11-21|13:48:40|sistem|Menghapus barang keripik kentang chela (BRG9507)
+2026-11-21|13:49:02|sistem|Menghapus barang kopi hitam (BRG1095)
+2026-11-21|13:49:15|sistem|Menghapus barang salt butter (BRG7074)
+2026-11-21|13:49:28|admin|Membuat backup data ke tujuan backup_20261121_134928
+2026-11-21|13:49:33|admin|Logout dari sistem

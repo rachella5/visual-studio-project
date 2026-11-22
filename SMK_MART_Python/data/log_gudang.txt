@@ -1,0 +1,15 @@
+[18-11-2026 09:04:07] (usrasel) Login ke sistem
+[18-11-2026 09:05:53] (usrasel) Logout dari sistem
+[21-11-2026 13:23:22] (usrasel) Login ke sistem
+[21-11-2026 13:25:38] (usrasel) Logout dari sistem
+[21-11-2026 13:29:55] (usrasel) Login ke sistem
+[21-11-2026 13:30:35] (usrasel) BARANG MASUK MASUK001 BRG9509 +150 dari pt. anugerah indah
+[21-11-2026 13:31:12] (usrasel) BARANG MASUK MASUK002 BRG9510 +200 dari pt. south asean
+[21-11-2026 13:32:05] (usrasel) BARANG MASUK MASUK003 BRG9508 +300 dari pt. pencari cinta sejati
+[21-11-2026 13:32:42] (usrasel) BARANG KELUAR KELUAR001 BRG9508 -15 (RUSAK)
+[21-11-2026 13:34:01] (usrasel) BARANG KELUAR KELUAR002 BRG9508 -285 (KADALUARSA)
+[21-11-2026 13:34:23] (usrasel) BARANG MASUK MASUK004 BRG9508 +300 dari pt. anugerah indah
+[21-11-2026 13:35:14] (usrasel) Logout dari sistem
+[21-11-2026 13:48:40] (sistem) Menghapus barang keripik kentang chela (BRG9507)
+[21-11-2026 13:49:02] (sistem) Menghapus barang kopi hitam (BRG1095)
+[21-11-2026 13:49:15] (sistem) Menghapus barang salt butter (BRG7074)

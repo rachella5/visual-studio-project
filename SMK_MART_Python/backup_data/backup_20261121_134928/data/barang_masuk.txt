@@ -1,0 +1,4 @@
+MASUK001|2026-11-21|BRG9509|150|pt. anugerah indah|usrasel
+MASUK002|2026-11-21|BRG9510|200|pt. south asean|usrasel
+MASUK003|2026-11-21|BRG9508|300|pt. pencari cinta sejati|usrasel
+MASUK004|2026-11-21|BRG9508|300|pt. anugerah indah|usrasel

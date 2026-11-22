@@ -1,0 +1,2 @@
+TRX002|BRG9510|mie samyang buldak|16000|15|240000
+TRX002|BRG9509|sprite lemon|3500|15|52500
