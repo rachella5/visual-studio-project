@@ -176,11 +176,23 @@ def muat_data():
             else:
                 pengguna_arsip[id_pengguna] = objek_pengguna
 
-    data_pengguna = {
-        "pengguna": pengguna_aktif,
-        "arsip_pengguna": pengguna_arsip
-    }
+        if "ADM001" not in pengguna_aktif:
+            akun_admin_lama = pengguna_arsip.pop("ADM001", None)
+            pengguna_aktif["ADM001"] = {
+                "nama": "Administrator SMK MART",
+                "username": "admin utama",
+                "password": akun_admin_lama["password"] if akun_admin_lama else buat_hash_password("admin123"),
+                "role": "admin",
+                "date_added": akun_admin_lama["date_added"] if akun_admin_lama else datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+                "date_modified": "-",
+                "date_deleted": "-"
+        }
 
+        data_pengguna = {
+                "pengguna": pengguna_aktif,
+                "arsip_pengguna": pengguna_arsip
+            }
+        
     barang_aktif = {}
     for baris in FILE_BARANG.read_text(encoding="utf-8").splitlines():
         if not baris.strip():
