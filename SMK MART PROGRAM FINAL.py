@@ -202,7 +202,7 @@ def pilih_kategori_valid(izin_tambah=True):
 def muat_data():
     global data_barang, data_pengguna, list_riwayat_stok
 
-    for file_txt in (FILE_PENGGUNA, FILE_BARANG, FILE_TRANSAKSI, FILE_DETAIL, FILE_MASUK, FILE_KELUAR, FILE_LOG):
+    for file_txt in (FILE_PENGGUNA, FILE_BARANG, FILE_TRANSAKSI, FILE_DETAIL, FILE_MASUK, FILE_KELUAR, FILE_LOG, FILE_KATEGORI):
         if not file_txt.exists():
             file_txt.write_text("", encoding="utf-8")
 
@@ -1083,11 +1083,11 @@ def reset_password_pengguna(admin_login):
 # FITUR GUDANG
 # ==========================================
 def tampilkan_barang():
-    lebar = 135
-    print("\n" + "=" * lebar)
+    lebar = 138
+    print("=" * lebar)
     print("TAMPILAN DATA BARANG (TERURUT BERDASARKAN NAMA A-Z)".center(lebar))
     print("=" * lebar)
-
+    
     if not data_barang["barang"]:
         print("[INFO] Belum ada data barang yang tersimpan.")
         return
@@ -1114,9 +1114,11 @@ def tampilkan_barang():
         heapify(semua_barang, i, 0)
 
     print(
-        f"{'ID BARANG':<10} | {'NAMA BARANG':<18} | {'STOK':>5} | {'HARGA PABRIK':>13} | "
-        f"{'HARGA JUAL':>13} | {'LABA PER UNIT':>13} | {'TANGGAL EXPIRED':<15} | {'STATUS DISKON':<28}"
-    )
+            f"{'ID':<7} | {'NAMA BARANG':<18} | {'KATEGORI':<15} | {'STOK':>4} | "
+            f"{'HARGA PABRIK':>12} | {'HARGA JUAL':>12} | {'LABA/UNIT':>11} | "
+            f"{'EXPIRED':<10} | {'STATUS DISKON':<16}"
+        )
+    
     print("-" * lebar)
 
     for id_barang, barang in semua_barang:
@@ -1132,9 +1134,9 @@ def tampilkan_barang():
             status_diskon = "TIDAK ADA DISKON"
 
         print(
-            f"{id_barang:<10} | {barang['nama_barang'][:18]:<18} | {barang['stok']:>5} | "
-            f"{rupiah(pabrik):>13} | {rupiah(jual):>13} | {rupiah(jual - pabrik):>13} | "
-            f"{barang.get('expired', '-'):<15} | {status_diskon:<28}"
+            f"{id_barang:<7} | {barang['nama_barang'][:18]:<18} | {barang.get('kategori', '-')[:15]:<15} | {barang['stok']:>4} | "
+            f"{rupiah(pabrik):>12} | {rupiah(jual):>12} | {rupiah(jual - pabrik):>11} | "
+            f"{barang.get('expired', '-'):<10} | {status_diskon:<16}"
         )
 
     print("=" * lebar)
@@ -1215,6 +1217,8 @@ def edit_barang():
     print("\nKosongkan input jika tidak ingin mengubah data.")
 
     nama = input(f"Nama barang [{barang['nama_barang']}]: ").strip()
+    if konfirmasi_default(f"Ubah kategori barang? (Saat ini: {barang.get('kategori', '-')})"):
+        barang["kategori"] = pilih_kategori_valid(izin_tambah=True)
     harga_pabrik = input(f"Harga pabrik [{ambil_harga_pabrik(barang)}]: ").strip()
     harga_jual = input(f"Harga jual [{ambil_harga_jual(barang)}]: ").strip()
     expired = input(f"Expired [{barang.get('expired', '')}]: ").strip()
