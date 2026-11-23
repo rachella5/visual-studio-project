@@ -24,3 +24,12 @@
 [23-11-2026 08:09:02] (usrasel) BARANG MASUK MASUK007 BRG9511 +300 dari pt. seafood
 [23-11-2026 08:09:30] (usrasel) BARANG MASUK MASUK008 BRG9513 +150 dari pt. indonesia indah
 [23-11-2026 08:10:23] (usrasel) Logout dari sistem
+[23-11-2026 09:17:40] (admin utama) BARANG MASUK MASUK009 BRG9512 +40 dari pt. anugerah indah
+[23-11-2026 09:18:00] (admin utama) Logout dari sistem
+[23-11-2026 09:46:51] (admin utama) Logout dari sistem
+[23-11-2026 13:46:52] (usrasel) Login ke sistem
+[23-11-2026 13:47:21] (usrasel) BARANG MASUK MASUK010 BRG9515 +25 dari py. putera anggun
+[23-11-2026 13:47:57] (usrasel) Logout dari sistem
+[23-11-2026 13:48:04] (usrasel) Login ke sistem
+[23-11-2026 13:48:39] (usrasel) BARANG MASUK MASUK011 BRG9516 +50 dari pt. cheezebrick
+[23-11-2026 13:48:56] (usrasel) Logout dari sistem

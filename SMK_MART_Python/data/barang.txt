@@ -2,6 +2,9 @@ BRG9508|biskuit gandum|makanan|5000|300|5|4500|12-06-2027|Aktif
 BRG9509|sprite lemon|minuman|4500|135|5|4000|03-06-2029|Aktif
 BRG9510|mie samyang buldak|makanan|16000|185|3|15500|12-04-2030|Aktif
 BRG9511|mie sedaap soto|makanan|3500|285|5|3000|04-05-2028|Aktif
-BRG9512|le minerale|minuman|3000|45|5|2000|05-06-2030|Aktif
+BRG9512|le minerale|minuman|3000|85|5|2500|05-06-2030|Aktif
 BRG9513|susu full cream|minuman|7000|148|10|6500|04-08-2031|Aktif
 BRG9514|beras koi|sembako|70000|16|10|68500|06-08-2027|Aktif
+BRG9515|beras punokawan|sembako|67000|25|5|66000|12-02-2027|Aktif
+BRG9516|crackers|Snack|2500|50|5|2000|12-08-2030|Aktif
+BRG9517|pewangi lantai|Alat Kebersihan|3500|0|10|3000|06-08-2030|Aktif

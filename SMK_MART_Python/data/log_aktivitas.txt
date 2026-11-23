@@ -114,3 +114,33 @@
 2026-11-23|08:14:26|sheila2013|Logout dari sistem
 2026-11-23|08:14:34|blackwood|Login ke sistem
 2026-11-23|08:14:51|blackwood|Logout dari sistem
+2026-11-23|09:13:20|admin utama|Login ke sistem
+2026-11-23|09:17:40|admin utama|BARANG MASUK MASUK009 BRG9512 +40 dari pt. anugerah indah
+2026-11-23|09:18:00|admin utama|Logout dari sistem
+2026-11-23|09:34:09|admin utama|Logout dari sistem
+2026-11-23|09:38:08|admin utama|Login ke sistem
+2026-11-23|09:45:53|admin utama|Logout dari sistem
+2026-11-23|09:46:03|admin utama|Login ke sistem
+2026-11-23|09:46:51|admin utama|Logout dari sistem
+2026-11-23|09:46:53|admin utama|Logout dari sistem
+2026-11-23|13:44:11|admin utama|Login ke sistem
+2026-11-23|13:46:42|admin utama|Logout dari sistem
+2026-11-23|13:46:52|usrasel|Login ke sistem
+2026-11-23|13:47:21|usrasel|BARANG MASUK MASUK010 BRG9515 +25 dari py. putera anggun
+2026-11-23|13:47:57|usrasel|Logout dari sistem
+2026-11-23|13:48:04|usrasel|Login ke sistem
+2026-11-23|13:48:39|usrasel|BARANG MASUK MASUK011 BRG9516 +50 dari pt. cheezebrick
+2026-11-23|13:48:56|usrasel|Logout dari sistem
+2026-11-23|13:49:03|admin utama|Login ke sistem
+2026-11-23|13:50:04|admin utama|Logout dari sistem
+2026-11-23|20:16:23|admin utama|Login ke sistem
+2026-11-23|20:20:19|admin utama|Logout dari sistem
+2026-11-23|20:23:41|admin utama|Login ke sistem
+2026-11-23|20:25:41|admin utama|Logout dari sistem
+2026-11-23|20:27:32|admin utama|Login ke sistem
+2026-11-23|20:30:11|admin utama|Logout dari sistem
+2026-11-23|20:30:25|admin utama|Login ke sistem
+2026-11-23|20:34:13|admin utama|Logout dari sistem
+2026-11-23|20:34:19|admin utama|Login ke sistem
+2026-11-23|20:35:15|admin utama|Login ke sistem
+2026-11-23|20:36:21|admin utama|Logout dari sistem
