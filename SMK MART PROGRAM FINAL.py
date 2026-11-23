@@ -81,7 +81,7 @@ def input_angka(pesan, minimum=0):
         try:
             angka = int(input(pesan).strip())
             if angka < minimum:
-                print(f"[ERROR] Angka minimal {minimum}.")
+                print(f"⚠️[ERROR] Angka minimal {minimum}.")
                 continue
             return angka
         except ValueError:
@@ -401,7 +401,7 @@ def tampilkan_data_pengguna():
         semua_akun.append((id_pengguna, pengguna, "NONAKTIF"))
 
     if not semua_akun:
-        print("[INFO] Belum ada data pengguna yang tersimpan.")
+        print("❗[INFO] Belum ada data pengguna yang tersimpan.")
         return
 
     urutan_role = {"admin": 1, "gudang": 2, "kasir": 3}
@@ -533,7 +533,7 @@ def edit_pengguna():
         print("=" * lebar)
         
         if username_baru and username_terpakai(username_baru, id_pengguna):
-            print("[ERROR] Username sudah digunakan pengguna lain.")
+            print("⚠️[ERROR] Username sudah digunakan pengguna lain.")
             return
 
         password_baru = input_password_simple("Password baru [Kosongkan jika tetap]: ", boleh_kosong=True)
@@ -630,7 +630,7 @@ def cari_pengguna():
 
  if not hasil:
      print( "="  * lebar )  
-     print("[ERROR] Pengguna tidak ditemukan.")
+     print("⚠️[ERROR] Pengguna tidak ditemukan.")
      print( "="  * lebar )  
      return
      
@@ -676,7 +676,7 @@ def hapus_transaksi():
 
     if not data_barang["transaksi"]:
         print ( "=" * lebar )
-        print("[INFO] Belum ada riwayat transaksi yang tersimpan.")
+        print("❗[INFO] Belum ada riwayat transaksi yang tersimpan.")
         print ( "=" * lebar )
         return
 
@@ -690,7 +690,7 @@ def hapus_transaksi():
             break
 
     if not transaksi_ditemukan:
-        print(f"[ERROR] Transaksi dengan nomor '{nomor}' tidak ditemukan.")
+        print(f"⚠️[ERROR] Transaksi dengan nomor '{nomor}' tidak ditemukan.")
         return
         
     print( "=" * lebar ) 
@@ -1003,7 +1003,7 @@ def tampilkan_barang():
     print("=" * lebar)
 
     if not data_barang["barang"]:
-        print("[INFO] Belum ada data barang yang tersimpan.")
+        print("❗[INFO] Belum ada data barang yang tersimpan.")
         return
 
     semua_barang = list(data_barang["barang"].items())
@@ -1210,7 +1210,7 @@ def hapus_barang():
           print(f"[SUKSES] barang diarsipkan.")
           catat_log("gudang", f"Menghapus barang {barang_dihapus['nama_barang']} ({id_barang})")
     else:
-        print("[ERROR] ID barang tidak ditemukan.")
+        print("⚠️[ERROR] ID barang tidak ditemukan.")
 
 def cari_barang():
     print("\n" + "=" * 50)
@@ -1276,7 +1276,7 @@ def filter_kategori_barang():
         if kategori_dicari in barang.get("kategori", "Umum").casefold()
     ]
     if not hasil:
-        print("⚠️[INFO] Tidak ada barang pada kategori tersebut.")
+        print("❗[INFO] Tidak ada barang pada kategori tersebut.")
         return
     print(f"\n{'ID':<8} | {'NAMA BARANG':<22} | {'KATEGORI':<12} | {'HARGA':>12} | {'STOK':>5}")
     print("-" * 68)
@@ -1291,7 +1291,7 @@ def cek_dan_urutkan_expired():
     print("LAPORAN CEK DAN URUTAN EXPIRED BARANG".center(lebar))
     print("=" * lebar)
     if not data_barang["barang"]:
-        print("[INFO] Belum ada data barang.")
+        print("❗[INFO] Belum ada data barang.")
         print("=" * lebar)
         return
     hari_ini = datetime.now().date()
@@ -1338,7 +1338,7 @@ def cek_dan_urutkan_expired():
             "harga_akhir": harga_akhir
         })
     if not daftar_expired:
-        print("[INFO] Tidak ada tanggal expired yang valid.")
+        print("❗[INFO] Tidak ada tanggal expired yang valid.")
         return
     # 5. pengurutan barang e katek heapsrot 
     n = len(daftar_expired)
@@ -1899,10 +1899,10 @@ def cetak_struk(data_transaksi):
         FOLDER_STRUK.mkdir(parents=True, exist_ok=True)
         lokasi_struk = FOLDER_STRUK / f"{data_transaksi['nomor']}.txt"
         lokasi_struk.write_text(isi + "\n", encoding="utf-8")
-        print(f"[SUKSES] File nota disimpan: {lokasi_struk}")
+        print(f"✅[SUKSES] File nota disimpan: {lokasi_struk}")
       
     except OSError as error:
-        print(f"[PERINGATAN] Struk tampil, tetapi gagal tersimpan: {error}")
+        print(f"⚠️[PERINGATAN] Struk tampil, tetapi gagal tersimpan: {error}")
 
 def transaksi_penjualan(kasir):
     if not data_barang["barang"]:
@@ -2177,7 +2177,7 @@ def rekomendasi_barang_terlaris():
             data_rekomendasi[id_barang]["jumlah_transaksi"] += 1
 
     if not data_rekomendasi:
-        print("[INFO] Belum ada data penjualan barang.")
+        print("❗[INFO] Belum ada data penjualan barang.")
         return
 
   #angon ge ngurutke
@@ -2512,7 +2512,7 @@ def restore_data_sistem(id_login):
     print("=" * lebar)
 
     if not FOLDER_BACKUP.exists():
-        print("[INFO] Belum ada folder backup yang tersimpan.")
+        print("❗[INFO] Belum ada folder backup yang tersimpan.")
         return
 
     daftar_backup = sorted(
@@ -2521,7 +2521,7 @@ def restore_data_sistem(id_login):
     )
 
     if not daftar_backup:
-        print("[INFO] Belum ada folder backup yang tersedia.")
+        print("❗[INFO] Belum ada folder backup yang tersedia.")
         return
 
     print("Daftar Backup Tersedia:")
@@ -2530,7 +2530,7 @@ def restore_data_sistem(id_login):
 
     pilih = input("\nPilih nomor backup yang ingin di-restore (0 untuk batal): ").strip()
     if pilih == "0" or not pilih:
-        print("[INFO] Restore dibatalkan.")
+        print("❗[INFO] Restore dibatalkan.")
         return
 
     try:
@@ -2543,7 +2543,7 @@ def restore_data_sistem(id_login):
 
     sumber_backup = daftar_backup[indeks]
     if not konfirmasi_default(f"Yakin menimpa data saat ini dengan '{sumber_backup.name}'?"):
-        print("[INFO] Restore dibatalkan.")
+        print("❗[INFO] Restore dibatalkan.")
         return
 
     try:
