@@ -24,6 +24,7 @@ print(f"Folder database dan struk: {BASE_DIR}")
 
 FILE_PENGGUNA = DATA_DIR / "pengguna.txt"
 FILE_BARANG = DATA_DIR / "barang.txt"
+FILE_KATEGORI = DATA_DIR / "kategori.txt"
 FILE_TRANSAKSI = DATA_DIR / "transaksi.txt"
 FILE_DETAIL = DATA_DIR / "detail_transaksi.txt"
 FILE_MASUK = DATA_DIR / "barang_masuk.txt"
@@ -31,6 +32,7 @@ FILE_KELUAR = DATA_DIR / "barang_keluar.txt"
 FILE_LOG = DATA_DIR / "log_aktivitas.txt"
 
 data_barang = {}
+data_kategori = {}
 data_pengguna = {}
 list_riwayat_stok = []
 data_expired = {}
@@ -130,12 +132,96 @@ def input_password():
             return buat_hash_password(sandi)
         print("⚠️[ERROR] Kedua password tidak sama.")
 
+def simpan_kategori():
+    baris_kategori = [
+        f"{id_kategori}|{nama_kategori}"
+        for id_kategori, nama_kategori in sorted(data_kategori.items())
+    ]
+    FILE_KATEGORI.write_text(
+        "\n".join(baris_kategori) + ("\n" if baris_kategori else ""),
+        encoding="utf-8"
+    )
+
+def tampilkan_daftar_kategori():
+    print("\n--- DAFTAR KATEGORI VALID ---")
+    print(f"{'ID':<8} | {'NAMA KATEGORI':<25}")
+    print("-" * 36)
+    for id_kategori, nama_kategori in sorted(data_kategori.items()):
+        print(f"{id_kategori:<8} | {nama_kategori:<25}")
+    print("-" * 36)
+
+def cari_kategori_valid(teks_input):
+    kunci = teks_input.strip().casefold()
+    for id_kategori, nama_kategori in data_kategori.items():
+        if id_kategori.casefold() == kunci or nama_kategori.casefold() == kunci:
+            return id_kategori, nama_kategori
+    return None
+
+def tambah_kategori_baru(nama_awal=None, oleh_admin=True):
+    if not oleh_admin:
+        print("⚠️ [DITOLAK] Hanya Admin yang dapat menambahkan kategori baru.")
+        return None
+
+    nama_kategori = nama_awal.strip() if nama_awal else input_wajib("Nama kategori baru: ").strip()
+    nama_kategori_rapi = nama_kategori.title()
+
+    if cari_kategori_valid(nama_kategori_rapi):
+        print(f"⚠️ [ERROR] Kategori '{nama_kategori_rapi}' sudah terdaftar.")
+        return None
+
+    nomor_terakhir = 0
+    for kode in data_kategori.keys():
+        if kode.startswith("KAT") and kode[3:].isdigit():
+            nomor_terakhir = max(nomor_terakhir, int(kode[3:]))
+    id_baru = f"KAT{nomor_terakhir + 1:03d}"
+
+    data_kategori[id_baru] = nama_kategori_rapi
+    simpan_kategori()
+    print(f"✅ [SUKSES] Kategori baru '{nama_kategori_rapi}' ({id_baru}) berhasil ditambahkan!")
+    return nama_kategori_rapi
+
+def pilih_kategori_valid(izin_tambah=True):
+    while True:
+        tampilkan_daftar_kategori()
+        masukan = input_wajib("Pilih ID atau Nama kategori: ").strip()
+        hasil = cari_kategori_valid(masukan)
+        if hasil:
+            return hasil[1]  # Mengembalikan nama kategori resmi (contoh: "Alat Kebersihan")
+
+        print(f"⚠️ [PERINGATAN] Kategori '{masukan}' tidak ditemukan di daftar kategori valid!")
+        if izin_tambah:
+            if konfirmasi_default(f"Apakah kategori '{masukan.title()}' sudah valid dan ingin dibuat sebagai kategori baru?"):
+                kategori_baru = tambah_kategori_baru(masukan, oleh_admin=True)
+                if kategori_baru:
+                    return kategori_baru
+            else:
+                print("❗ [INFO] Silakan ketik ulang kategori sesuai daftar yang tersedia (cek ejaan/typo).")
+        else:
+            print("❗ [INFO] Pilih salah satu kategori yang tersedia di atas (hubungi Admin untuk tambah kategori).")
+
 def muat_data():
     global data_barang, data_pengguna, list_riwayat_stok
 
     for file_txt in (FILE_PENGGUNA, FILE_BARANG, FILE_TRANSAKSI, FILE_DETAIL, FILE_MASUK, FILE_KELUAR, FILE_LOG):
         if not file_txt.exists():
             file_txt.write_text("", encoding="utf-8")
+
+    data_kategori.clear()
+    baris_kategori = [baris for baris in FILE_KATEGORI.read_text(encoding="utf-8-sig").splitlines() if baris.strip()]
+    if not baris_kategori:
+        data_kategori.update({
+            "KAT001": "Makanan",
+            "KAT002": "Minuman",
+            "KAT003": "Snack",
+            "KAT004": "Alat Kebersihan",
+            "KAT005": "Sembako",
+        })
+        simpan_kategori()
+    else:
+        for baris in baris_kategori:
+            kolom = baris.split("|")
+            if len(kolom) >= 2:
+                data_kategori[kolom[0].lstrip("\ufeff").strip().upper()] = kolom[1].strip()
 
     pengguna_aktif = {}
     pengguna_arsip = {}
@@ -1075,7 +1161,7 @@ def tambah_barang():
     print("-" * lebar)
 
     nama = input_wajib("Nama barang: ")
-    kategori = input_wajib("Kategori barang (Sembako/Minuman/Makanan): ")
+    kategori = pilih_kategori_valid(izin_tambah=True)
     stok = 0  
     stok_min = input_angka("Stok minimum (minimal 0): ", 0)
     harga_pabrik = input_angka("Harga dari pabrik (Rp): ", 1)
@@ -1270,18 +1356,19 @@ def cari_barang():
     print("-" * 50)
 
 def filter_kategori_barang():
-    kategori_dicari = input_wajib("Masukkan nama kategori (Sembako/Minuman/Makanan): ").casefold()
+    kategori_dicari = pilih_kategori_valid(izin_tambah=False)
     hasil = [
         (kode, barang) for kode, barang in data_barang["barang"].items()
-        if kategori_dicari in barang.get("kategori", "Umum").casefold()
+        if barang.get("kategori", "").casefold() == kategori_dicari.casefold()
     ]
     if not hasil:
-        print("⚠️[INFO] Tidak ada barang pada kategori tersebut.")
+        print(f"⚠️ [INFO] Belum ada barang pada kategori '{kategori_dicari}'.")
         return
-    print(f"\n{'ID':<8} | {'NAMA BARANG':<22} | {'KATEGORI':<12} | {'HARGA':>12} | {'STOK':>5}")
-    print("-" * 68)
+    print(f"\n=== BARANG KATEGORI: {kategori_dicari.upper()} ===")
+    print(f"{'ID':<8} | {'NAMA BARANG':<22} | {'KATEGORI':<16} | {'HARGA':>12} | {'STOK':>5}")
+    print("-" * 72)
     for kode, barang in hasil:
-        print(f"{kode:<8} | {barang['nama_barang'][:22]:<22} | {barang.get('kategori','Umum'):<12} | {rupiah(barang['harga']):>12} | {barang['stok']:>5}")
+        print(f"{kode:<8} | {barang['nama_barang'][:22]:<22} | {barang.get('kategori','-'):<16} | {rupiah(barang['harga']):>12} | {barang['stok']:>5}")
 
 
 def cek_dan_urutkan_expired():
@@ -2362,8 +2449,9 @@ def submenu_kelola_barang_admin():
         print("3. Edit Barang")
         print("4. Hapus Barang")
         print("5. Kelola Status Barang")
+        print("6. Kelola & Tambah Kategori Barang")
         print("0. Kembali")
-        pilih = input("Pilih fitur (0-5): ").strip()
+        pilih = input("Pilih fitur (0-6): ").strip()
         if pilih == "0":
             break
         elif pilih == "1":
@@ -2376,6 +2464,10 @@ def submenu_kelola_barang_admin():
             hapus_barang()
         elif pilih == "5":
             kelola_status_barang()
+        elif pilih == "6":
+            tampilkan_daftar_kategori()
+            if konfirmasi_default("Tambah kategori baru?"):
+                tambah_kategori_baru(oleh_admin=True)
         else:
             print("Pilihan tidak valid.")
 
