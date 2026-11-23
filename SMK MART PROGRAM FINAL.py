@@ -140,7 +140,7 @@ def muat_data():
     pengguna_aktif = {}
     pengguna_arsip = {}
 
-    baris_pengguna = [baris for baris in FILE_PENGGUNA.read_text(encoding="utf-8").splitlines() if baris.strip()]
+    baris_pengguna = [baris for baris in FILE_PENGGUNA.read_text(encoding="utf-8-sig").splitlines() if baris.strip()]
     if not baris_pengguna:
         pengguna_aktif["ADM001"] = {
             "nama": "Administrator SMK MART",
@@ -157,6 +157,7 @@ def muat_data():
             if len(kolom) < 5:
                 continue
             username_data, password_data, nama_data, role_data, status_data = kolom[:5]
+            username_data =  username_data.lstrip("\ufeff").strip()
             tanggal_tambah = kolom[5] if len(kolom) > 5 else datetime.now().strftime("%d-%m-%Y %H:%M:%S")
             tanggal_ubah = kolom[6] if len(kolom) > 6 else "-"
             tanggal_hapus = kolom[7] if len(kolom) > 7 else "-"

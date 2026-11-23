@@ -2,3 +2,7 @@ MASUK001|2026-11-21|BRG9509|150|pt. anugerah indah|usrasel
 MASUK002|2026-11-21|BRG9510|200|pt. south asean|usrasel
 MASUK003|2026-11-21|BRG9508|300|pt. pencari cinta sejati|usrasel
 MASUK004|2026-11-21|BRG9508|300|pt. anugerah indah|usrasel
+MASUK005|2026-11-23|BRG9514|20|pt. beras sejahtera|usrasel
+MASUK006|2026-11-23|BRG9512|50|pt. air bening|usrasel
+MASUK007|2026-11-23|BRG9511|300|pt. seafood|usrasel
+MASUK008|2026-11-23|BRG9513|150|pt. indonesia indah|usrasel

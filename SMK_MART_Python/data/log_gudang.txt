@@ -13,3 +13,14 @@
 [21-11-2026 13:48:40] (sistem) Menghapus barang keripik kentang chela (BRG9507)
 [21-11-2026 13:49:02] (sistem) Menghapus barang kopi hitam (BRG1095)
 [21-11-2026 13:49:15] (sistem) Menghapus barang salt butter (BRG7074)
+[22-11-2026 19:39:21] (admin utama) Logout dari sistem
+[22-11-2026 19:46:25] (admin utama) Logout dari sistem
+[23-11-2026 08:05:54] (usrasel) Login ke sistem
+[23-11-2026 08:06:32] (usrasel) BARANG MASUK MASUK005 BRG9514 +20 dari pt. beras sejahtera
+[23-11-2026 08:07:00] (usrasel) BARANG KELUAR KELUAR003 BRG9514 -2 (RUSAK)
+[23-11-2026 08:07:57] (usrasel) Logout dari sistem
+[23-11-2026 08:08:09] (usrasel) Login ke sistem
+[23-11-2026 08:08:33] (usrasel) BARANG MASUK MASUK006 BRG9512 +50 dari pt. air bening
+[23-11-2026 08:09:02] (usrasel) BARANG MASUK MASUK007 BRG9511 +300 dari pt. seafood
+[23-11-2026 08:09:30] (usrasel) BARANG MASUK MASUK008 BRG9513 +150 dari pt. indonesia indah
+[23-11-2026 08:10:23] (usrasel) Logout dari sistem

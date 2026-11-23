@@ -57,3 +57,60 @@
 2026-11-21|13:49:15|sistem|Menghapus barang salt butter (BRG7074)
 2026-11-21|13:49:28|admin|Membuat backup data ke tujuan backup_20261121_134928
 2026-11-21|13:49:33|admin|Logout dari sistem
+2026-11-22|07:27:53|melinana|NONAKTIF_OTOMATIS
+2026-11-22|07:36:16|blackwood|NONAKTIF_OTOMATIS
+2026-11-22|07:36:35|admin|LOGIN
+2026-11-22|07:36:40|admin|LOGIN
+2026-11-22|07:37:08|admin|LOGIN
+2026-11-22|07:37:32|admin|NONAKTIF_OTOMATIS
+2026-11-22|08:03:48|admin utama|Login ke sistem
+2026-11-22|08:03:59|admin utama|Logout dari sistem
+2026-11-22|08:06:42|admin utama|Login ke sistem
+2026-11-22|08:07:46|admin utama|Logout dari sistem
+2026-11-22|08:22:33|admin utama|LOGIN
+2026-11-22|19:31:16|admin utama|Login ke sistem
+2026-11-22|19:33:55|admin utama|Logout dari sistem
+2026-11-22|19:34:29|admin utama|Login ke sistem
+2026-11-22|19:35:06|admin utama|Mengaktifkan kembali pengguna blackwood (USR006)
+2026-11-22|19:35:23|admin utama|Mengaktifkan kembali pengguna melinana (USR007)
+2026-11-22|19:39:21|admin utama|Logout dari sistem
+2026-11-22|19:39:22|admin utama|Logout dari sistem
+2026-11-22|19:43:25|admin utama|Login ke sistem
+2026-11-22|19:44:58|admin utama|Logout dari sistem
+2026-11-22|19:45:25|admin utama|Login ke sistem
+2026-11-22|19:46:25|admin utama|Logout dari sistem
+2026-11-22|19:46:27|admin utama|Logout dari sistem
+2026-11-23|07:21:26|admin utama|Login ke sistem
+2026-11-23|07:22:25|sistem|Menghapus pengguna Nana (USR007)
+2026-11-23|07:22:55|admin utama|Mengaktifkan kembali pengguna melinana (USR007)
+2026-11-23|07:29:05|admin utama|Logout dari sistem
+2026-11-23|07:34:31|admin utama|Login ke sistem
+2026-11-23|07:34:58|admin utama|Reset password pengguna USR001
+2026-11-23|07:35:01|admin utama|Logout dari sistem
+2026-11-23|07:35:55|admin utama|Login ke sistem
+2026-11-23|07:36:32|admin utama|Reset password pengguna USR001
+2026-11-23|07:36:37|admin utama|Logout dari sistem
+2026-11-23|07:38:38|blackwood|Login ke sistem
+2026-11-23|07:39:47|blackwood|Logout dari sistem
+2026-11-23|07:39:57|admin utama|Login ke sistem
+2026-11-23|07:40:33|admin utama|Reset password pengguna USR001
+2026-11-23|07:40:38|admin utama|Logout dari sistem
+2026-11-23|07:47:37|tyaa|Akun tyaa dinonaktifkan otomatis (3x gagal login)
+2026-11-23|08:04:57|admin utama|Login ke sistem
+2026-11-23|08:05:46|admin utama|Logout dari sistem
+2026-11-23|08:05:54|usrasel|Login ke sistem
+2026-11-23|08:06:32|usrasel|BARANG MASUK MASUK005 BRG9514 +20 dari pt. beras sejahtera
+2026-11-23|08:07:00|usrasel|BARANG KELUAR KELUAR003 BRG9514 -2 (RUSAK)
+2026-11-23|08:07:57|usrasel|Logout dari sistem
+2026-11-23|08:08:09|usrasel|Login ke sistem
+2026-11-23|08:08:33|usrasel|BARANG MASUK MASUK006 BRG9512 +50 dari pt. air bening
+2026-11-23|08:09:02|usrasel|BARANG MASUK MASUK007 BRG9511 +300 dari pt. seafood
+2026-11-23|08:09:30|usrasel|BARANG MASUK MASUK008 BRG9513 +150 dari pt. indonesia indah
+2026-11-23|08:10:23|usrasel|Logout dari sistem
+2026-11-23|08:10:53|admin utama|Login ke sistem
+2026-11-23|08:11:32|admin utama|Membuat backup data ke tujuan backup_20261123_081132
+2026-11-23|08:12:28|admin utama|Logout dari sistem
+2026-11-23|08:12:48|sheila2013|Login ke sistem
+2026-11-23|08:14:26|sheila2013|Logout dari sistem
+2026-11-23|08:14:34|blackwood|Login ke sistem
+2026-11-23|08:14:51|blackwood|Logout dari sistem
