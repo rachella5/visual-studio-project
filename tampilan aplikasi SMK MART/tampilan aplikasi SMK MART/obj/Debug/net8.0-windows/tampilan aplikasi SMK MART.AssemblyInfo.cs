@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("tampilan aplikasi SMK MART")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+78fd2e7e1b1afdbb40e8608032149b91f125f986")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f339c0df4ae5b01f6bdcb54f204b2c12c8420560")]
 [assembly: System.Reflection.AssemblyProductAttribute("tampilan aplikasi SMK MART")]
 [assembly: System.Reflection.AssemblyTitleAttribute("tampilan aplikasi SMK MART")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
