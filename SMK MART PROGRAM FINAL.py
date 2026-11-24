@@ -1144,7 +1144,6 @@ def edit_barang():
         print("⚠️[ERROR] ID barang tidak ditemukan.")
         return
 
-
     print("\nKosongkan input jika tidak ingin mengubah data.")
 
     nama = input(f"Nama barang [{barang['nama_barang']}]: ").strip()
@@ -1179,17 +1178,40 @@ def edit_barang():
             print("⚠️[ERROR] Format tanggal expired salah.")
             return
 
+    # Menyiapkan data baru untuk pratinjau
+    nama_baru_final = nama or barang["nama_barang"]
+    expired_baru_final = expired or barang.get("expired", "31-12-2099")
+    laba_baru = hitung_laba(pabrik_baru, jual_baru)
+    laba_lama = barang.get('laba_per_barang', hitung_laba(ambil_harga_pabrik(barang), ambil_harga_jual(barang)))
+
+    # --- INOVASI: Menampilkan Pratinjau dalam Bentuk Tabel ---
+    print("\n" + "="*65)
+    print(f"📋 PRATINJAU PERUBAHAN DATA BARANG (ID: {id_barang})")
+    print("="*65)
+    print(f"{'Kategori':<15} | {'Data Lama':<20} | {'Data Baru':<20}")
+    print("-" * 65)
+    print(f"{'Nama Barang':<15} | {str(barang['nama_barang']):<20} | {str(nama_baru_final):<20}")
+    print(f"{'Harga Pabrik':<15} | {str(ambil_harga_pabrik(barang)):<20} | {str(pabrik_baru):<20}")
+    print(f"{'Harga Jual':<15} | {str(ambil_harga_jual(barang)):<20} | {str(jual_baru):<20}")
+    print(f"{'Laba':<15} | {str(laba_lama):<20} | {str(laba_baru):<20}")
+    print(f"{'Expired':<15} | {str(barang.get('expired', '')):<20} | {str(expired_baru_final):<20}")
+    print("="*65)
+
+    yakin = input("Apakah Anda yakin ingin menyimpan perubahan ini? (y/t): ").strip().lower()
+    if yakin != 'y':
+        print("❌ Perubahan dibatalkan.")
+        return
+    # --------------------------------------------------------
+
     data_lama = copy.deepcopy(barang)
 
     barang.update({
-        "nama_barang": nama or barang["nama_barang"],
+        "nama_barang": nama_baru_final,
         "harga_pabrik": pabrik_baru,
         "harga_jual": jual_baru,
         "harga": jual_baru,
-        "laba_per_barang": hitung_laba(
-            pabrik_baru, jual_baru
-        ),
-        "expired": expired or barang.get("expired", "31-12-2099")
+        "laba_per_barang": laba_baru,
+        "expired": expired_baru_final
     })
 
     if simpan_data():
