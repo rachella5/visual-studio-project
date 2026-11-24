@@ -244,19 +244,31 @@ def muat_data():
         kolom = baris.split("|")
         if len(kolom) < 7:
             continue
-        nomor_trx, tanggal_trx, waktu_trx, kasir_username, total_trx, bayar_trx, kembalian_trx = kolom[:7]
+           nomor_trx, tanggal_trx, waktu_trx, kasir_username, total_trx, bayar_trx, kembalian_trx = kolom[:7]
+
+        subtotal_trx = int(kolom[7]) if len(kolom) > 7 else int(total_trx)
+        ppn_trx = int(kolom[8]) if len(kolom) > 8 else 0
+        tarif_ppn_trx = int(kolom[9]) if len(kolom) > 9 else 0
+
         if nomor_trx.startswith("TRX") and nomor_trx[3:].isdigit():
             nomor_urut_terakhir = max(nomor_urut_terakhir, int(nomor_trx[3:]))
+
         try:
-            tanggal_tampil = datetime.strptime(tanggal_trx, "%Y-%m-%d").strftime("%d-%m-%Y")
+            tanggal_tampil = datetime.strptime(
+                tanggal_trx, "%Y-%m-%d"
+            ).strftime("%d-%m-%Y")
         except ValueError:
             tanggal_tampil = tanggal_trx
+
         daftar_transaksi.append({
             "nomor": nomor_trx,
             "tanggal": f"{tanggal_tampil} {waktu_trx}",
             "kasir_username": kasir_username,
             "kasir_nama": kasir_username,
             "item": detail_per_transaksi.get(nomor_trx, []),
+            "subtotal": subtotal_trx,
+            "ppn": ppn_trx,
+            "tarif_ppn": tarif_ppn_trx,
             "total": int(total_trx),
             "bayar": int(bayar_trx),
             "kembalian": int(kembalian_trx)
@@ -313,9 +325,16 @@ def simpan_data(data_baru=None):
             except ValueError:
                 tanggal_simpan = tanggal_str
 
-            baris_transaksi.append(
-                f"{transaksi['nomor']}|{tanggal_simpan}|{waktu_str}|{transaksi.get('kasir_username', '-')}|"
-                f"{int(transaksi['total'])}|{int(transaksi['bayar'])}|{int(transaksi['kembalian'])}"
+        baris_transaksi.append(
+            f"{transaksi['nomor']}|{tanggal_simpan}|{waktu_str}|"
+            f"{transaksi.get('kasir_username', '-')}|"
+            f"{int(transaksi['total'])}|"
+            f"{int(transaksi['bayar'])}|"
+            f"{int(transaksi['kembalian'])}|"
+            f"{int(transaksi.get('subtotal', transaksi['total']))}|"
+            f"{int(transaksi.get('ppn', 0))}|"
+            f"{int(transaksi.get('tarif_ppn', 0))}"
+         )
             )
             for item in transaksi.get("item", []):
                 harga_modal = int(item.get("harga_pabrik", item["harga"]))
@@ -1886,6 +1905,8 @@ def format_struk(data_transaksi):
             baris.append(f"{kiri:<27}{kanan:>19}")
 
     metode_bayar = data_transaksi.get("metode", "TUNAI")
+        tarif_ppn = data_transaksi.get("tarif_ppn", TARIF_PPN)
+    label_ppn = f"PPN {tarif_ppn}%"
 
     baris.append("-" * 46)
     if total_hemat > 0:
@@ -1901,6 +1922,8 @@ def format_struk(data_transaksi):
      "Terima kasih sudah berbelanja!".center(46),
       garis
       ] 
+    return "\n".join(baris)
+    
 def cetak_struk(data_transaksi):
     isi = format_struk(data_transaksi)
     print("\n" + isi)
@@ -1992,19 +2015,17 @@ def transaksi_penjualan(kasir):
         keranjang[id_barang] = keranjang.get(id_barang, 0) + jumlah
         print("[SUKSES] Barang masuk keranjang.")
         
-subtotal_transaksi = tampil_keranjang(keranjang)
+    subtotal_transaksi = tampil_keranjang(keranjang)
 
-ppn = hitung_ppn(subtotal_transaksi)
+    ppn = hitung_ppn(subtotal_transaksi)
 
-total = subtotal_transaksi + ppn
+    total = subtotal_transaksi + ppn
 
-print("\n=== RINCIAN PEMBAYARAN ===")
-print(f"Subtotal : {rupiah(subtotal_transaksi)}")
-print(f"PPN 11%  : {rupiah(ppn)}")
-print("-" * 35)
-print(f"TOTAL    : {rupiah(total)}")
-
-    print("\n=== METODE PEMBAYARAN ===")
+    print("\n=== RINCIAN PEMBAYARAN ===")
+    print(f"Subtotal : {rupiah(subtotal_transaksi)}")
+    print(f"PPN {TARIF_PPN}% : {rupiah(ppn)}")
+    print("-" * 35)
+    print(f"TOTAL    : {rupiah(total)}")
     print("1. Tunai (Cash)")
     print("2. Debit")
     print("Ketik 0 pada pembayaran untuk membatalkan transaksi.")
@@ -2063,23 +2084,23 @@ print(f"TOTAL    : {rupiah(total)}")
 )
         })
 
-   data_transaksi = {
-    "nomor": f"TRX{baru['nomor_berikutnya']:03d}",
-    "tanggal": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
-    "kasir_id": kasir[0],
-    "kasir_nama": kasir[1]["nama"],
-    "kasir_username": kasir[1]["username"],
-    "item": daftar_item,
+      data_transaksi = {
+        "nomor": f"TRX{baru['nomor_berikutnya']:03d}",
+        "tanggal": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+        "kasir_id": kasir[0],
+        "kasir_nama": kasir[1]["nama"],
+        "kasir_username": kasir[1]["username"],
+        "item": daftar_item,
 
-    "subtotal": subtotal_transaksi,
-    "ppn": ppn,
-    "tarif_ppn": TARIF_PPN,
-    "total": total,
+        "subtotal": subtotal_transaksi,
+        "ppn": ppn,
+        "tarif_ppn": TARIF_PPN,
+        "total": total,
 
-    "metode": metode,
-    "bayar": bayar,
-    "kembalian": kembalian
-}
+        "metode": metode,
+        "bayar": bayar,
+        "kembalian": kembalian
+    }
 
     baru["transaksi"].append(data_transaksi)
     baru["nomor_berikutnya"] += 1
