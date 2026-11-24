@@ -1,4 +1,5 @@
 from pathlib import Path
+import difflib
 import hashlib
 import hmac
 import secrets
@@ -6,7 +7,6 @@ from datetime import datetime
 import copy
 import getpass
 import shutil
-
 
 LOKASI_SCRIPT_INI = Path.cwd()
 BASE_DIR = LOKASI_SCRIPT_INI / "SMK_MART_Python"
@@ -1101,6 +1101,48 @@ def tampilkan_barang():
     print(f"Total Barang: {jumlah_data} Item")
     print("=" * lebar)
 
+def pilih_kategori():
+    while True:
+        nama_kategori = input_wajib("Kategori barang: ").strip()
+
+        # Cek apakah kategori sudah ada
+        for kategori in data_kategori:
+            if nama_kategori.casefold() == kategori.casefold():
+                return kategori
+
+        # Cari kategori yang paling mirip
+        saran = difflib.get_close_matches(
+            nama_kategori,
+            data_kategori,
+            n=1,
+            cutoff=0.65
+        )
+
+        if saran:
+            print(f"Apakah yang Anda maksud {saran[0]}?")
+            jawaban = input("Pilih Y/T: ").strip().upper()
+
+            if jawaban == "Y":
+                return saran[0]
+            elif jawaban != "T":
+                print("Masukkan Y atau T.")
+                continue
+
+        # Buat kategori baru
+        nama_baru = nama_kategori.title()
+        file_kategori = FOLDER_KATEGORI / f"{nama_baru}.txt"
+
+        file_kategori.write_text(
+            nama_baru,
+            encoding="utf-8"
+        )
+
+        data_kategori.append(nama_baru)
+
+        print(f"Kategori baru '{nama_baru}' berhasil dibuat.")
+
+        return nama_baru
+
 def tambah_barang():
     lebar = 77
     print("=" * lebar)
@@ -1121,7 +1163,7 @@ def tambah_barang():
     print("-" * lebar)
 
     nama = input_wajib("Nama barang: ")
-    kategori = input_wajib("Kategori barang (Sembako/Minuman/Makanan): ")
+    kategori = pilih_kategori()
     stok = 0  
     stok_min = input_angka("Stok minimum (minimal 0): ", 0)
     harga_pabrik = input_angka("Harga dari pabrik (Rp): ", 1)
