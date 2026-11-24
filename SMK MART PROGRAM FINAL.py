@@ -340,7 +340,7 @@ def muat_data():
         kolom = baris.split("|")
         if len(kolom) < 7:
             continue
-           nomor_trx, tanggal_trx, waktu_trx, kasir_username, total_trx, bayar_trx, kembalian_trx = kolom[:7]
+        nomor_trx, tanggal_trx, waktu_trx, kasir_username, total_trx, bayar_trx, kembalian_trx = kolom[:7]
 
         subtotal_trx = int(kolom[7]) if len(kolom) > 7 else int(total_trx)
         ppn_trx = int(kolom[8]) if len(kolom) > 8 else 0
@@ -421,23 +421,24 @@ def simpan_data(data_baru=None):
             except ValueError:
                 tanggal_simpan = tanggal_str
 
-        baris_transaksi.append(
-            f"{transaksi['nomor']}|{tanggal_simpan}|{waktu_str}|"
-            f"{transaksi.get('kasir_username', '-')}|"
-            f"{int(transaksi['total'])}|"
-            f"{int(transaksi['bayar'])}|"
-            f"{int(transaksi['kembalian'])}|"
-            f"{int(transaksi.get('subtotal', transaksi['total']))}|"
-            f"{int(transaksi.get('ppn', 0))}|"
-            f"{int(transaksi.get('tarif_ppn', 0))}"
-         )
+            baris_transaksi.append(
+                f"{transaksi['nomor']}|{tanggal_simpan}|{waktu_str}|"
+                f"{transaksi.get('kasir_username', '-')}|"
+                f"{int(transaksi['total'])}|"
+                f"{int(transaksi['bayar'])}|"
+                f"{int(transaksi['kembalian'])}|"
+                f"{int(transaksi.get('subtotal', transaksi['total']))}|"
+                f"{int(transaksi.get('ppn', 0))}|"
+                f"{int(transaksi.get('tarif_ppn', 0))}"
             )
+            
             for item in transaksi.get("item", []):
                 harga_modal = int(item.get("harga_pabrik", item["harga"]))
                 baris_detail.append(
-                    f"{transaksi['nomor']}|{item['id_barang']}|{item['nama_barang']}|"
-                    f"{int(item['harga'])}|{int(item['jumlah'])}|{int(item['subtotal'])}|{harga_modal}"
-                )
+                f"{transaksi['nomor']}|{item['id_barang']}|{item['nama_barang']}|"
+                f"{int(item['harga'])}|{int(item['jumlah'])}|{int(item['subtotal'])}|{harga_modal}"
+            )
+                
         FILE_TRANSAKSI.write_text("\n".join(baris_transaksi) + ("\n" if baris_transaksi else ""), encoding="utf-8")
         FILE_DETAIL.write_text("\n".join(baris_detail) + ("\n" if baris_detail else ""), encoding="utf-8")
         return True
@@ -1892,6 +1893,154 @@ def kartu_stok_barang():
         print(f"{tanggal_tampil:<12} | {jenis_aktivitas:<10} | {jumlah_unit:>8} | {keterangan_detail[:29]:<29}")
     print("=" * lebar)
 
+def stok_opname(id_login):
+    lebar = 82
+    print("\n" + "=" * lebar)
+    print("STOK OPNAME (PENCOCOKAN STOK FISIK VS SISTEM)".center(lebar))
+    print("=" * lebar)
+
+    if not data_barang["barang"]:
+        print("❗[INFO] Belum ada data barang yang tersimpan.")
+        return
+
+    tampilkan_barang()
+    print("\nMasukkan kode barang yang ingin dicek stok fisiknya (ketik 'selesai' jika sudah).")
+
+    hasil_opname = []
+    petugas = data_pengguna["pengguna"][id_login]["username"]
+    role_petugas = data_pengguna["pengguna"][id_login]["role"]
+
+    while True:
+        id_barang = input("\nKode barang / selesai: ").strip().upper()
+        if id_barang == "SELESAI":
+            break
+        if id_barang not in data_barang["barang"]:
+            print("⚠️[ERROR] Kode barang tidak ditemukan.")
+            continue
+
+        barang = data_barang["barang"][id_barang]
+        stok_sistem = int(barang["stok"])
+        print(f"Barang      : {barang['nama_barang']}")
+        print(f"Stok Sistem : {stok_sistem}")
+
+        stok_fisik = input_angka("Stok Fisik (hasil hitungan nyata): ", minimum=0)
+        selisih = stok_fisik - stok_sistem
+
+        if selisih == 0:
+            keterangan_selisih = "SESUAI (0)"
+            print("✅[INFO] Stok fisik sesuai dengan stok sistem.")
+        elif selisih > 0:
+            keterangan_selisih = f"LEBIH (+{selisih})"
+            print(f"⚠️[SELISIH] Stok fisik lebih banyak {selisih} unit dari sistem.")
+        else:
+            keterangan_selisih = f"KURANG ({selisih})"
+            print(f"⚠️[SELISIH] Stok fisik kurang {abs(selisih)} unit dari sistem.")
+
+        catatan = input("Catatan opname (opsional, Enter untuk '-'): ").strip() or "-"
+
+        if selisih != 0:
+            if konfirmasi_default(f"Sesuaikan stok sistem '{barang['nama_barang']}' menjadi {stok_fisik}?"):
+                barang["stok"] = stok_fisik
+                list_riwayat_stok.append({
+                    "id_barang": id_barang,
+                    "nama_barang": barang["nama_barang"],
+                    "jenis": f"Stok Opname ({keterangan_selisih})",
+                    "jumlah": abs(selisih),
+                    "stok_sebelum": stok_sistem,
+                    "stok_sesudah": stok_fisik
+                })
+                catat_log(
+                    role_petugas,
+                    f"STOK OPNAME {id_barang}: sistem {stok_sistem} -> fisik {stok_fisik} ({keterangan_selisih}) | {catatan}",
+                    petugas
+                )
+
+        hasil_opname.append({
+            "id": id_barang,
+            "nama": barang["nama_barang"],
+            "sistem": stok_sistem,
+            "fisik": stok_fisik,
+            "selisih": selisih,
+            "catatan": catatan
+        })
+
+    if not hasil_opname:
+        print("❗[INFO] Tidak ada barang yang diperiksa pada sesi stok opname ini.")
+        return
+
+    simpan_data()
+
+    baris_laporan = [
+        "=" * lebar,
+        "BERITA ACARA STOK OPNAME SMK MART".center(lebar),
+        f"Tanggal : {datetime.now().strftime('%d-%m-%Y %H:%M:%S')} | Petugas: {petugas}".center(lebar),
+        "=" * lebar,
+        f"{'ID':<8} | {'NAMA BARANG':<22} | {'SISTEM':>7} | {'FISIK':>7} | {'SELISIH':>8} | {'CATATAN':<15}",
+        "-" * lebar
+    ]
+
+    for item in hasil_opname:
+        tanda_selisih = f"+{item['selisih']}" if item["selisih"] > 0 else str(item["selisih"])
+        baris_laporan.append(
+            f"{item['id']:<8} | {item['nama'][:22]:<22} | {item['sistem']:>7} | "
+            f"{item['fisik']:>7} | {tanda_selisih:>8} | {item['catatan'][:15]:<15}"
+        )
+
+    baris_laporan.append("=" * lebar)
+    isi_laporan = "\n".join(baris_laporan)
+    print("\n" + isi_laporan)
+    simpan_teks_laporan(f"stok_opname_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt", isi_laporan)
+
+def laporan_nilai_persediaan():
+    lebar = 96
+    if not data_barang["barang"]:
+        print("❗[INFO] Belum ada data barang yang tersimpan.")
+        return
+
+    baris_laporan = [
+        "=" * lebar,
+        "LAPORAN NILAI PERSEDIAAN BARANG SMK MART".center(lebar),
+        f"Tanggal Cetak: {datetime.now().strftime('%d-%m-%Y %H:%M:%S')}".center(lebar),
+        "=" * lebar,
+        f"{'ID':<8} | {'NAMA BARANG':<22} | {'STOK':>5} | {'HARGA JUAL':>13} | {'NILAI JUAL':>15} | {'NILAI MODAL':>15}",
+        "-" * lebar
+    ]
+
+    total_unit = 0
+    total_nilai_jual = 0
+    total_nilai_modal = 0
+
+    for id_barang, barang in sorted(data_barang["barang"].items()):
+        stok = int(barang["stok"])
+        harga_jual = int(ambil_harga_jual(barang))
+        harga_modal = int(ambil_harga_pabrik(barang))
+
+        nilai_jual = stok * harga_jual
+        nilai_modal = stok * harga_modal
+
+        total_unit += stok
+        total_nilai_jual += nilai_jual
+        total_nilai_modal += nilai_modal
+
+        baris_laporan.append(
+            f"{id_barang:<8} | {barang['nama_barang'][:22]:<22} | {stok:>5} | "
+            f"{rupiah(harga_jual):>13} | {rupiah(nilai_jual):>15} | {rupiah(nilai_modal):>15}"
+        )
+
+    baris_laporan.extend([
+        "=" * lebar,
+        f"Total Jenis Barang       : {len(data_barang['barang'])} item",
+        f"Total Seluruh Unit Stok  : {total_unit} unit",
+        f"Total Nilai Persediaan   : {rupiah(total_nilai_jual)} (berdasarkan harga jual)",
+        f"Total Nilai Modal Pabrik : {rupiah(total_nilai_modal)} (berdasarkan harga pabrik)",
+        f"Potensi Laba Persediaan  : {rupiah(total_nilai_jual - total_nilai_modal)}",
+        "=" * lebar
+    ])
+
+    isi_laporan = "\n".join(baris_laporan)
+    print("\n" + isi_laporan)
+    simpan_teks_laporan(f"laporan_nilai_persediaan_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt", isi_laporan)
+
 def analisis_spldv_harga_barang():
     print("\n=== ANALISIS HARGA BARANG (SPLDV) ===")
     print("Gunakan metode ini untuk menentukan harga satuan dua barang (Barang X dan Barang Y)")
@@ -2070,7 +2219,7 @@ def format_struk(data_transaksi):
             baris.append(f"{kiri:<27}{kanan:>19}")
 
     metode_bayar = data_transaksi.get("metode", "TUNAI")
-        tarif_ppn = data_transaksi.get("tarif_ppn", TARIF_PPN)
+    tarif_ppn = data_transaksi.get("tarif_ppn", TARIF_PPN)
     label_ppn = f"PPN {tarif_ppn}%"
 
     baris.append("-" * 46)
@@ -2249,7 +2398,7 @@ def transaksi_penjualan(kasir):
 )
         })
 
-      data_transaksi = {
+    data_transaksi = {
         "nomor": f"TRX{baru['nomor_berikutnya']:03d}",
         "tanggal": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
         "kasir_id": kasir[0],
@@ -2295,6 +2444,133 @@ def cetak_ulang_struk():
         cetak_struk(data_transaksi)
     else:
         print("⚠️ [ERROR] Nomor transaksi tidak ditemukan.")
+
+def retur_penjualan(id_login):
+    lebar = 76
+    print("\n" + "=" * lebar)
+    print("RETUR PENJUALAN (PEMBATALAN SEBAGIAN / SELURUH TRANSAKSI)".center(lebar))
+    print("=" * lebar)
+
+    if not data_barang["transaksi"]:
+        print("❗[INFO] Belum ada riwayat transaksi penjualan.")
+        return
+
+    riwayat_transaksi()
+    nomor = input_wajib("Masukkan Nomor Transaksi yang diretur (contoh: TRX001): ").upper()
+
+    transaksi = next((t for t in data_barang["transaksi"] if t["nomor"] == nomor), None)
+    if not transaksi:
+        print(f"⚠️[ERROR] Transaksi '{nomor}' tidak ditemukan.")
+        return
+
+    if not transaksi.get("item"):
+        print("⚠️[ERROR] Transaksi ini tidak memiliki detail item.")
+        return
+
+    print("\n--- ITEM DALAM TRANSAKSI ---")
+    for idx, item in enumerate(transaksi["item"], start=1):
+        print(f"{idx}. [{item['id_barang']}] {item['nama_barang']} | Qty: {item['jumlah']} | Harga: {rupiah(item['harga'])} | Subtotal: {rupiah(item['subtotal'])}")
+
+    print("\nPilih jenis retur:")
+    print("1. Retur Sebagian Item")
+    print("2. Retur Seluruh Transaksi")
+    print("0. Batal")
+    jenis_retur = input("Pilihan (0-2): ").strip()
+
+    if jenis_retur == "0":
+        print("❗[INFO] Retur penjualan dibatalkan.")
+        return
+
+    petugas = data_pengguna["pengguna"][id_login]["username"]
+    role_petugas = data_pengguna["pengguna"][id_login]["role"]
+    alasan_retur = input_wajib("Alasan retur dari pembeli: ")
+
+    if jenis_retur == "2":
+        if not konfirmasi_default(f"Yakin retur SELURUH transaksi {nomor} dan kembalikan semua stok?"):
+            return
+
+        total_refund = transaksi["total"]
+        for item in transaksi["item"]:
+            id_brg = item["id_barang"]
+            jml = int(item["jumlah"])
+            if id_brg in data_barang["barang"]:
+                stok_awal = int(data_barang["barang"][id_brg]["stok"])
+                data_barang["barang"][id_brg]["stok"] = stok_awal + jml
+                list_riwayat_stok.append({
+                    "id_barang": id_brg,
+                    "nama_barang": item["nama_barang"],
+                    "jenis": f"Retur Penjualan ({nomor})",
+                    "jumlah": jml,
+                    "stok_sebelum": stok_awal,
+                    "stok_sesudah": stok_awal + jml
+                })
+
+        data_barang["transaksi"].remove(transaksi)
+        if simpan_data():
+            catat_log(role_petugas, f"RETUR PENUH {nomor} | Refund: {rupiah(total_refund)} | Alasan: {alasan_retur}", petugas)
+            print(f"✅[SUKSES] Seluruh transaksi {nomor} diretur. Stok dikembalikan & uang kembali: {rupiah(total_refund)}.")
+
+    elif jenis_retur == "1":
+        id_brg_retur = input_wajib("Masukkan ID Barang yang diretur (contoh BRG001): ").upper()
+        item_target = next((i for i in transaksi["item"] if i["id_barang"] == id_brg_retur), None)
+        if not item_target:
+            print("⚠️[ERROR] Barang tersebut tidak ada di dalam transaksi ini.")
+            return
+
+        maks_qty = int(item_target["jumlah"])
+        qty_retur = input_angka(f"Jumlah yang diretur (1 - {maks_qty}): ", minimum=1)
+        if qty_retur > maks_qty:
+            print(f"⚠️[ERROR] Jumlah retur tidak boleh melebihi jumlah beli ({maks_qty}).")
+            return
+
+        if not konfirmasi_default(f"Konfirmasi retur {qty_retur} unit '{item_target['nama_barang']}' dari {nomor}?"):
+            return
+
+        # Kembalikan stok barang
+        if id_brg_retur in data_barang["barang"]:
+            stok_awal = int(data_barang["barang"][id_brg_retur]["stok"])
+            data_barang["barang"][id_brg_retur]["stok"] = stok_awal + qty_retur
+            list_riwayat_stok.append({
+                "id_barang": id_brg_retur,
+                "nama_barang": item_target["nama_barang"],
+                "jenis": f"Retur Sebagian ({nomor})",
+                "jumlah": qty_retur,
+                "stok_sebelum": stok_awal,
+                "stok_sesudah": stok_awal + qty_retur
+            })
+
+        # Hitung pengurangan transaksi & PPN proporsional
+        total_lama = int(transaksi["total"])
+        if qty_retur == maks_qty:
+            transaksi["item"].remove(item_target)
+        else:
+            item_target["jumlah"] = maks_qty - qty_retur
+            item_target["subtotal"] = item_target["jumlah"] * int(item_target["harga"])
+            if "laba_kotor" in item_target:
+                item_target["laba_kotor"] = item_target["subtotal"] - (int(item_target.get("harga_pabrik", item_target["harga"])) * item_target["jumlah"])
+
+        if not transaksi["item"]:
+            data_barang["transaksi"].remove(transaksi)
+            uang_kembali = total_lama
+        else:
+            subtotal_baru = sum(int(i["subtotal"]) for i in transaksi["item"])
+            tarif_ppn = int(transaksi.get("tarif_ppn", 0))
+            ppn_baru = round(subtotal_baru * tarif_ppn / 100) if tarif_ppn > 0 else 0
+            total_baru = subtotal_baru + ppn_baru
+            uang_kembali = max(0, total_lama - total_baru)
+
+            transaksi["subtotal"] = subtotal_baru
+            transaksi["ppn"] = ppn_baru
+            transaksi["total"] = total_baru
+            if transaksi["bayar"] >= total_baru:
+                transaksi["kembalian"] = transaksi["bayar"] - total_baru
+
+        if simpan_data():
+            catat_log(role_petugas, f"RETUR SEBAGIAN {nomor} {id_brg_retur} ({qty_retur} unit) | Refund: {rupiah(uang_kembali)} | Alasan: {alasan_retur}", petugas)
+            print(f"✅[SUKSES] Retur {qty_retur} unit '{item_target['nama_barang']}' berhasil.")
+            print(f"💰 Uang dikembalikan ke pembeli: {rupiah(uang_kembali)}")
+    else:
+        print("⚠️[ERROR] Pilihan tidak valid.")
 
 def riwayat_transaksi_tanggal():
     print("\n=== RIWAYAT TRANSAKSI ===")
@@ -2628,8 +2904,10 @@ def submenu_laporan_admin():
         print("3. Laporan Kondisi Stok & Expired")
         print("4. Riwayat Perubahan Stok")
         print("5. Hapus Transaksi Penjualan")
+        print("6. Laporan Nilai Persediaan")
+        print("7. Retur Penjualan")
         print("0. Kembali")
-        pilih = input("Pilih fitur (0-4): ").strip()
+        pilih = input("Pilih fitur (0-7): ").strip()
         if pilih == "0":
             break
         elif pilih == "1":
@@ -2642,6 +2920,11 @@ def submenu_laporan_admin():
             riwayat_stok()
         elif pilih == "5":
             hapus_transaksi()
+        elif pilih == "6":
+            laporan_nilai_persediaan()
+        elif pilih == "7":
+            id_admin = next(iter(data_pengguna["pengguna"]))
+            retur_penjualan(id_admin)
         else:
             print("Pilihan tidak valid.")
 
@@ -2855,6 +3138,10 @@ def menu_gudang(id_login):
         print("5. Daftar Stok, Kartu Stok & Cek Expired")
         print("6. Laporan Stok & Analisis Harga (SPLDV)")
         print("7. Ganti Password")
+        print("8. Stok Opname (Cek Stok Fisik)")
+        print("9. Laporan Nilai Persediaan")
+        print("0. Logout")
+        pilih = input("Pilih fitur yang ingin digunakan (0-9): ").strip()
         print("0. Logout")
         pilih = input("Pilih fitur yang ingin digunakan (0-7): ").strip()
         if pilih == "1":
@@ -2876,6 +3163,10 @@ def menu_gudang(id_login):
                 analisis_spldv_harga_barang()
         elif pilih == "7":
             ganti_password_sendiri(id_login)
+        elif pilih == "8":
+            stok_opname(id_login)
+        elif pilih == "9":
+            laporan_nilai_persediaan()
         elif pilih == "0":
             catat_log("gudang", "Logout dari sistem", data_pengguna["pengguna"][id_login]["username"])
             print("\n" + "=" * 64)
@@ -2895,6 +3186,9 @@ def menu_kasir(id_login):
         print("4. Cetak Ulang Struk & Riwayat Tanggal")
         print("5. Rekomendasi 5 Barang Terlaris")
         print("6. Ganti Password")
+        print("7. Retur Penjualan")
+        print("0. Logout")
+        pilih = input("Pilih fitur yang ingin digunakan (0-7): ").strip()
         print("0. Logout")
         pilih = input("Pilih fitur yang ingin digunakan (0-6): ").strip()
         if pilih == "1":
@@ -2910,6 +3204,8 @@ def menu_kasir(id_login):
             rekomendasi_barang_terlaris()
         elif pilih == "6":
             ganti_password_sendiri(id_login)
+        elif pilih == "7":
+            retur_penjualan(id_login)
         elif pilih == "0":
             catat_log("kasir", "Logout dari sistem", kasir[1]["username"])
             print("\n" + "=" * 64)
