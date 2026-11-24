@@ -14,11 +14,13 @@ DATA_DIR = BASE_DIR / "data"
 FOLDER_STRUK = BASE_DIR / "struk"
 FOLDER_LAPORAN = BASE_DIR / "laporan"
 FOLDER_BACKUP = BASE_DIR / "backup_data"
+FOLDER_KATEGORI = DATA_DIR / "kategori"
 
 BASE_DIR.mkdir(parents=True, exist_ok=True)
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 FOLDER_STRUK.mkdir(parents=True, exist_ok=True)
 FOLDER_LAPORAN.mkdir(parents=True, exist_ok=True)
+FOLDER_KATEGORI.mkdir(parents=True, exist_ok=True)
 
 print(f"Folder database dan struk: {BASE_DIR}")
 
@@ -29,12 +31,15 @@ FILE_DETAIL = DATA_DIR / "detail_transaksi.txt"
 FILE_MASUK = DATA_DIR / "barang_masuk.txt"
 FILE_KELUAR = DATA_DIR / "barang_keluar.txt"
 FILE_LOG = DATA_DIR / "log_aktivitas.txt"
+FILE_KATEGORI = DATA_DIR / "kategori.txt"
 
 data_barang = {}
 data_pengguna = {}
 list_riwayat_stok = []
 data_expired = {}
+data_kategori = []
 nomor_berikutnya = 1
+data_kategori = []
 
 ROLE = ("admin", "gudang", "kasir")
 MAP_ROLE = {
@@ -131,11 +136,33 @@ def input_password():
         print("⚠️[ERROR] Kedua password tidak sama.")
 
 def muat_data():
-    global data_barang, data_pengguna, list_riwayat_stok
-
+    global data_barang, data_pengguna, list_riwayat_stok, data_kategori
+    
     for file_txt in (FILE_PENGGUNA, FILE_BARANG, FILE_TRANSAKSI, FILE_DETAIL, FILE_MASUK, FILE_KELUAR, FILE_LOG):
         if not file_txt.exists():
             file_txt.write_text("", encoding="utf-8")
+    data_kategori = []
+    
+    for file_kategori in sorted(FOLDER_KATEGORI.glob("*.txt")):
+        nama_kategori = file_kategori.read_text(
+            encoding="utf-8"
+        ).strip()
+
+        if nama_kategori:
+            data_kategori.append(nama_kategori)
+
+    if not data_kategori:
+        kategori_awal = ["Sembako", "Minuman", "Makanan"]
+
+        for nama in kategori_awal:
+            file_kategori = FOLDER_KATEGORI / f"{nama}.txt"
+
+            file_kategori.write_text(
+                nama,
+                encoding="utf-8"
+            )
+
+        data_kategori = kategori_awal.copy()
 
     pengguna_aktif = {}
     pengguna_arsip = {}
