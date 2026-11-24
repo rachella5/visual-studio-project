@@ -1,4 +1,5 @@
 from pathlib import Path
+import difflib
 import hashlib
 import hmac
 import secrets
@@ -7,18 +8,19 @@ import copy
 import getpass
 import shutil
 
-
 LOKASI_SCRIPT_INI = Path.cwd()
 BASE_DIR = LOKASI_SCRIPT_INI / "SMK_MART_Python"
 DATA_DIR = BASE_DIR / "data"
 FOLDER_STRUK = BASE_DIR / "struk"
 FOLDER_LAPORAN = BASE_DIR / "laporan"
 FOLDER_BACKUP = BASE_DIR / "backup_data"
+FOLDER_KATEGORI = DATA_DIR / "kategori"
 
 BASE_DIR.mkdir(parents=True, exist_ok=True)
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 FOLDER_STRUK.mkdir(parents=True, exist_ok=True)
 FOLDER_LAPORAN.mkdir(parents=True, exist_ok=True)
+FOLDER_KATEGORI.mkdir(parents=True, exist_ok=True)
 
 print(f"Folder database dan struk: {BASE_DIR}")
 
@@ -30,13 +32,16 @@ FILE_DETAIL = DATA_DIR / "detail_transaksi.txt"
 FILE_MASUK = DATA_DIR / "barang_masuk.txt"
 FILE_KELUAR = DATA_DIR / "barang_keluar.txt"
 FILE_LOG = DATA_DIR / "log_aktivitas.txt"
+FILE_KATEGORI = DATA_DIR / "kategori.txt"
 
 data_barang = {}
 data_kategori = {}
 data_pengguna = {}
 list_riwayat_stok = []
 data_expired = {}
+data_kategori = []
 nomor_berikutnya = 1
+data_kategori = []
 
 ROLE = ("admin", "gudang", "kasir")
 MAP_ROLE = {
@@ -83,7 +88,7 @@ def input_angka(pesan, minimum=0):
         try:
             angka = int(input(pesan).strip())
             if angka < minimum:
-                print(f"[ERROR] Angka minimal {minimum}.")
+                print(f"⚠️[ERROR] Angka minimal {minimum}.")
                 continue
             return angka
         except ValueError:
@@ -200,28 +205,33 @@ def pilih_kategori_valid(izin_tambah=True):
             print("❗ [INFO] Pilih salah satu kategori yang tersedia di atas (hubungi Admin untuk tambah kategori).")
 
 def muat_data():
-    global data_barang, data_pengguna, list_riwayat_stok
-
-    for file_txt in (FILE_PENGGUNA, FILE_BARANG, FILE_TRANSAKSI, FILE_DETAIL, FILE_MASUK, FILE_KELUAR, FILE_LOG, FILE_KATEGORI):
+    global data_barang, data_pengguna, list_riwayat_stok, data_kategori
+    
+    for file_txt in (FILE_PENGGUNA, FILE_BARANG, FILE_TRANSAKSI, FILE_DETAIL, FILE_MASUK, FILE_KELUAR, FILE_LOG):
         if not file_txt.exists():
             file_txt.write_text("", encoding="utf-8")
+    data_kategori = []
+    
+    for file_kategori in sorted(FOLDER_KATEGORI.glob("*.txt")):
+        nama_kategori = file_kategori.read_text(
+            encoding="utf-8"
+        ).strip()
 
-    data_kategori.clear()
-    baris_kategori = [baris for baris in FILE_KATEGORI.read_text(encoding="utf-8-sig").splitlines() if baris.strip()]
-    if not baris_kategori:
-        data_kategori.update({
-            "KAT001": "Makanan",
-            "KAT002": "Minuman",
-            "KAT003": "Snack",
-            "KAT004": "Alat Kebersihan",
-            "KAT005": "Sembako",
-        })
-        simpan_kategori()
-    else:
-        for baris in baris_kategori:
-            kolom = baris.split("|")
-            if len(kolom) >= 2:
-                data_kategori[kolom[0].lstrip("\ufeff").strip().upper()] = kolom[1].strip()
+        if nama_kategori:
+            data_kategori.append(nama_kategori)
+
+    if not data_kategori:
+        kategori_awal = ["Sembako", "Minuman", "Makanan"]
+
+        for nama in kategori_awal:
+            file_kategori = FOLDER_KATEGORI / f"{nama}.txt"
+
+            file_kategori.write_text(
+                nama,
+                encoding="utf-8"
+            )
+
+        data_kategori = kategori_awal.copy()
 
     pengguna_aktif = {}
     pengguna_arsip = {}
@@ -330,19 +340,31 @@ def muat_data():
         kolom = baris.split("|")
         if len(kolom) < 7:
             continue
-        nomor_trx, tanggal_trx, waktu_trx, kasir_username, total_trx, bayar_trx, kembalian_trx = kolom[:7]
+           nomor_trx, tanggal_trx, waktu_trx, kasir_username, total_trx, bayar_trx, kembalian_trx = kolom[:7]
+
+        subtotal_trx = int(kolom[7]) if len(kolom) > 7 else int(total_trx)
+        ppn_trx = int(kolom[8]) if len(kolom) > 8 else 0
+        tarif_ppn_trx = int(kolom[9]) if len(kolom) > 9 else 0
+
         if nomor_trx.startswith("TRX") and nomor_trx[3:].isdigit():
             nomor_urut_terakhir = max(nomor_urut_terakhir, int(nomor_trx[3:]))
+
         try:
-            tanggal_tampil = datetime.strptime(tanggal_trx, "%Y-%m-%d").strftime("%d-%m-%Y")
+            tanggal_tampil = datetime.strptime(
+                tanggal_trx, "%Y-%m-%d"
+            ).strftime("%d-%m-%Y")
         except ValueError:
             tanggal_tampil = tanggal_trx
+
         daftar_transaksi.append({
             "nomor": nomor_trx,
             "tanggal": f"{tanggal_tampil} {waktu_trx}",
             "kasir_username": kasir_username,
             "kasir_nama": kasir_username,
             "item": detail_per_transaksi.get(nomor_trx, []),
+            "subtotal": subtotal_trx,
+            "ppn": ppn_trx,
+            "tarif_ppn": tarif_ppn_trx,
             "total": int(total_trx),
             "bayar": int(bayar_trx),
             "kembalian": int(kembalian_trx)
@@ -399,9 +421,16 @@ def simpan_data(data_baru=None):
             except ValueError:
                 tanggal_simpan = tanggal_str
 
-            baris_transaksi.append(
-                f"{transaksi['nomor']}|{tanggal_simpan}|{waktu_str}|{transaksi.get('kasir_username', '-')}|"
-                f"{int(transaksi['total'])}|{int(transaksi['bayar'])}|{int(transaksi['kembalian'])}"
+        baris_transaksi.append(
+            f"{transaksi['nomor']}|{tanggal_simpan}|{waktu_str}|"
+            f"{transaksi.get('kasir_username', '-')}|"
+            f"{int(transaksi['total'])}|"
+            f"{int(transaksi['bayar'])}|"
+            f"{int(transaksi['kembalian'])}|"
+            f"{int(transaksi.get('subtotal', transaksi['total']))}|"
+            f"{int(transaksi.get('ppn', 0))}|"
+            f"{int(transaksi.get('tarif_ppn', 0))}"
+         )
             )
             for item in transaksi.get("item", []):
                 harga_modal = int(item.get("harga_pabrik", item["harga"]))
@@ -487,7 +516,7 @@ def tampilkan_data_pengguna():
         semua_akun.append((id_pengguna, pengguna, "NONAKTIF"))
 
     if not semua_akun:
-        print("[INFO] Belum ada data pengguna yang tersimpan.")
+        print("❗[INFO] Belum ada data pengguna yang tersimpan.")
         return
 
     urutan_role = {"admin": 1, "gudang": 2, "kasir": 3}
@@ -619,7 +648,7 @@ def edit_pengguna():
         print("=" * lebar)
         
         if username_baru and username_terpakai(username_baru, id_pengguna):
-            print("[ERROR] Username sudah digunakan pengguna lain.")
+            print("⚠️[ERROR] Username sudah digunakan pengguna lain.")
             return
 
         password_baru = input_password_simple("Password baru [Kosongkan jika tetap]: ", boleh_kosong=True)
@@ -716,7 +745,7 @@ def cari_pengguna():
 
  if not hasil:
      print( "="  * lebar )  
-     print("[ERROR] Pengguna tidak ditemukan.")
+     print("⚠️[ERROR] Pengguna tidak ditemukan.")
      print( "="  * lebar )  
      return
      
@@ -762,7 +791,7 @@ def hapus_transaksi():
 
     if not data_barang["transaksi"]:
         print ( "=" * lebar )
-        print("[INFO] Belum ada riwayat transaksi yang tersimpan.")
+        print("❗[INFO] Belum ada riwayat transaksi yang tersimpan.")
         print ( "=" * lebar )
         return
 
@@ -776,7 +805,7 @@ def hapus_transaksi():
             break
 
     if not transaksi_ditemukan:
-        print(f"[ERROR] Transaksi dengan nomor '{nomor}' tidak ditemukan.")
+        print(f"⚠️[ERROR] Transaksi dengan nomor '{nomor}' tidak ditemukan.")
         return
         
     print( "=" * lebar ) 
@@ -1089,7 +1118,7 @@ def tampilkan_barang():
     print("=" * lebar)
     
     if not data_barang["barang"]:
-        print("[INFO] Belum ada data barang yang tersimpan.")
+        print("❗[INFO] Belum ada data barang yang tersimpan.")
         return
 
     semua_barang = list(data_barang["barang"].items())
@@ -1143,6 +1172,48 @@ def tampilkan_barang():
     print(f"Total Barang: {jumlah_data} Item")
     print("=" * lebar)
 
+def pilih_kategori():
+    while True:
+        nama_kategori = input_wajib("Kategori barang: ").strip()
+
+        # Cek apakah kategori sudah ada
+        for kategori in data_kategori:
+            if nama_kategori.casefold() == kategori.casefold():
+                return kategori
+
+        # Cari kategori yang paling mirip
+        saran = difflib.get_close_matches(
+            nama_kategori,
+            data_kategori,
+            n=1,
+            cutoff=0.65
+        )
+
+        if saran:
+            print(f"Apakah yang Anda maksud {saran[0]}?")
+            jawaban = input("Pilih Y/T: ").strip().upper()
+
+            if jawaban == "Y":
+                return saran[0]
+            elif jawaban != "T":
+                print("Masukkan Y atau T.")
+                continue
+
+        # Buat kategori baru
+        nama_baru = nama_kategori.title()
+        file_kategori = FOLDER_KATEGORI / f"{nama_baru}.txt"
+
+        file_kategori.write_text(
+            nama_baru,
+            encoding="utf-8"
+        )
+
+        data_kategori.append(nama_baru)
+
+        print(f"Kategori baru '{nama_baru}' berhasil dibuat.")
+
+        return nama_baru
+
 def tambah_barang():
     lebar = 77
     print("=" * lebar)
@@ -1163,7 +1234,7 @@ def tambah_barang():
     print("-" * lebar)
 
     nama = input_wajib("Nama barang: ")
-    kategori = pilih_kategori_valid(izin_tambah=True)
+    kategori = pilih_kategori()
     stok = 0  
     stok_min = input_angka("Stok minimum (minimal 0): ", 0)
     harga_pabrik = input_angka("Harga dari pabrik (Rp): ", 1)
@@ -1213,7 +1284,6 @@ def edit_barang():
         print("⚠️[ERROR] ID barang tidak ditemukan.")
         return
 
-
     print("\nKosongkan input jika tidak ingin mengubah data.")
 
     nama = input(f"Nama barang [{barang['nama_barang']}]: ").strip()
@@ -1250,17 +1320,40 @@ def edit_barang():
             print("⚠️[ERROR] Format tanggal expired salah.")
             return
 
+    # Menyiapkan data baru untuk pratinjau
+    nama_baru_final = nama or barang["nama_barang"]
+    expired_baru_final = expired or barang.get("expired", "31-12-2099")
+    laba_baru = hitung_laba(pabrik_baru, jual_baru)
+    laba_lama = barang.get('laba_per_barang', hitung_laba(ambil_harga_pabrik(barang), ambil_harga_jual(barang)))
+
+    # --- INOVASI: Menampilkan Pratinjau dalam Bentuk Tabel ---
+    print("\n" + "="*65)
+    print(f"📋 PRATINJAU PERUBAHAN DATA BARANG (ID: {id_barang})")
+    print("="*65)
+    print(f"{'Kategori':<15} | {'Data Lama':<20} | {'Data Baru':<20}")
+    print("-" * 65)
+    print(f"{'Nama Barang':<15} | {str(barang['nama_barang']):<20} | {str(nama_baru_final):<20}")
+    print(f"{'Harga Pabrik':<15} | {str(ambil_harga_pabrik(barang)):<20} | {str(pabrik_baru):<20}")
+    print(f"{'Harga Jual':<15} | {str(ambil_harga_jual(barang)):<20} | {str(jual_baru):<20}")
+    print(f"{'Laba':<15} | {str(laba_lama):<20} | {str(laba_baru):<20}")
+    print(f"{'Expired':<15} | {str(barang.get('expired', '')):<20} | {str(expired_baru_final):<20}")
+    print("="*65)
+
+    yakin = input("Apakah Anda yakin ingin menyimpan perubahan ini? (y/t): ").strip().lower()
+    if yakin != 'y':
+        print("❌ Perubahan dibatalkan.")
+        return
+    # --------------------------------------------------------
+
     data_lama = copy.deepcopy(barang)
 
     barang.update({
-        "nama_barang": nama or barang["nama_barang"],
+        "nama_barang": nama_baru_final,
         "harga_pabrik": pabrik_baru,
         "harga_jual": jual_baru,
         "harga": jual_baru,
-        "laba_per_barang": hitung_laba(
-            pabrik_baru, jual_baru
-        ),
-        "expired": expired or barang.get("expired", "31-12-2099")
+        "laba_per_barang": laba_baru,
+        "expired": expired_baru_final
     })
 
     if simpan_data():
@@ -1300,7 +1393,7 @@ def hapus_barang():
           print(f"[SUKSES] barang diarsipkan.")
           catat_log("gudang", f"Menghapus barang {barang_dihapus['nama_barang']} ({id_barang})")
     else:
-        print("[ERROR] ID barang tidak ditemukan.")
+        print("⚠️[ERROR] ID barang tidak ditemukan.")
 
 def cari_barang():
     print("\n" + "=" * 50)
@@ -1366,7 +1459,7 @@ def filter_kategori_barang():
         if barang.get("kategori", "").casefold() == kategori_dicari.casefold()
     ]
     if not hasil:
-        print(f"⚠️ [INFO] Belum ada barang pada kategori '{kategori_dicari}'.")
+        print("❗[INFO] Tidak ada barang pada kategori tersebut.")
         return
     print(f"\n=== BARANG KATEGORI: {kategori_dicari.upper()} ===")
     print(f"{'ID':<8} | {'NAMA BARANG':<22} | {'KATEGORI':<16} | {'HARGA':>12} | {'STOK':>5}")
@@ -1382,7 +1475,7 @@ def cek_dan_urutkan_expired():
     print("LAPORAN CEK DAN URUTAN EXPIRED BARANG".center(lebar))
     print("=" * lebar)
     if not data_barang["barang"]:
-        print("[INFO] Belum ada data barang.")
+        print("❗[INFO] Belum ada data barang.")
         print("=" * lebar)
         return
     hari_ini = datetime.now().date()
@@ -1429,7 +1522,7 @@ def cek_dan_urutkan_expired():
             "harga_akhir": harga_akhir
         })
     if not daftar_expired:
-        print("[INFO] Tidak ada tanggal expired yang valid.")
+        print("❗[INFO] Tidak ada tanggal expired yang valid.")
         return
     # 5. pengurutan barang e katek heapsrot 
     n = len(daftar_expired)
@@ -1908,7 +2001,13 @@ def migrasi_harga_barang():
             barang["harga_pabrik"],
             barang["harga_jual"]
         )
+# ==========================================
+# PERHITUNGAN PPN
+# ==========================================
+TARIF_PPN = 11
 
+def hitung_ppn(subtotal):
+    return round(subtotal * TARIF_PPN / 100)
 # ==========================================
 # FITUR KASIR
 # ==========================================
@@ -1971,18 +2070,25 @@ def format_struk(data_transaksi):
             baris.append(f"{kiri:<27}{kanan:>19}")
 
     metode_bayar = data_transaksi.get("metode", "TUNAI")
+        tarif_ppn = data_transaksi.get("tarif_ppn", TARIF_PPN)
+    label_ppn = f"PPN {tarif_ppn}%"
 
     baris.append("-" * 46)
     if total_hemat > 0:
         baris.append(f"{'TOTAL HEMAT DISKON':<25}{rupiah(total_hemat):>21}")
-
-    baris += ["-" * 46,
-              f"{'TOTAL':<25}{rupiah(data_transaksi['total']):>21}",
-              f"{metode_bayar:<25}{rupiah(data_transaksi['bayar']):>21}",
-              f"{'KEMBALIAN':<25}{rupiah(data_transaksi['kembalian']):>21}",
-              garis, "Terima kasih sudah berbelanja!".center(46), garis]
+    baris += [
+      "-" * 46,
+      f"{'SUBTOTAL':<25}{rupiah(data_transaksi.get('subtotal', data_transaksi['total'])):>21}",
+      f"{'PPN 11%':<25}{rupiah(data_transaksi.get('ppn', 0)):>21}",
+      f"{'TOTAL BAYAR':<25}{rupiah(data_transaksi['total']):>21}",
+      f"{metode_bayar:<25}{rupiah(data_transaksi['bayar']):>21}",
+      f"{'KEMBALIAN':<25}{rupiah(data_transaksi['kembalian']):>21}",
+     garis,
+     "Terima kasih sudah berbelanja!".center(46),
+      garis
+      ] 
     return "\n".join(baris)
-
+    
 def cetak_struk(data_transaksi):
     isi = format_struk(data_transaksi)
     print("\n" + isi)
@@ -1990,10 +2096,10 @@ def cetak_struk(data_transaksi):
         FOLDER_STRUK.mkdir(parents=True, exist_ok=True)
         lokasi_struk = FOLDER_STRUK / f"{data_transaksi['nomor']}.txt"
         lokasi_struk.write_text(isi + "\n", encoding="utf-8")
-        print(f"[SUKSES] File nota disimpan: {lokasi_struk}")
+        print(f"✅[SUKSES] File nota disimpan: {lokasi_struk}")
       
     except OSError as error:
-        print(f"[PERINGATAN] Struk tampil, tetapi gagal tersimpan: {error}")
+        print(f"⚠️[PERINGATAN] Struk tampil, tetapi gagal tersimpan: {error}")
 
 def transaksi_penjualan(kasir):
     if not data_barang["barang"]:
@@ -2073,10 +2179,18 @@ def transaksi_penjualan(kasir):
             continue
         keranjang[id_barang] = keranjang.get(id_barang, 0) + jumlah
         print("[SUKSES] Barang masuk keranjang.")
+        
+    subtotal_transaksi = tampil_keranjang(keranjang)
 
-    total = tampil_keranjang(keranjang)
+    ppn = hitung_ppn(subtotal_transaksi)
 
-    print("\n=== METODE PEMBAYARAN ===")
+    total = subtotal_transaksi + ppn
+
+    print("\n=== RINCIAN PEMBAYARAN ===")
+    print(f"Subtotal : {rupiah(subtotal_transaksi)}")
+    print(f"PPN {TARIF_PPN}% : {rupiah(ppn)}")
+    print("-" * 35)
+    print(f"TOTAL    : {rupiah(total)}")
     print("1. Tunai (Cash)")
     print("2. Debit")
     print("Ketik 0 pada pembayaran untuk membatalkan transaksi.")
@@ -2135,11 +2249,23 @@ def transaksi_penjualan(kasir):
 )
         })
 
-    data_transaksi = {"nomor": f"TRX{baru['nomor_berikutnya']:03d}",
-           "tanggal": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
-           "kasir_id": kasir[0], "kasir_nama": kasir[1]["nama"],
-           "kasir_username": kasir[1]["username"], "item": daftar_item,
-           "total": total, "metode": metode, "bayar": bayar, "kembalian": kembalian}
+      data_transaksi = {
+        "nomor": f"TRX{baru['nomor_berikutnya']:03d}",
+        "tanggal": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+        "kasir_id": kasir[0],
+        "kasir_nama": kasir[1]["nama"],
+        "kasir_username": kasir[1]["username"],
+        "item": daftar_item,
+
+        "subtotal": subtotal_transaksi,
+        "ppn": ppn,
+        "tarif_ppn": TARIF_PPN,
+        "total": total,
+
+        "metode": metode,
+        "bayar": bayar,
+        "kembalian": kembalian
+    }
 
     baru["transaksi"].append(data_transaksi)
     baru["nomor_berikutnya"] += 1
@@ -2268,7 +2394,7 @@ def rekomendasi_barang_terlaris():
             data_rekomendasi[id_barang]["jumlah_transaksi"] += 1
 
     if not data_rekomendasi:
-        print("[INFO] Belum ada data penjualan barang.")
+        print("❗[INFO] Belum ada data penjualan barang.")
         return
 
   #angon ge ngurutke
@@ -2608,7 +2734,7 @@ def restore_data_sistem(id_login):
     print("=" * lebar)
 
     if not FOLDER_BACKUP.exists():
-        print("[INFO] Belum ada folder backup yang tersimpan.")
+        print("❗[INFO] Belum ada folder backup yang tersimpan.")
         return
 
     daftar_backup = sorted(
@@ -2617,7 +2743,7 @@ def restore_data_sistem(id_login):
     )
 
     if not daftar_backup:
-        print("[INFO] Belum ada folder backup yang tersedia.")
+        print("❗[INFO] Belum ada folder backup yang tersedia.")
         return
 
     print("Daftar Backup Tersedia:")
@@ -2626,7 +2752,7 @@ def restore_data_sistem(id_login):
 
     pilih = input("\nPilih nomor backup yang ingin di-restore (0 untuk batal): ").strip()
     if pilih == "0" or not pilih:
-        print("[INFO] Restore dibatalkan.")
+        print("❗[INFO] Restore dibatalkan.")
         return
 
     try:
@@ -2639,7 +2765,7 @@ def restore_data_sistem(id_login):
 
     sumber_backup = daftar_backup[indeks]
     if not konfirmasi_default(f"Yakin menimpa data saat ini dengan '{sumber_backup.name}'?"):
-        print("[INFO] Restore dibatalkan.")
+        print("❗[INFO] Restore dibatalkan.")
         return
 
     try:
