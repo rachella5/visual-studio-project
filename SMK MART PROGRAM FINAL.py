@@ -3,7 +3,7 @@ import difflib
 import hashlib
 import hmac
 import secrets
-from datetime import datetime
+from datetime import datetime, timedelta
 import copy
 import getpass
 import shutil
@@ -207,31 +207,27 @@ def pilih_kategori_valid(izin_tambah=True):
 def muat_data():
     global data_barang, data_pengguna, list_riwayat_stok, data_kategori
     
-    for file_txt in (FILE_PENGGUNA, FILE_BARANG, FILE_TRANSAKSI, FILE_DETAIL, FILE_MASUK, FILE_KELUAR, FILE_LOG):
+    for file_txt in (FILE_PENGGUNA, FILE_BARANG, FILE_KATEGORI, FILE_TRANSAKSI, FILE_DETAIL, FILE_MASUK, FILE_KELUAR, FILE_LOG):
         if not file_txt.exists():
             file_txt.write_text("", encoding="utf-8")
-    data_kategori = []
-    
-    for file_kategori in sorted(FOLDER_KATEGORI.glob("*.txt")):
-        nama_kategori = file_kategori.read_text(
-            encoding="utf-8"
-        ).strip()
 
-        if nama_kategori:
-            data_kategori.append(nama_kategori)
+    data_kategori = {}
+    for baris in FILE_KATEGORI.read_text(encoding="utf-8").splitlines():
+        if not baris.strip():
+            continue
+        kolom = baris.split("|")
+        if len(kolom) >= 2:
+            data_kategori[kolom[0].strip()] = kolom[1].strip()
 
     if not data_kategori:
-        kategori_awal = ["Sembako", "Minuman", "Makanan"]
-
-        for nama in kategori_awal:
-            file_kategori = FOLDER_KATEGORI / f"{nama}.txt"
-
-            file_kategori.write_text(
-                nama,
-                encoding="utf-8"
-            )
-
-        data_kategori = kategori_awal.copy()
+        data_kategori = {
+            "KAT001": "Sembako",
+            "KAT002": "Makanan",
+            "KAT003": "Minuman",
+            "KAT004": "Snack",
+            "KAT005": "Alat Kebersihan",
+        }
+        simpan_kategori()
 
     pengguna_aktif = {}
     pengguna_arsip = {}
@@ -848,12 +844,9 @@ def riwayat_transaksi():
     if not data_barang["transaksi"]:
         print("😕Belum ada transaksi.")
         return
-        
+
     print(f"{'NO. TRX':<10} | {'TANGGAL':<19} | {'KASIR':<16} | {'TOTAL':>12}")
     print("-" * lebar)
-
-    print(f"{'NO. TRX':<11} | {'TANGGAL':<19} | {'KASIR':<16} | {'TOTAL':>13}")
-    print("=" * lebar)
     for data_transaksi in data_barang["transaksi"]:
         print(
             f"{data_transaksi['nomor']:<10} | "
@@ -861,12 +854,10 @@ def riwayat_transaksi():
             f"{data_transaksi['kasir_nama'][:16]:<16} | "
             f"{rupiah(data_transaksi['total']):>12}"
         )
-    print( "=" * lebar )
-
     print("=" * lebar)
 
 def laporan_penjualan_admin():
-    lebar = 66
+    lebar = 76
     baris_laporan = [
         "=" * lebar,
         "LAPORAN PENJUALAN".center(lebar)
@@ -876,51 +867,67 @@ def laporan_penjualan_admin():
         print("\n".join(baris_laporan))
         print("[INFO] Belum ada transaksi penjualan.")
         return
-        
+
+    print("\nPilih Mode Laporan Penjualan:")
+    print("1. Ringkasan Otomatis (Hari Ini, Minggu Ini, Bulan Ini)")
+    print("2. Filter Rentang Tanggal (Sesuai Ketentuan SAS)")
+    mode = input("Pilih mode laporan (1/2): ").strip()
+
     hari_ini = datetime.now().date()
-    awal_minggu = hari_ini.fromordinal(
-        hari_ini.toordinal() - hari_ini.weekday()
-    )
+    awal_minggu = hari_ini - timedelta(days=hari_ini.weekday())
     awal_bulan = hari_ini.replace(day=1)
 
-    # Mengelompokkan transaksi berdasarkan tanggal   
-    periode = {
-        "PENJUALAN HARI INI": [],
-        "PENJUALAN MINGGU INI": [],
-        "PENJUALAN BULAN INI": []
-    }
+    periode = {}
+    if mode == "1":
+        periode = {
+            "PENJUALAN HARI INI": [],
+            "PENJUALAN MINGGU INI": [],
+            "PENJUALAN BULAN INI": []
+        }
+        for transaksi in data_barang["transaksi"]:
+            try:
+                tanggal_transaksi = datetime.strptime(
+                    transaksi["tanggal"], "%d-%m-%Y %H:%M:%S"
+                ).date()
+            except (ValueError, KeyError):
+                continue
 
-    for transaksi in data_barang["transaksi"]:
-        try:
-            tanggal_transaksi = datetime.strptime(
-                transaksi["tanggal"], "%d-%m-%Y %H:%M:%S"
-            ).date()
-        except (ValueError, KeyError):
-            continue
+            if tanggal_transaksi == hari_ini:
+                periode["PENJUALAN HARI INI"].append(transaksi)
+            if awal_minggu <= tanggal_transaksi <= hari_ini:
+                periode["PENJUALAN MINGGU INI"].append(transaksi)
+            if awal_bulan <= tanggal_transaksi <= hari_ini:
+                periode["PENJUALAN BULAN INI"].append(transaksi)
+    elif mode == "2":
+        tgl_awal, tgl_akhir = input_rentang_tanggal()
+        periode_teks = f"PERIODE: {tgl_awal.strftime('%d-%m-%Y')} s.d. {tgl_akhir.strftime('%d-%m-%Y')}"
+        daftar_filter = []
+        for transaksi in data_barang["transaksi"]:
+            try:
+                tanggal_transaksi = datetime.strptime(
+                    transaksi["tanggal"], "%d-%m-%Y %H:%M:%S"
+                ).date()
+            except (ValueError, KeyError):
+                continue
+            if tgl_awal <= tanggal_transaksi <= tgl_akhir:
+                daftar_filter.append(transaksi)
+        periode[periode_teks] = daftar_filter
+    else:
+        print("Pilihan mode tidak valid.")
+        return
 
-        if tanggal_transaksi == hari_ini:
-            periode["PENJUALAN HARI INI"].append(transaksi)
-
-        if awal_minggu <= tanggal_transaksi <= hari_ini:
-            periode["PENJUALAN MINGGU INI"].append(transaksi)
-
-        if awal_bulan <= tanggal_transaksi <= hari_ini:
-            periode["PENJUALAN BULAN INI"].append(transaksi)
-
-    # Menampilkan laporan setiap periode
     for judul, daftar_transaksi in periode.items():
         total_penjualan = sum(
             transaksi["total"] for transaksi in daftar_transaksi
         )
         transaksi_lengkap = [
-              transaksi
-              for transaksi in daftar_transaksi
-              if hitung_laba_kotor_transaksi(transaksi) is not None
+            transaksi
+            for transaksi in daftar_transaksi
+            if hitung_laba_kotor_transaksi(transaksi) is not None
         ]
-
         total_laba_kotor = sum(
-               hitung_laba_kotor_transaksi(transaksi)
-               for transaksi in transaksi_lengkap
+            hitung_laba_kotor_transaksi(transaksi)
+            for transaksi in transaksi_lengkap
         )
 
         baris_laporan.append("=" * lebar)
@@ -929,14 +936,39 @@ def laporan_penjualan_admin():
 
         if not daftar_transaksi:
             baris_laporan.append("Belum ada transaksi pada periode ini.")
-        else:
-            for transaksi in daftar_transaksi:
-                baris_laporan.append(
-                    f"{transaksi['nomor']} | "
-                    f"{transaksi['tanggal']} | "
-                    f"{transaksi['kasir_nama']} | "
-                    f"{rupiah(transaksi['total'])}"
-                )
+            baris_laporan.append("=" * lebar)
+            baris_laporan.append("Jumlah transaksi : 0")
+            baris_laporan.append(f"Total penjualan  : {rupiah(0)}")
+            baris_laporan.append(f"Laba kotor       : {rupiah(0)}")
+            continue
+
+        rekap_kasir = {}
+        rekap_barang = {}
+        for transaksi in daftar_transaksi:
+            baris_laporan.append(
+                f"{transaksi['nomor']} | "
+                f"{transaksi['tanggal']} | "
+                f"{transaksi['kasir_nama']} | "
+                f"{rupiah(transaksi['total'])}"
+            )
+
+            kasir_username = transaksi.get("kasir_username", "-")
+            if kasir_username not in rekap_kasir:
+                rekap_kasir[kasir_username] = {
+                    "jumlah_transaksi": 0,
+                    "total_penjualan": 0
+                }
+            rekap_kasir[kasir_username]["jumlah_transaksi"] += 1
+            rekap_kasir[kasir_username]["total_penjualan"] += int(transaksi["total"])
+
+            for item in transaksi.get("item", []):
+                id_barang = item["id_barang"]
+                if id_barang not in rekap_barang:
+                    rekap_barang[id_barang] = {
+                        "nama_barang": item["nama_barang"],
+                        "jumlah_terjual": 0
+                    }
+                rekap_barang[id_barang]["jumlah_terjual"] += int(item["jumlah"])
 
         baris_laporan.append("=" * lebar)
         baris_laporan.append(f"Jumlah transaksi : {len(daftar_transaksi)}")
@@ -946,6 +978,26 @@ def laporan_penjualan_admin():
             baris_laporan.append(
                 "[PERINGATAN] Sebagian transaksi lama "
                 "belum memiliki data modal."
+            )
+
+        baris_laporan.append("-" * lebar)
+        baris_laporan.append("5 BARANG TERLARIS".center(lebar))
+        baris_laporan.append("-" * lebar)
+        barang_urut = sorted(
+            rekap_barang.items(),
+            key=lambda x: (-x[1]["jumlah_terjual"], x[0])
+        )[:5]
+        for peringkat, (id_barang, info_barang) in enumerate(barang_urut, start=1):
+            baris_laporan.append(
+                f"{peringkat}. {id_barang} | {info_barang['nama_barang']} : {info_barang['jumlah_terjual']} unit"
+            )
+
+        baris_laporan.append("-" * lebar)
+        baris_laporan.append("TOTAL PENJUALAN PER KASIR".center(lebar))
+        baris_laporan.append("-" * lebar)
+        for kasir_username, info_kasir in sorted(rekap_kasir.items()):
+            baris_laporan.append(
+                f"{kasir_username:<20} : {info_kasir['jumlah_transaksi']} transaksi ({rupiah(info_kasir['total_penjualan'])})"
             )
 
     baris_laporan.append("=" * lebar)
@@ -1113,7 +1165,7 @@ def reset_password_pengguna(admin_login):
 # FITUR GUDANG
 # ==========================================
 def tampilkan_barang():
-    lebar = 138
+    lebar = 148
     print("=" * lebar)
     print("TAMPILAN DATA BARANG (TERURUT BERDASARKAN NAMA A-Z)".center(lebar))
     print("=" * lebar)
@@ -1145,7 +1197,7 @@ def tampilkan_barang():
 
     print(
             f"{'ID':<7} | {'NAMA BARANG':<18} | {'KATEGORI':<15} | {'STOK':>4} | "
-            f"{'HARGA PABRIK':>12} | {'HARGA JUAL':>12} | {'LABA/UNIT':>11} | "
+            f"{'HARGA PABRIK':>12} | {'HARGA JUAL':>12} | {'LABA LAMA':>11} | {'LABA BARU':>11} | "
             f"{'EXPIRED':<10} | {'STATUS DISKON':<16}"
         )
     
@@ -1154,6 +1206,8 @@ def tampilkan_barang():
     for id_barang, barang in semua_barang:
         pabrik = ambil_harga_pabrik(barang)
         jual = ambil_harga_jual(barang)
+        laba_baru = hitung_laba(pabrik, jual)
+        laba_lama = barang.get("laba_lama", laba_baru)
         sisa_hari, potongan, harga_akhir = hitung_diskon_expired(barang)
 
         if sisa_hari is not None and 1 <= sisa_hari <= 5:
@@ -1164,8 +1218,8 @@ def tampilkan_barang():
             status_diskon = "TIDAK ADA DISKON"
 
         print(
-            f"{id_barang:<7} | {barang['nama_barang'][:18]:<18} | {barang.get('kategori', '-')[:15]:<15} | {barang['stok']:>4} | "
-            f"{rupiah(pabrik):>12} | {rupiah(jual):>12} | {rupiah(jual - pabrik):>11} | "
+            f"{id_barang:<7} | {barang['nama_barang'][:18]:<18} | {barang.get('kategori', '-')[:14]:<14} | {barang['stok']:>4} | "
+            f"{rupiah(pabrik):>12} | {rupiah(jual):>12} | {rupiah(laba_lama):>11} | {rupiah(laba_baru):>11} | "
             f"{barang.get('expired', '-'):<10} | {status_diskon:<16}"
         )
 
@@ -1176,6 +1230,7 @@ def tampilkan_barang():
 def pilih_kategori():
     while True:
         nama_kategori = input_wajib("Kategori barang: ").strip()
+        if nama_kategori == "0": return "0"
 
         # Cek apakah kategori sudah ada
         for kategori in data_kategori:
@@ -1234,12 +1289,38 @@ def tambah_barang():
     print(f"❗[INFO] ID Barang otomatis: {id_barang}")
     print("-" * lebar)
 
-    nama = input_wajib("Nama barang: ")
+    print("(Ketik 0 pada input mana saja untuk membatalkan)")
+    nama = input_wajib("Nama barang (0 untuk batal): ")
+    if nama == "0":
+        print("❗[INFO] Tambah barang dibatalkan.")
+        return
+
     kategori = pilih_kategori()
-    stok = 0  
+    if kategori == "0":
+        print("❗[INFO] Tambah barang dibatalkan.")
+        return
+
     stok_min = input_angka("Stok minimum (minimal 0): ", 0)
-    harga_pabrik = input_angka("Harga dari pabrik (Rp): ", 1)
-    harga_jual = input_angka("Harga jual (Rp): ", 1)
+    harga_pabrik = input_angka("Harga dari pabrik (Rp, 0 untuk batal): ", 0)
+    if harga_pabrik == 0:
+        print("❗[INFO] Tambah barang dibatalkan.")
+        return
+
+    harga_jual = input_angka("Harga jual (Rp, 0 untuk batal): ", 0)
+    if harga_jual == 0:
+        print("❗[INFO] Tambah barang dibatalkan.")
+        return
+
+    while True:
+        tanggal_str = input_wajib("Tanggal expired (DD-MM-YYYY, 0 untuk batal): ").strip()
+        if tanggal_str == "0":
+            print("❗[INFO] Tambah barang dibatalkan.")
+            return
+        try:
+            datetime.strptime(tanggal_str, "%d-%m-%Y")
+            break
+        except ValueError:
+            print("⚠️ [ERROR] Format tanggal tidak valid (contoh: 25-12-2026).")
 
     while True:
         tanggal_str = input_wajib("Tanggal expired (DD-MM-YYYY): ").strip()
@@ -1287,13 +1368,30 @@ def edit_barang():
 
     print("\nKosongkan input jika tidak ingin mengubah data.")
 
+    print("\nKosongkan input jika tidak ingin mengubah data (Ketik 0 untuk batal).")
+
     nama = input(f"Nama barang [{barang['nama_barang']}]: ").strip()
+    if nama == "0":
+        print("❗[INFO] Edit barang dibatalkan.")
+        return
+
     if konfirmasi_default(f"Ubah kategori barang? (Saat ini: {barang.get('kategori', '-')})"):
         barang["kategori"] = pilih_kategori_valid(izin_tambah=True)
-    harga_pabrik = input(f"Harga pabrik [{ambil_harga_pabrik(barang)}]: ").strip()
-    harga_jual = input(f"Harga jual [{ambil_harga_jual(barang)}]: ").strip()
-    expired = input(f"Expired [{barang.get('expired', '')}]: ").strip()
 
+    harga_pabrik = input(f"Harga pabrik [{ambil_harga_pabrik(barang)}]: ").strip()
+    if harga_pabrik == "0":
+        print("❗[INFO] Edit barang dibatalkan.")
+        return
+
+    harga_jual = input(f"Harga jual [{ambil_harga_jual(barang)}]: ").strip()
+    if harga_jual == "0":
+        print("❗[INFO] Edit barang dibatalkan.")
+        return
+
+    expired = input(f"Expired [{barang.get('expired', '')}]: ").strip()
+    if expired == "0":
+        print("❗[INFO] Edit barang dibatalkan.")
+        return
     try:
         pabrik_baru = (
             int(harga_pabrik)
@@ -1353,6 +1451,7 @@ def edit_barang():
         "harga_pabrik": pabrik_baru,
         "harga_jual": jual_baru,
         "harga": jual_baru,
+        "laba_lama": laba_lama,
         "laba_per_barang": laba_baru,
         "expired": expired_baru_final
     })
@@ -1617,14 +1716,17 @@ def riwayat_stok():
     print("=" * lebar)
 
 def laporan_barang():
-    lebar = 84
+    lebar = 96
     print("\n" + "-" * lebar)
-    print("LAPORAN KONDISI BARANG".center(lebar))
+    print("LAPORAN STOK DAN AKTIVITAS GUDANG".center(lebar))
     print("=" * lebar)
 
     if not data_barang["barang"]:
         print("Barang Belum Tersedia!")
         return
+
+    tgl_awal, tgl_akhir = input_rentang_tanggal()
+    periode_teks = f"{tgl_awal.strftime('%d-%m-%Y')} s.d. {tgl_akhir.strftime('%d-%m-%Y')}"
 
     hari_ini = datetime.now().date()
     normal = 0
@@ -1632,11 +1734,18 @@ def laporan_barang():
     sudah_expired = 0
     stok_menipis = 0
 
-    print(f"{'ID':<9} | {'NAMA BARANG':<22} | {'STOK':>5} | {'EXPIRED':<12} | {'SISA':>5} | {'STATUS':<18}")
-    print("=" * lebar)
+    baris_laporan = [
+        "=" * lebar,
+        "LAPORAN STOK DAN AKTIVITAS GUDANG".center(lebar),
+        f"Periode Aktivitas: {periode_teks}".center(lebar),
+        "=" * lebar,
+        f"{'ID':<9} | {'NAMA BARANG':<22} | {'STOK':>5} | {'STATUS':<11} | {'EXPIRED':<12} | {'KONDISI':<12}",
+        "=" * lebar
+    ]
 
     for id_barang, barang in data_barang["barang"].items():
         stok = int(barang["stok"])
+        status_stok = status_stok_barang(barang)
         tanggal_str = barang.get("expired", "31-12-2099")
 
         try:
@@ -1658,26 +1767,91 @@ def laporan_barang():
 
         if stok <= 5:
             stok_menipis += 1
-            print("⚠️ PERINGATAN: STOK BARANG MENIPIS!")
 
-        print(
+        baris_laporan.append(
             f"{id_barang:<9} | "
             f"{barang['nama_barang'][:22]:<22} | "
             f"{stok:>5} | "
+            f"{status_stok:<11} | "
             f"{tanggal_str:<12} | "
-            f"{sisa_hari:>5} | "
-            f"{status:<18}"
+            f"{status:<12}"
         )
 
-    print("=" * lebar)
-    print("RINGKASAN LAPORAN KONDISI BARANG".center(lebar))
-    print("-" * lebar)
-    print(f"{'Total Jenis Barang':<28} : {len(data_barang['barang'])} item")
-    print(f"{'Barang Kondisi Normal':<28} : {normal} item")
-    print(f"{'Barang Mendekati Expired':<28} : {mendekati_expired} item")
-    print(f"{'Barang Sudah Expired':<28} : {sudah_expired} item")
-    print(f"{'Barang Stok Menipis (<= 5)':<28} : {stok_menipis} item")
-    print("=" * lebar)
+    baris_laporan.append("=" * lebar)
+    baris_laporan.append("RINGKASAN LAPORAN KONDISI BARANG".center(lebar))
+    baris_laporan.append("-" * lebar)
+    baris_laporan.append(f"{'Total Jenis Barang':<28} : {len(data_barang['barang'])} item")
+    baris_laporan.append(f"{'Barang Kondisi Normal':<28} : {normal} item")
+    baris_laporan.append(f"{'Barang Mendekati Expired':<28} : {mendekati_expired} item")
+    baris_laporan.append(f"{'Barang Sudah Expired':<28} : {sudah_expired} item")
+    baris_laporan.append(f"{'Barang Stok Menipis (<= 5)':<28} : {stok_menipis} item")
+    baris_laporan.append("=" * lebar)
+
+    # Tambahan: Daftar Barang Masuk pada Rentang Tanggal
+    daftar_masuk = []
+    total_masuk = 0
+    if FILE_MASUK.exists():
+        for baris in FILE_MASUK.read_text(encoding="utf-8").splitlines():
+            kolom = baris.split("|")
+            if len(kolom) < 6:
+                continue
+            try:
+                tanggal_masuk = datetime.strptime(kolom[1], "%Y-%m-%d").date()
+            except ValueError:
+                continue
+            if tgl_awal <= tanggal_masuk <= tgl_akhir:
+                jumlah = int(kolom[3])
+                total_masuk += jumlah
+                nama_barang = data_barang["barang"].get(kolom[2], {}).get("nama_barang", kolom[2])
+                daftar_masuk.append(
+                    f"{kolom[0]:<10} | {tanggal_masuk.strftime('%d-%m-%Y'):<12} | {kolom[2]:<8} | {nama_barang[:22]:<22} | +{jumlah:<5} | {kolom[4]}"
+                )
+
+    baris_laporan.append(f"DAFTAR BARANG MASUK ({periode_teks})".center(lebar))
+    baris_laporan.append("-" * lebar)
+    if not daftar_masuk:
+        baris_laporan.append("Tidak ada data barang masuk pada rentang tanggal ini.")
+    else:
+        baris_laporan.extend(daftar_masuk)
+
+    # Tambahan: Daftar Barang Keluar pada Rentang Tanggal
+    daftar_keluar = []
+    total_keluar = 0
+    if FILE_KELUAR.exists():
+        for baris in FILE_KELUAR.read_text(encoding="utf-8").splitlines():
+            kolom = baris.split("|")
+            if len(kolom) < 7:
+                continue
+            try:
+                tanggal_keluar = datetime.strptime(kolom[1], "%Y-%m-%d").date()
+            except ValueError:
+                continue
+            if tgl_awal <= tanggal_keluar <= tgl_akhir:
+                jumlah = int(kolom[3])
+                total_keluar += jumlah
+                nama_barang = data_barang["barang"].get(kolom[2], {}).get("nama_barang", kolom[2])
+                daftar_keluar.append(
+                    f"{kolom[0]:<10} | {tanggal_keluar.strftime('%d-%m-%Y'):<12} | {kolom[2]:<8} | {nama_barang[:22]:<22} | -{jumlah:<5} | {kolom[4]}"
+                )
+
+    baris_laporan.append("=" * lebar)
+    baris_laporan.append(f"DAFTAR BARANG KELUAR ({periode_teks})".center(lebar))
+    baris_laporan.append("-" * lebar)
+    if not daftar_keluar:
+        baris_laporan.append("Tidak ada data barang keluar pada rentang tanggal ini.")
+    else:
+        baris_laporan.extend(daftar_keluar)
+
+    baris_laporan.append("=" * lebar)
+    baris_laporan.append(f"Total Catatan Barang Masuk  : {len(daftar_masuk)} catatan ({total_masuk} unit)")
+    baris_laporan.append(f"Total Catatan Barang Keluar : {len(daftar_keluar)} catatan ({total_keluar} unit)")
+    baris_laporan.append("=" * lebar)
+
+    isi_laporan = "\n".join(baris_laporan)
+    print("\n" + isi_laporan)
+
+    nama_file = f"laporan_gudang_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+    simpan_teks_laporan(nama_file, isi_laporan)
 
 def notifikasi_barang():
     print("\n" + "-" * 30)
@@ -1755,6 +1929,16 @@ def catat_barang_masuk(id_login):
 
     jumlah = input_angka("Jumlah barang masuk (> 0): ", minimum=1)
     pemasok = input_wajib("Nama pemasok: ")
+
+    pabrik_sekarang = ambil_harga_pabrik(barang)
+    jual_sekarang = ambil_harga_jual(barang)
+    input_pabrik_baru = input(f"Harga pabrik terbaru [Enter jika tetap {rupiah(pabrik_sekarang)}]: ").strip()
+    if input_pabrik_baru.isdigit() and int(input_pabrik_baru) >= 1:
+        pabrik_baru = int(input_pabrik_baru)
+        if pabrik_baru != pabrik_sekarang:
+            barang["laba_lama"] = hitung_laba(pabrik_sekarang, jual_sekarang)
+            barang["harga_pabrik"] = pabrik_baru
+            barang["laba_per_barang"] = hitung_laba(pabrik_baru, jual_sekarang)
 
     id_masuk = buat_id_file_otomatis(FILE_MASUK, "MASUK")
     tanggal_iso = datetime.now().strftime("%Y-%m-%d")
@@ -3142,8 +3326,6 @@ def menu_gudang(id_login):
         print("9. Laporan Nilai Persediaan")
         print("0. Logout")
         pilih = input("Pilih fitur yang ingin digunakan (0-9): ").strip()
-        print("0. Logout")
-        pilih = input("Pilih fitur yang ingin digunakan (0-7): ").strip()
         if pilih == "1":
             tampilkan_ringkasan_login(id_login)
         elif pilih == "2":
@@ -3189,8 +3371,6 @@ def menu_kasir(id_login):
         print("7. Retur Penjualan")
         print("0. Logout")
         pilih = input("Pilih fitur yang ingin digunakan (0-7): ").strip()
-        print("0. Logout")
-        pilih = input("Pilih fitur yang ingin digunakan (0-6): ").strip()
         if pilih == "1":
             tampilkan_ringkasan_login(id_login)
         elif pilih == "2":
