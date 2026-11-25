@@ -9,3 +9,4 @@ MASUK008|2026-11-23|BRG9513|150|pt. indonesia indah|usrasel
 MASUK009|2026-11-23|BRG9512|40|pt. anugerah indah|admin utama
 MASUK010|2026-11-23|BRG9515|25|py. putera anggun|usrasel
 MASUK011|2026-11-23|BRG9516|50|pt. cheezebrick|usrasel
+MASUK012|2026-11-25|BRG9514|20|pt. koi emas|admin utama

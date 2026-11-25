@@ -33,3 +33,9 @@
 [23-11-2026 13:48:04] (usrasel) Login ke sistem
 [23-11-2026 13:48:39] (usrasel) BARANG MASUK MASUK011 BRG9516 +50 dari pt. cheezebrick
 [23-11-2026 13:48:56] (usrasel) Logout dari sistem
+[25-11-2026 20:51:20] (sistem) Menghapus barang 0 (BRG9518)
+[25-11-2026 20:54:50] (admin utama) Logout dari sistem
+[25-11-2026 21:20:53] (admin utama) Logout dari sistem
+[25-11-2026 21:35:06] (admin utama) Logout dari sistem
+[25-11-2026 21:36:22] (admin utama) BARANG MASUK MASUK012 BRG9514 +20 dari pt. koi emas
+[25-11-2026 21:36:29] (admin utama) Logout dari sistem
