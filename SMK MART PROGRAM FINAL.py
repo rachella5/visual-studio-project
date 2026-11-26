@@ -14,13 +14,11 @@ DATA_DIR = BASE_DIR / "data"
 FOLDER_STRUK = BASE_DIR / "struk"
 FOLDER_LAPORAN = BASE_DIR / "laporan"
 FOLDER_BACKUP = BASE_DIR / "backup_data"
-FOLDER_KATEGORI = DATA_DIR / "kategori"
 
 BASE_DIR.mkdir(parents=True, exist_ok=True)
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 FOLDER_STRUK.mkdir(parents=True, exist_ok=True)
 FOLDER_LAPORAN.mkdir(parents=True, exist_ok=True)
-FOLDER_KATEGORI.mkdir(parents=True, exist_ok=True)
 
 print(f"Folder database dan struk: {BASE_DIR}")
 
@@ -32,16 +30,13 @@ FILE_DETAIL = DATA_DIR / "detail_transaksi.txt"
 FILE_MASUK = DATA_DIR / "barang_masuk.txt"
 FILE_KELUAR = DATA_DIR / "barang_keluar.txt"
 FILE_LOG = DATA_DIR / "log_aktivitas.txt"
-FILE_KATEGORI = DATA_DIR / "kategori.txt"
 
 data_barang = {}
 data_kategori = {}
 data_pengguna = {}
 list_riwayat_stok = []
 data_expired = {}
-data_kategori = []
 nomor_berikutnya = 1
-data_kategori = []
 
 ROLE = ("admin", "gudang", "kasir")
 MAP_ROLE = {
@@ -297,6 +292,8 @@ def muat_data():
         harga_pabrik_val = int(kolom[6]) if len(kolom) > 6 and kolom[6].isdigit() else int(harga_barang)
         expired_val = kolom[7].strip() if len(kolom) > 7 and kolom[7].strip() else "31-12-2099"
         status_val = kolom[8].strip() if len(kolom) > 8 and kolom[8].strip() else "Aktif"
+        laba_default = hitung_laba(harga_pabrik_val, int(harga_barang))
+        laba_lama_val = int(kolom[9]) if len(kolom) > 9 and kolom[9].lstrip("-").isdigit() else laba_default
 
         barang_aktif[kode_barang] = {
             "nama_barang": nama_barang,
@@ -306,6 +303,7 @@ def muat_data():
             "harga": int(harga_barang),
             "harga_pabrik": harga_pabrik_val,
             "harga_jual": int(harga_barang),
+            "laba_lama": laba_lama_val,
             "expired": expired_val,
             "status": status_val
         }
@@ -398,6 +396,9 @@ def simpan_data(data_baru=None):
             kategori = barang.get("kategori", "Umum")
             stok_minimum = barang.get("stok_min", 5)
             harga_pabrik = int(ambil_harga_pabrik(barang))
+            harga_jual = int(ambil_harga_jual(barang))
+            laba_sekarang = hitung_laba(harga_pabrik, harga_jual)
+            laba_lama = int(barang.get("laba_lama", laba_sekarang))
             expired = barang.get("expired", "31-12-2099")
             status = barang.get("status", "Aktif")
             baris_barang.append(
@@ -1227,48 +1228,6 @@ def tampilkan_barang():
     print(f"Total Barang: {jumlah_data} Item")
     print("=" * lebar)
 
-def pilih_kategori():
-    while True:
-        nama_kategori = input_wajib("Kategori barang: ").strip()
-        if nama_kategori == "0": return "0"
-
-        # Cek apakah kategori sudah ada
-        for kategori in data_kategori:
-            if nama_kategori.casefold() == kategori.casefold():
-                return kategori
-
-        # Cari kategori yang paling mirip
-        saran = difflib.get_close_matches(
-            nama_kategori,
-            data_kategori,
-            n=1,
-            cutoff=0.65
-        )
-
-        if saran:
-            print(f"Apakah yang Anda maksud {saran[0]}?")
-            jawaban = input("Pilih Y/T: ").strip().upper()
-
-            if jawaban == "Y":
-                return saran[0]
-            elif jawaban != "T":
-                print("Masukkan Y atau T.")
-                continue
-
-        # Buat kategori baru
-        nama_baru = nama_kategori.title()
-        file_kategori = FOLDER_KATEGORI / f"{nama_baru}.txt"
-
-        file_kategori.write_text(
-            nama_baru,
-            encoding="utf-8"
-        )
-
-        data_kategori.append(nama_baru)
-
-        print(f"Kategori baru '{nama_baru}' berhasil dibuat.")
-
-        return nama_baru
 
 def tambah_barang():
     lebar = 77
@@ -1295,7 +1254,7 @@ def tambah_barang():
         print("❗[INFO] Tambah barang dibatalkan.")
         return
 
-    kategori = pilih_kategori()
+    kategori = pilih_kategori_valid(izin_tambah=True)
     if kategori == "0":
         print("❗[INFO] Tambah barang dibatalkan.")
         return
@@ -1438,8 +1397,7 @@ def edit_barang():
     print(f"{'Expired':<15} | {str(barang.get('expired', '')):<20} | {str(expired_baru_final):<20}")
     print("="*65)
 
-    yakin = input("Apakah Anda yakin ingin menyimpan perubahan ini? (y/t): ").strip().lower()
-    if yakin != 'y':
+    if not konfirmasi_default("Apakah Anda yakin ingin menyimpan perubahan ini?"):
         print("❌ Perubahan dibatalkan.")
         return
     # --------------------------------------------------------

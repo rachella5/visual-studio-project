@@ -39,3 +39,5 @@
 [25-11-2026 21:35:06] (admin utama) Logout dari sistem
 [25-11-2026 21:36:22] (admin utama) BARANG MASUK MASUK012 BRG9514 +20 dari pt. koi emas
 [25-11-2026 21:36:29] (admin utama) Logout dari sistem
+[26-11-2026 07:14:20] (admin utama) BARANG MASUK MASUK013 BRG9515 +15 dari py. bening
+[26-11-2026 07:14:26] (admin utama) Logout dari sistem
