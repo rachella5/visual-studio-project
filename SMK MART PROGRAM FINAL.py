@@ -39,7 +39,6 @@ list_riwayat_stok = []
 data_expired = {}
 data_kategori = []
 nomor_berikutnya = 1
-data_kategori = []
 
 ROLE = ("admin", "gudang", "kasir")
 MAP_ROLE = {
@@ -216,10 +215,10 @@ def muat_data():
                 "date_deleted": "-"
         }
 
-        data_pengguna = {
+    data_pengguna = {
                 "pengguna": pengguna_aktif,
                 "arsip_pengguna": pengguna_arsip
-            }
+    }
         
     barang_aktif = {}
     for baris in FILE_BARANG.read_text(encoding="utf-8").splitlines():
@@ -271,7 +270,7 @@ def muat_data():
         kolom = baris.split("|")
         if len(kolom) < 7:
             continue
-           nomor_trx, tanggal_trx, waktu_trx, kasir_username, total_trx, bayar_trx, kembalian_trx = kolom[:7]
+        nomor_trx, tanggal_trx, waktu_trx, kasir_username, total_trx, bayar_trx, kembalian_trx = kolom[:7]
 
         subtotal_trx = int(kolom[7]) if len(kolom) > 7 else int(total_trx)
         ppn_trx = int(kolom[8]) if len(kolom) > 8 else 0
@@ -352,17 +351,17 @@ def simpan_data(data_baru=None):
             except ValueError:
                 tanggal_simpan = tanggal_str
 
-        baris_transaksi.append(
-            f"{transaksi['nomor']}|{tanggal_simpan}|{waktu_str}|"
-            f"{transaksi.get('kasir_username', '-')}|"
-            f"{int(transaksi['total'])}|"
-            f"{int(transaksi['bayar'])}|"
-            f"{int(transaksi['kembalian'])}|"
-            f"{int(transaksi.get('subtotal', transaksi['total']))}|"
-            f"{int(transaksi.get('ppn', 0))}|"
-            f"{int(transaksi.get('tarif_ppn', 0))}"
-         )
-            )
+            baris_transaksi.append(
+                f"{transaksi['nomor']}|{tanggal_simpan}|{waktu_str}|"
+                f"{transaksi.get('kasir_username', '-')}|"
+                f"{int(transaksi['total'])}|"
+                f"{int(transaksi['bayar'])}|"
+                f"{int(transaksi['kembalian'])}|"
+                f"{int(transaksi.get('subtotal', transaksi['total']))}|"
+                f"{int(transaksi.get('ppn', 0))}|"
+                f"{int(transaksi.get('tarif_ppn', 0))}"
+             )
+                
             for item in transaksi.get("item", []):
                 harga_modal = int(item.get("harga_pabrik", item["harga"]))
                 baris_detail.append(
