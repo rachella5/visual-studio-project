@@ -194,3 +194,43 @@
 2026-11-26|09:16:38|admin utama|Logout dari sistem
 2026-11-26 09:15:07|Kasir|Transaksi TRX20261126091507 sebesar Rp 19,000
 2026-11-26 09:17:29|Kasir|Transaksi TRX20261126091729 sebesar Rp 19,000
+2026-11-26|17:13:42|admin utama|Login ke sistem
+2026-11-26|17:19:37|sistem|Menghapus barang pewangi lantai (BRG9517)
+2026-11-26|17:19:57|admin utama|Logout dari sistem
+2026-11-26|17:20:20|admin utama|Login ke sistem
+2026-11-26|17:20:43|admin utama|Logout dari sistem
+2026-11-26|17:29:23|admin utama|Login ke sistem
+2026-11-26|17:31:27|sistem|Menghapus barang so klin pewangi lantai (BRG9519)
+2026-11-26|17:31:38|admin utama|Logout dari sistem
+2026-11-26|17:32:08|admin utama|Login ke sistem
+2026-11-26|17:33:30|admin utama|Logout dari sistem
+2026-11-26|17:37:58|admin utama|Login ke sistem
+2026-11-26|17:38:44|sistem|Mengubah status barang so klin pewangi lantai (BRG9519) menjadi Aktif
+2026-11-26|17:38:56|sistem|Menghapus barang so klin pewangi lantai (BRG9519)
+2026-11-26|17:38:59|admin utama|Logout dari sistem
+2026-11-26|17:39:32|admin utama|Login ke sistem
+2026-11-26|17:39:43|admin utama|Logout dari sistem
+2026-11-26|17:42:09|admin utama|Login ke sistem
+2026-11-26|17:42:22|admin utama|Logout dari sistem
+2026-11-26|17:42:49|admin utama|Login ke sistem
+2026-11-26|17:43:11|admin utama|Logout dari sistem
+2026-11-26|17:46:12|admin utama|Login ke sistem
+2026-11-26|17:46:42|admin utama|Logout dari sistem
+2026-11-26|17:47:20|admin utama|Login ke sistem
+2026-11-26|17:47:38|admin utama|Logout dari sistem
+2026-11-26|18:02:49|admin utama|Login ke sistem
+2026-11-26|18:05:55|admin utama|Logout dari sistem
+2026-11-26|18:06:16|admin utama|Login ke sistem
+2026-11-26|18:09:42|admin utama|Logout dari sistem
+2026-11-26|18:10:08|admin utama|Login ke sistem
+2026-11-26|18:10:26|admin utama|Logout dari sistem
+2026-11-26|19:12:21|admin utama|Login ke sistem
+2026-11-26|19:14:24|admin utama|Logout dari sistem
+2026-11-26|19:14:37|admin utama|Login ke sistem
+2026-11-26|19:22:44|admin utama|BARANG MASUK MASUK017 BRG9521 +125 dari pt. washington us
+2026-11-26|19:22:53|admin utama|Logout dari sistem
+2026-11-26|19:24:18|admin utama|Logout dari sistem
+2026-11-26|19:25:42|admin utama|BARANG MASUK MASUK018 BRG9522 +102 dari pt. georgia waste
+2026-11-26|19:25:45|admin utama|Logout dari sistem
+2026-11-26|19:28:08|admin utama|Logout dari sistem
+2026-11-26|19:28:08|admin utama|Logout dari sistem

@@ -48,3 +48,10 @@
 [26-11-2026 07:47:19] (admin utama) BARANG MASUK MASUK016 BRG9515 +25 dari pt. ganesha
 [26-11-2026 07:47:24] (admin utama) Logout dari sistem
 [26-11-2026 08:00:27] (admin utama) Logout dari sistem
+[26-11-2026 17:19:37] (sistem) Menghapus barang pewangi lantai (BRG9517)
+[26-11-2026 17:31:27] (sistem) Menghapus barang so klin pewangi lantai (BRG9519)
+[26-11-2026 17:38:56] (sistem) Menghapus barang so klin pewangi lantai (BRG9519)
+[26-11-2026 19:22:44] (admin utama) BARANG MASUK MASUK017 BRG9521 +125 dari pt. washington us
+[26-11-2026 19:22:53] (admin utama) Logout dari sistem
+[26-11-2026 19:25:42] (admin utama) BARANG MASUK MASUK018 BRG9522 +102 dari pt. georgia waste
+[26-11-2026 19:25:45] (admin utama) Logout dari sistem
