@@ -276,10 +276,10 @@ def muat_data():
                 "date_deleted": "-"
         }
 
-        data_pengguna = {
+    data_pengguna = {
                 "pengguna": pengguna_aktif,
                 "arsip_pengguna": pengguna_arsip
-            }
+    }
         
     barang_aktif = {}
     for baris in FILE_BARANG.read_text(encoding="utf-8").splitlines():
@@ -429,6 +429,8 @@ def simpan_data(data_baru=None):
                 f"{int(transaksi.get('tarif_ppn', 0))}"
             )
             
+             )
+                
             for item in transaksi.get("item", []):
                 harga_modal = int(item.get("harga_pabrik", item["harga"]))
                 baris_detail.append(
