@@ -1,0 +1,23 @@
+================================================================================================
+                            LAPORAN NILAI PERSEDIAAN BARANG SMK MART                            
+                               Tanggal Cetak: 25-11-2026 20:50:07                               
+================================================================================================
+ID       | NAMA BARANG            |  STOK |    HARGA JUAL |      NILAI JUAL |     NILAI MODAL
+------------------------------------------------------------------------------------------------
+BRG9508  | biskuit gandum         |   300 |       Rp5.000 |     Rp1.500.000 |     Rp1.350.000
+BRG9509  | sprite lemon           |   135 |       Rp4.500 |       Rp607.500 |       Rp540.000
+BRG9510  | mie samyang buldak     |   185 |      Rp16.000 |     Rp2.960.000 |     Rp2.867.500
+BRG9511  | mie sedaap soto        |   285 |       Rp3.500 |       Rp997.500 |       Rp855.000
+BRG9512  | le minerale            |    85 |       Rp3.000 |       Rp255.000 |       Rp212.500
+BRG9513  | susu full cream        |   148 |       Rp7.000 |     Rp1.036.000 |       Rp962.000
+BRG9514  | beras koi              |    16 |      Rp70.000 |     Rp1.120.000 |     Rp1.096.000
+BRG9515  | beras punokawan        |    25 |      Rp67.000 |     Rp1.675.000 |     Rp1.650.000
+BRG9516  | crackers               |    50 |       Rp2.500 |       Rp125.000 |       Rp100.000
+BRG9517  | pewangi lantai         |     0 |       Rp3.500 |             Rp0 |             Rp0
+================================================================================================
+Total Jenis Barang       : 10 item
+Total Seluruh Unit Stok  : 1229 unit
+Total Nilai Persediaan   : Rp10.276.000 (berdasarkan harga jual)
+Total Nilai Modal Pabrik : Rp9.633.000 (berdasarkan harga pabrik)
+Potensi Laba Persediaan  : Rp643.000
+================================================================================================

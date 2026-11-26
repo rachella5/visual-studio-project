@@ -1,0 +1,40 @@
+====================================================================================
+                         LAPORAN STOK DAN AKTIVITAS GUDANG                          
+                   Periode Aktivitas: 21-11-2026 s.d. 22-11-2026                    
+====================================================================================
+ID        | NAMA BARANG            |  STOK | STATUS      | EXPIRED      | KONDISI     
+====================================================================================
+BRG9508   | biskuit gandum         |   300 | AMAN        | 12-06-2027   | NORMAL      
+BRG9509   | sprite lemon           |   135 | AMAN        | 03-06-2029   | NORMAL      
+BRG9510   | mie samyang buldak     |   185 | AMAN        | 12-04-2030   | NORMAL      
+BRG9511   | mie sedaap soto        |   285 | AMAN        | 04-05-2028   | NORMAL      
+BRG9512   | le minerale            |    85 | AMAN        | 05-06-2030   | NORMAL      
+BRG9513   | susu full cream        |   148 | AMAN        | 04-08-2031   | NORMAL      
+BRG9514   | beras koi              |    16 | AMAN        | 06-08-2027   | NORMAL      
+BRG9515   | beras punokawan        |    25 | AMAN        | 12-02-2027   | NORMAL      
+BRG9516   | crackers               |    50 | AMAN        | 12-08-2030   | NORMAL      
+BRG9517   | pewangi lantai         |     0 | HABIS       | 06-08-2030   | NORMAL      
+====================================================================================
+                          RINGKASAN LAPORAN KONDISI BARANG                          
+------------------------------------------------------------------------------------
+Total Jenis Barang           : 10 item
+Barang Kondisi Normal        : 10 item
+Barang Mendekati Expired     : 0 item
+Barang Sudah Expired         : 0 item
+Barang Stok Menipis (<= 5)   : 1 item
+====================================================================================
+                  DAFTAR BARANG MASUK (21-11-2026 s.d. 22-11-2026)                  
+------------------------------------------------------------------------------------
+MASUK001 | 21-11-2026 | BRG9509 - sprite lemon | +150 | Pemasok: pt. anugerah indah
+MASUK002 | 21-11-2026 | BRG9510 - mie samyang buldak | +200 | Pemasok: pt. south asean
+MASUK003 | 21-11-2026 | BRG9508 - biskuit gandum | +300 | Pemasok: pt. pencari cinta sejati
+MASUK004 | 21-11-2026 | BRG9508 - biskuit gandum | +300 | Pemasok: pt. anugerah indah
+====================================================================================
+                 DAFTAR BARANG KELUAR (21-11-2026 s.d. 22-11-2026)                  
+------------------------------------------------------------------------------------
+KELUAR001 | 21-11-2026 | BRG9508 - biskuit gandum | -15 | Alasan: RUSAK
+KELUAR002 | 21-11-2026 | BRG9508 - biskuit gandum | -285 | Alasan: KADALUARSA
+====================================================================================
+Total Catatan Barang Masuk  : 4 catatan (950 unit)
+Total Catatan Barang Keluar : 2 catatan (300 unit)
+====================================================================================
