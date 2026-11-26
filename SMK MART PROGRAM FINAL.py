@@ -402,8 +402,8 @@ def simpan_data(data_baru=None):
             expired = barang.get("expired", "31-12-2099")
             status = barang.get("status", "Aktif")
             baris_barang.append(
-                f"{kode_barang}|{barang['nama_barang']}|{kategori}|{int(ambil_harga_jual(barang))}|"
-                f"{int(barang['stok'])}|{int(stok_minimum)}|{harga_pabrik}|{expired}|{status}"
+                f"{kode_barang}|{barang['nama_barang']}|{kategori}|{harga_jual}|"
+                f"{int(barang['stok'])}|{int(stok_minimum)}|{harga_pabrik}|{expired}|{status}|{laba_lama}"
             )
         FILE_BARANG.write_text("\n".join(baris_barang) + ("\n" if baris_barang else ""), encoding="utf-8")
 
@@ -628,6 +628,7 @@ def tambah_pengguna():
     
 
 def edit_pengguna():
+    tampilkan_data_pengguna()
     lebar = 55
     print("=" * lebar)
     print("--- EDIT DATA PENGGUNA ---".center(lebar))
@@ -652,12 +653,7 @@ def edit_pengguna():
         password_baru = input_password_simple("Password baru [Kosongkan jika tetap]: ", boleh_kosong=True)
         role_input = input(f"Role baru [{pengguna['role']}] ([A]dmin / [G]udang / [K]asir): ").strip().lower()
 
-        if nama_baru:
-            pengguna['nama'] = nama_baru
-        if username_baru:
-            pengguna['username'] = username_baru
-        if password_baru:
-            pengguna['password'] = buat_hash_password(password_baru)
+        role_baru_final = pengguna['role']
         if role_input:
             if role_input in MAP_ROLE:
                 pengguna['role'] = MAP_ROLE[role_input]
@@ -666,6 +662,35 @@ def edit_pengguna():
                 print("⚠️ [GAGAL] Role tidak valid. Gunakan A (admin), G (gudang), atau K (kasir).")
                 print("=" * lebar)
                 return
+
+        nama_baru_final = nama_baru if nama_baru else pengguna['nama']
+        username_baru_final = username_baru if username_baru else pengguna['username']
+        status_password_baru = "Diubah" if password_baru else "Tetap"
+
+        print("\n" + "=" * 65)
+        print(f"📋 PRATINJAU PERUBAHAN DATA PENGGUNA (ID: {id_pengguna})")
+        print("=" * 65)
+        print(f"{'Kategori':<15} | {'Data Lama':<20} | {'Data Baru':<20}")
+        print("-" * 65)
+        print(f"{'Nama':<15} | {str(pengguna['nama']):<20} | {str(nama_baru_final):<20}")
+        print(f"{'Username':<15} | {str(pengguna['username']):<20} | {str(username_baru_final):<20}")
+        print(f"{'Role':<15} | {str(pengguna['role']):<20} | {str(role_baru_final):<20}")
+        print(f"{'Password':<15} | {'********':<20} | {status_password_baru:<20}")
+        print("=" * 65)
+
+        if not konfirmasi_default("Apakah Anda yakin ingin menyimpan perubahan ini?"):
+            print("❌ Perubahan dibatalkan.")
+            return
+        # ---------------------------------------------------
+
+        if nama_baru:
+            pengguna['nama'] = nama_baru
+        if username_baru:
+            pengguna['username'] = username_baru
+        if password_baru:
+            pengguna['password'] = buat_hash_password(password_baru)
+        if role_input:
+            pengguna['role'] = role_baru_final
 
         pengguna['date_modified'] = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
         pengguna['date_deleted'] = "-"

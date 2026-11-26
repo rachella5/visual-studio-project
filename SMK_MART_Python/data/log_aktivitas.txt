@@ -166,3 +166,25 @@
 2026-11-26|07:14:28|admin utama|Logout dari sistem
 2026-11-26|07:14:37|admin utama|Login ke sistem
 2026-11-26|07:15:10|admin utama|Logout dari sistem
+2026-11-26|07:36:24|admin utama|Login ke sistem
+2026-11-26|07:39:25|admin utama|BARANG MASUK MASUK014 BRG9514 +12 dari pt. sejahtera
+2026-11-26|07:39:31|admin utama|Logout dari sistem
+2026-11-26|07:39:48|admin utama|Logout dari sistem
+2026-11-26|07:39:59|admin utama|Login ke sistem
+2026-11-26|07:43:13|admin utama|Logout dari sistem
+2026-11-26|07:45:04|admin utama|Login ke sistem
+2026-11-26|07:45:35|admin utama|BARANG MASUK MASUK015 BRG9516 +20 dari pt. jayadi
+2026-11-26|07:45:51|admin utama|Logout dari sistem
+2026-11-26|07:47:19|admin utama|BARANG MASUK MASUK016 BRG9515 +25 dari pt. ganesha
+2026-11-26|07:47:24|admin utama|Logout dari sistem
+2026-11-26|07:47:41|admin utama|Logout dari sistem
+2026-11-26|07:48:14|admin utama|Login ke sistem
+2026-11-26|07:54:45|admin utama|Logout dari sistem
+2026-11-26|07:55:06|admin utama|Login ke sistem
+2026-11-26|07:56:36|admin utama|Logout dari sistem
+2026-11-26|07:57:51|admin utama|Login ke sistem
+2026-11-26|07:58:32|admin utama|Mengaktifkan kembali pengguna tyaa (USR007)
+2026-11-26|07:58:54|admin utama|Logout dari sistem
+2026-11-26|07:59:03|admin utama|Login ke sistem
+2026-11-26|08:00:27|admin utama|Logout dari sistem
+2026-11-26|08:00:28|admin utama|Logout dari sistem

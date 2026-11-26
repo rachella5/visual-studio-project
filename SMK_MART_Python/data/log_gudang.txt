@@ -41,3 +41,10 @@
 [25-11-2026 21:36:29] (admin utama) Logout dari sistem
 [26-11-2026 07:14:20] (admin utama) BARANG MASUK MASUK013 BRG9515 +15 dari py. bening
 [26-11-2026 07:14:26] (admin utama) Logout dari sistem
+[26-11-2026 07:39:25] (admin utama) BARANG MASUK MASUK014 BRG9514 +12 dari pt. sejahtera
+[26-11-2026 07:39:31] (admin utama) Logout dari sistem
+[26-11-2026 07:45:35] (admin utama) BARANG MASUK MASUK015 BRG9516 +20 dari pt. jayadi
+[26-11-2026 07:45:51] (admin utama) Logout dari sistem
+[26-11-2026 07:47:19] (admin utama) BARANG MASUK MASUK016 BRG9515 +25 dari pt. ganesha
+[26-11-2026 07:47:24] (admin utama) Logout dari sistem
+[26-11-2026 08:00:27] (admin utama) Logout dari sistem
