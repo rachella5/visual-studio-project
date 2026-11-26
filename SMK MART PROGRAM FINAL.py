@@ -429,7 +429,6 @@ def simpan_data(data_baru=None):
                 f"{int(transaksi.get('tarif_ppn', 0))}"
             )
             
-             )
                 
             for item in transaksi.get("item", []):
                 harga_modal = int(item.get("harga_pabrik", item["harga"]))
