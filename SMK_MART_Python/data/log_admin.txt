@@ -148,3 +148,12 @@
 [26-11-2026 19:14:24] (admin utama) Logout dari sistem
 [26-11-2026 19:14:37] (admin utama) Login ke sistem
 [26-11-2026 19:28:08] (admin utama) Logout dari sistem
+[27-11-2026 09:49:01] (admin utama) Login ke sistem
+[27-11-2026 09:55:14] (admin utama) Logout dari sistem
+[27-11-2026 09:57:09] (admin utama) Login ke sistem
+[27-11-2026 09:59:16] (admin utama) Logout dari sistem
+[27-11-2026 13:34:02] (admin utama) Login ke sistem
+[27-11-2026 13:44:06] (admin utama) Melakukan restore data dari backup_20261127_133731
+[27-11-2026 13:57:07] (admin utama) Logout dari sistem
+[27-11-2026 13:57:35] (admin utama) Login ke sistem
+[27-11-2026 14:24:46] (admin utama) Logout dari sistem

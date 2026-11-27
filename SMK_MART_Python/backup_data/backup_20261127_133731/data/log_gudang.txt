@@ -1,0 +1,58 @@
+[18-11-2026 09:04:07] (usrasel) Login ke sistem
+[18-11-2026 09:05:53] (usrasel) Logout dari sistem
+[21-11-2026 13:23:22] (usrasel) Login ke sistem
+[21-11-2026 13:25:38] (usrasel) Logout dari sistem
+[21-11-2026 13:29:55] (usrasel) Login ke sistem
+[21-11-2026 13:30:35] (usrasel) BARANG MASUK MASUK001 BRG9509 +150 dari pt. anugerah indah
+[21-11-2026 13:31:12] (usrasel) BARANG MASUK MASUK002 BRG9510 +200 dari pt. south asean
+[21-11-2026 13:32:05] (usrasel) BARANG MASUK MASUK003 BRG9508 +300 dari pt. pencari cinta sejati
+[21-11-2026 13:32:42] (usrasel) BARANG KELUAR KELUAR001 BRG9508 -15 (RUSAK)
+[21-11-2026 13:34:01] (usrasel) BARANG KELUAR KELUAR002 BRG9508 -285 (KADALUARSA)
+[21-11-2026 13:34:23] (usrasel) BARANG MASUK MASUK004 BRG9508 +300 dari pt. anugerah indah
+[21-11-2026 13:35:14] (usrasel) Logout dari sistem
+[21-11-2026 13:48:40] (sistem) Menghapus barang keripik kentang chela (BRG9507)
+[21-11-2026 13:49:02] (sistem) Menghapus barang kopi hitam (BRG1095)
+[21-11-2026 13:49:15] (sistem) Menghapus barang salt butter (BRG7074)
+[22-11-2026 19:39:21] (admin utama) Logout dari sistem
+[22-11-2026 19:46:25] (admin utama) Logout dari sistem
+[23-11-2026 08:05:54] (usrasel) Login ke sistem
+[23-11-2026 08:06:32] (usrasel) BARANG MASUK MASUK005 BRG9514 +20 dari pt. beras sejahtera
+[23-11-2026 08:07:00] (usrasel) BARANG KELUAR KELUAR003 BRG9514 -2 (RUSAK)
+[23-11-2026 08:07:57] (usrasel) Logout dari sistem
+[23-11-2026 08:08:09] (usrasel) Login ke sistem
+[23-11-2026 08:08:33] (usrasel) BARANG MASUK MASUK006 BRG9512 +50 dari pt. air bening
+[23-11-2026 08:09:02] (usrasel) BARANG MASUK MASUK007 BRG9511 +300 dari pt. seafood
+[23-11-2026 08:09:30] (usrasel) BARANG MASUK MASUK008 BRG9513 +150 dari pt. indonesia indah
+[23-11-2026 08:10:23] (usrasel) Logout dari sistem
+[23-11-2026 09:17:40] (admin utama) BARANG MASUK MASUK009 BRG9512 +40 dari pt. anugerah indah
+[23-11-2026 09:18:00] (admin utama) Logout dari sistem
+[23-11-2026 09:46:51] (admin utama) Logout dari sistem
+[23-11-2026 13:46:52] (usrasel) Login ke sistem
+[23-11-2026 13:47:21] (usrasel) BARANG MASUK MASUK010 BRG9515 +25 dari py. putera anggun
+[23-11-2026 13:47:57] (usrasel) Logout dari sistem
+[23-11-2026 13:48:04] (usrasel) Login ke sistem
+[23-11-2026 13:48:39] (usrasel) BARANG MASUK MASUK011 BRG9516 +50 dari pt. cheezebrick
+[23-11-2026 13:48:56] (usrasel) Logout dari sistem
+[25-11-2026 20:51:20] (sistem) Menghapus barang 0 (BRG9518)
+[25-11-2026 20:54:50] (admin utama) Logout dari sistem
+[25-11-2026 21:20:53] (admin utama) Logout dari sistem
+[25-11-2026 21:35:06] (admin utama) Logout dari sistem
+[25-11-2026 21:36:22] (admin utama) BARANG MASUK MASUK012 BRG9514 +20 dari pt. koi emas
+[25-11-2026 21:36:29] (admin utama) Logout dari sistem
+[26-11-2026 07:14:20] (admin utama) BARANG MASUK MASUK013 BRG9515 +15 dari py. bening
+[26-11-2026 07:14:26] (admin utama) Logout dari sistem
+[26-11-2026 07:39:25] (admin utama) BARANG MASUK MASUK014 BRG9514 +12 dari pt. sejahtera
+[26-11-2026 07:39:31] (admin utama) Logout dari sistem
+[26-11-2026 07:45:35] (admin utama) BARANG MASUK MASUK015 BRG9516 +20 dari pt. jayadi
+[26-11-2026 07:45:51] (admin utama) Logout dari sistem
+[26-11-2026 07:47:19] (admin utama) BARANG MASUK MASUK016 BRG9515 +25 dari pt. ganesha
+[26-11-2026 07:47:24] (admin utama) Logout dari sistem
+[26-11-2026 08:00:27] (admin utama) Logout dari sistem
+[26-11-2026 17:19:37] (sistem) Menghapus barang pewangi lantai (BRG9517)
+[26-11-2026 17:31:27] (sistem) Menghapus barang so klin pewangi lantai (BRG9519)
+[26-11-2026 17:38:56] (sistem) Menghapus barang so klin pewangi lantai (BRG9519)
+[26-11-2026 19:22:44] (admin utama) BARANG MASUK MASUK017 BRG9521 +125 dari pt. washington us
+[26-11-2026 19:22:53] (admin utama) Logout dari sistem
+[26-11-2026 19:25:42] (admin utama) BARANG MASUK MASUK018 BRG9522 +102 dari pt. georgia waste
+[26-11-2026 19:25:45] (admin utama) Logout dari sistem
+[27-11-2026 09:59:15] (admin utama) Logout dari sistem

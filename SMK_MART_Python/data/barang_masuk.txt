@@ -16,3 +16,4 @@ MASUK015|2026-11-26|BRG9516|20|pt. jayadi|admin utama
 MASUK016|2026-11-26|BRG9515|25|pt. ganesha|admin utama
 MASUK017|2026-11-26|BRG9521|125|pt. washington us|admin utama
 MASUK018|2026-11-26|BRG9522|102|pt. georgia waste|admin utama
+MASUK019|2026-11-27|BRG9514|10|pt. anderline|admin utama

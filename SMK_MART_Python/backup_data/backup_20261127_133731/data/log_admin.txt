@@ -1,0 +1,155 @@
+[18-11-2026 09:02:28] (admin) Login ke sistem
+[18-11-2026 09:03:39] (admin) Logout dari sistem
+[18-11-2026 09:06:00] (admin) Login ke sistem
+[18-11-2026 09:07:14] (admin) Logout dari sistem
+[18-11-2026 09:07:49] (admin) Login ke sistem
+[18-11-2026 09:14:30] (admin) Logout dari sistem
+[21-11-2026 12:22:06] (admin) Login ke sistem
+[21-11-2026 12:25:29] (sistem) Menghapus pengguna Nana (USR003)
+[21-11-2026 12:25:51] (admin) Mengaktifkan kembali pengguna melinana (USR003)
+[21-11-2026 12:26:51] (admin) Reset password pengguna USR002
+[21-11-2026 12:46:17] (admin) Login ke sistem
+[21-11-2026 12:53:03] (admin) Logout dari sistem
+[21-11-2026 12:54:06] (admin) Login ke sistem
+[21-11-2026 12:55:18] (admin) Logout dari sistem
+[21-11-2026 12:56:11] (admin) Login ke sistem
+[21-11-2026 13:12:12] (admin) Login ke sistem
+[21-11-2026 13:17:43] (admin) Membuat backup data ke tujuan backup_20261121_131743
+[21-11-2026 13:18:54] (admin) Logout dari sistem
+[21-11-2026 13:20:52] (admin) Login ke sistem
+[21-11-2026 13:21:26] (admin) Mengaktifkan kembali pengguna blackwood (USR003)
+[21-11-2026 13:21:36] (admin) Mengaktifkan kembali pengguna usrasel (USR002)
+[21-11-2026 13:21:46] (admin) Mengaktifkan kembali pengguna melinana (USR004)
+[21-11-2026 13:22:05] (admin) Reset password pengguna USR002
+[21-11-2026 13:22:27] (admin) Reset password pengguna USR003
+[21-11-2026 13:23:05] (admin) Reset password pengguna USR004
+[21-11-2026 13:23:14] (admin) Logout dari sistem
+[21-11-2026 13:25:43] (admin) Login ke sistem
+[21-11-2026 13:29:44] (admin) Logout dari sistem
+[21-11-2026 13:39:53] (admin) Login ke sistem
+[21-11-2026 13:45:17] (admin) Logout dari sistem
+[21-11-2026 13:45:26] (admin) Login ke sistem
+[21-11-2026 13:46:03] (admin) Logout dari sistem
+[21-11-2026 13:48:03] (admin) Login ke sistem
+[21-11-2026 13:49:28] (admin) Membuat backup data ke tujuan backup_20261121_134928
+[21-11-2026 13:49:33] (admin) Logout dari sistem
+[22-11-2026 08:03:48] (admin utama) Login ke sistem
+[22-11-2026 08:03:59] (admin utama) Logout dari sistem
+[22-11-2026 08:06:42] (admin utama) Login ke sistem
+[22-11-2026 08:07:46] (admin utama) Logout dari sistem
+[22-11-2026 19:31:16] (admin utama) Login ke sistem
+[22-11-2026 19:33:55] (admin utama) Logout dari sistem
+[22-11-2026 19:34:29] (admin utama) Login ke sistem
+[22-11-2026 19:35:06] (admin utama) Mengaktifkan kembali pengguna blackwood (USR006)
+[22-11-2026 19:35:23] (admin utama) Mengaktifkan kembali pengguna melinana (USR007)
+[22-11-2026 19:39:22] (admin utama) Logout dari sistem
+[22-11-2026 19:43:25] (admin utama) Login ke sistem
+[22-11-2026 19:44:58] (admin utama) Logout dari sistem
+[22-11-2026 19:45:25] (admin utama) Login ke sistem
+[22-11-2026 19:46:27] (admin utama) Logout dari sistem
+[23-11-2026 07:21:26] (admin utama) Login ke sistem
+[23-11-2026 07:22:25] (sistem) Menghapus pengguna Nana (USR007)
+[23-11-2026 07:22:55] (admin utama) Mengaktifkan kembali pengguna melinana (USR007)
+[23-11-2026 07:29:05] (admin utama) Logout dari sistem
+[23-11-2026 07:34:31] (admin utama) Login ke sistem
+[23-11-2026 07:34:58] (admin utama) Reset password pengguna USR001
+[23-11-2026 07:35:01] (admin utama) Logout dari sistem
+[23-11-2026 07:35:55] (admin utama) Login ke sistem
+[23-11-2026 07:36:32] (admin utama) Reset password pengguna USR001
+[23-11-2026 07:36:37] (admin utama) Logout dari sistem
+[23-11-2026 07:39:57] (admin utama) Login ke sistem
+[23-11-2026 07:40:33] (admin utama) Reset password pengguna USR001
+[23-11-2026 07:40:38] (admin utama) Logout dari sistem
+[23-11-2026 08:04:57] (admin utama) Login ke sistem
+[23-11-2026 08:05:46] (admin utama) Logout dari sistem
+[23-11-2026 08:10:53] (admin utama) Login ke sistem
+[23-11-2026 08:11:32] (admin utama) Membuat backup data ke tujuan backup_20261123_081132
+[23-11-2026 08:12:28] (admin utama) Logout dari sistem
+[23-11-2026 09:13:20] (admin utama) Login ke sistem
+[23-11-2026 09:34:09] (admin utama) Logout dari sistem
+[23-11-2026 09:38:08] (admin utama) Login ke sistem
+[23-11-2026 09:45:53] (admin utama) Logout dari sistem
+[23-11-2026 09:46:03] (admin utama) Login ke sistem
+[23-11-2026 09:46:53] (admin utama) Logout dari sistem
+[23-11-2026 13:44:11] (admin utama) Login ke sistem
+[23-11-2026 13:46:42] (admin utama) Logout dari sistem
+[23-11-2026 13:49:03] (admin utama) Login ke sistem
+[23-11-2026 13:50:04] (admin utama) Logout dari sistem
+[23-11-2026 20:16:23] (admin utama) Login ke sistem
+[23-11-2026 20:20:19] (admin utama) Logout dari sistem
+[23-11-2026 20:23:41] (admin utama) Login ke sistem
+[23-11-2026 20:25:41] (admin utama) Logout dari sistem
+[23-11-2026 20:27:32] (admin utama) Login ke sistem
+[23-11-2026 20:30:11] (admin utama) Logout dari sistem
+[23-11-2026 20:30:25] (admin utama) Login ke sistem
+[23-11-2026 20:34:13] (admin utama) Logout dari sistem
+[23-11-2026 20:34:19] (admin utama) Login ke sistem
+[23-11-2026 20:35:15] (admin utama) Login ke sistem
+[23-11-2026 20:36:21] (admin utama) Logout dari sistem
+[25-11-2026 20:38:24] (admin utama) Login ke sistem
+[25-11-2026 20:45:44] (admin utama) Login ke sistem
+[25-11-2026 20:46:22] (admin utama) Login ke sistem
+[25-11-2026 20:54:54] (admin utama) Logout dari sistem
+[25-11-2026 21:18:14] (admin utama) Login ke sistem
+[25-11-2026 21:29:42] (admin utama) Logout dari sistem
+[25-11-2026 21:31:44] (admin utama) Login ke sistem
+[25-11-2026 21:40:41] (admin utama) Logout dari sistem
+[26-11-2026 07:12:24] (admin utama) Login ke sistem
+[26-11-2026 07:14:28] (admin utama) Logout dari sistem
+[26-11-2026 07:14:37] (admin utama) Login ke sistem
+[26-11-2026 07:15:10] (admin utama) Logout dari sistem
+[26-11-2026 07:36:24] (admin utama) Login ke sistem
+[26-11-2026 07:39:48] (admin utama) Logout dari sistem
+[26-11-2026 07:39:59] (admin utama) Login ke sistem
+[26-11-2026 07:43:13] (admin utama) Logout dari sistem
+[26-11-2026 07:45:04] (admin utama) Login ke sistem
+[26-11-2026 07:47:41] (admin utama) Logout dari sistem
+[26-11-2026 07:48:14] (admin utama) Login ke sistem
+[26-11-2026 07:54:45] (admin utama) Logout dari sistem
+[26-11-2026 07:55:06] (admin utama) Login ke sistem
+[26-11-2026 07:56:36] (admin utama) Logout dari sistem
+[26-11-2026 07:57:51] (admin utama) Login ke sistem
+[26-11-2026 07:58:32] (admin utama) Mengaktifkan kembali pengguna tyaa (USR007)
+[26-11-2026 07:58:54] (admin utama) Logout dari sistem
+[26-11-2026 07:59:03] (admin utama) Login ke sistem
+[26-11-2026 08:00:28] (admin utama) Logout dari sistem
+[26-11-2026 08:27:22] (admin utama) Login ke sistem
+[26-11-2026 08:27:59] (admin utama) Logout dari sistem
+[26-11-2026 09:15:40] (admin utama) Login ke sistem
+[26-11-2026 09:16:38] (admin utama) Logout dari sistem
+[26-11-2026 17:13:42] (admin utama) Login ke sistem
+[26-11-2026 17:19:57] (admin utama) Logout dari sistem
+[26-11-2026 17:20:20] (admin utama) Login ke sistem
+[26-11-2026 17:20:43] (admin utama) Logout dari sistem
+[26-11-2026 17:29:23] (admin utama) Login ke sistem
+[26-11-2026 17:31:38] (admin utama) Logout dari sistem
+[26-11-2026 17:32:08] (admin utama) Login ke sistem
+[26-11-2026 17:33:30] (admin utama) Logout dari sistem
+[26-11-2026 17:37:58] (admin utama) Login ke sistem
+[26-11-2026 17:38:44] (sistem) Mengubah status barang so klin pewangi lantai (BRG9519) menjadi Aktif
+[26-11-2026 17:38:59] (admin utama) Logout dari sistem
+[26-11-2026 17:39:32] (admin utama) Login ke sistem
+[26-11-2026 17:39:43] (admin utama) Logout dari sistem
+[26-11-2026 17:42:09] (admin utama) Login ke sistem
+[26-11-2026 17:42:22] (admin utama) Logout dari sistem
+[26-11-2026 17:42:49] (admin utama) Login ke sistem
+[26-11-2026 17:43:11] (admin utama) Logout dari sistem
+[26-11-2026 17:46:12] (admin utama) Login ke sistem
+[26-11-2026 17:46:42] (admin utama) Logout dari sistem
+[26-11-2026 17:47:20] (admin utama) Login ke sistem
+[26-11-2026 17:47:38] (admin utama) Logout dari sistem
+[26-11-2026 18:02:49] (admin utama) Login ke sistem
+[26-11-2026 18:05:55] (admin utama) Logout dari sistem
+[26-11-2026 18:06:16] (admin utama) Login ke sistem
+[26-11-2026 18:09:42] (admin utama) Logout dari sistem
+[26-11-2026 18:10:08] (admin utama) Login ke sistem
+[26-11-2026 18:10:26] (admin utama) Logout dari sistem
+[26-11-2026 19:12:21] (admin utama) Login ke sistem
+[26-11-2026 19:14:24] (admin utama) Logout dari sistem
+[26-11-2026 19:14:37] (admin utama) Login ke sistem
+[26-11-2026 19:28:08] (admin utama) Logout dari sistem
+[27-11-2026 09:49:01] (admin utama) Login ke sistem
+[27-11-2026 09:55:14] (admin utama) Logout dari sistem
+[27-11-2026 09:57:09] (admin utama) Login ke sistem
+[27-11-2026 09:59:16] (admin utama) Logout dari sistem
+[27-11-2026 13:34:02] (admin utama) Login ke sistem

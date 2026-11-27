@@ -1,0 +1,18 @@
+MASUK001|2026-11-21|BRG9509|150|pt. anugerah indah|usrasel
+MASUK002|2026-11-21|BRG9510|200|pt. south asean|usrasel
+MASUK003|2026-11-21|BRG9508|300|pt. pencari cinta sejati|usrasel
+MASUK004|2026-11-21|BRG9508|300|pt. anugerah indah|usrasel
+MASUK005|2026-11-23|BRG9514|20|pt. beras sejahtera|usrasel
+MASUK006|2026-11-23|BRG9512|50|pt. air bening|usrasel
+MASUK007|2026-11-23|BRG9511|300|pt. seafood|usrasel
+MASUK008|2026-11-23|BRG9513|150|pt. indonesia indah|usrasel
+MASUK009|2026-11-23|BRG9512|40|pt. anugerah indah|admin utama
+MASUK010|2026-11-23|BRG9515|25|py. putera anggun|usrasel
+MASUK011|2026-11-23|BRG9516|50|pt. cheezebrick|usrasel
+MASUK012|2026-11-25|BRG9514|20|pt. koi emas|admin utama
+MASUK013|2026-11-26|BRG9515|15|py. bening|admin utama
+MASUK014|2026-11-26|BRG9514|12|pt. sejahtera|admin utama
+MASUK015|2026-11-26|BRG9516|20|pt. jayadi|admin utama
+MASUK016|2026-11-26|BRG9515|25|pt. ganesha|admin utama
+MASUK017|2026-11-26|BRG9521|125|pt. washington us|admin utama
+MASUK018|2026-11-26|BRG9522|102|pt. georgia waste|admin utama

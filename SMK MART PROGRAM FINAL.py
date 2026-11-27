@@ -8,7 +8,7 @@ import copy
 import getpass
 import shutil
 
-LOKASI_SCRIPT_INI = Path(__file__).resolve().parent                                              # <--- BERUBAH (sebelumnya Path.cwd())
+LOKASI_SCRIPT_INI = Path(__file__).resolve().parent                                            
 BASE_DIR = LOKASI_SCRIPT_INI / "SMK_MART_Python"
 DATA_DIR = BASE_DIR / "data"
 FOLDER_STRUK = BASE_DIR / "struk"
@@ -180,13 +180,63 @@ def tambah_kategori_baru(nama_awal=None, oleh_admin=True):
     print(f"✅ [SUKSES] Kategori baru '{nama_kategori_rapi}' ({id_baru}) berhasil ditambahkan!")
     return nama_kategori_rapi
 
+# ✅ TAMBAHKAN FUNGSI BARU INI:
+def hapus_kategori_admin(oleh_admin=True):
+    if not oleh_admin:
+        print("⚠️ [DITOLAK] Hanya Admin yang dapat menghapus kategori.")
+        return
+    if not data_kategori:
+        print("❗ [INFO] Belum ada data kategori yang tersimpan.")
+        return
+
+    tampilkan_daftar_kategori()
+    masukan = input_wajib("Masukkan ID atau Nama kategori yang ingin dihapus (0 untuk batal): ").strip()
+    if masukan == "0":
+        print("❗ [INFO] Penghapusan kategori dibatalkan.")
+        return
+
+    hasil = cari_kategori_valid(masukan)
+    if not hasil:
+        print(f"⚠️ [ERROR] Kategori '{masukan}' tidak ditemukan.")
+        return
+
+    id_kategori, nama_kategori = hasil
+    dipakai_aktif = any(barang.get("kategori", "").casefold() == nama_kategori.casefold() for barang in data_barang.get("barang", {}).values())
+    dipakai_arsip = any(barang.get("kategori", "").casefold() == nama_kategori.casefold() for barang in data_barang.get("arsip_barang", {}).values())
+    if dipakai_aktif or dipakai_arsip:
+        print(f"⚠️ [DITOLAK] Kategori '{nama_kategori}' masih digunakan oleh data barang.")
+        return
+
+    if not konfirmasi_default(f"Yakin ingin menghapus kategori '{nama_kategori}' ({id_kategori})?"):
+        print("❗ [INFO] Penghapusan kategori dibatalkan.")
+        return
+
+    del data_kategori[id_kategori]
+    simpan_kategori()
+    print(f"✅ [SUKSES] Kategori '{nama_kategori}' ({id_kategori}) berhasil dihapus!")
+
 def pilih_kategori_valid(izin_tambah=True):
     while True:
+        if not data_kategori:
+            print("⚠️ [PERINGATAN] Belum ada kategori tersedia.")
+            if izin_tambah:
+                if konfirmasi_default("Apakah Anda ingin menambahkan kategori baru sekarang?"):
+                    kategori_baru = tambah_kategori_baru(oleh_admin=True)
+                    if kategori_baru:
+                        return kategori_baru
+                return "0"
+            else:
+                print("❗ [INFO] Hubungi Admin untuk menambahkan kategori terlebih dahulu.")
+                return "0"
+
         tampilkan_daftar_kategori()
-        masukan = input_wajib("Pilih ID atau Nama kategori: ").strip()
+        masukan = input_wajib("Pilih ID atau Nama kategori (0 untuk batal): ").strip()
+        if masukan == "0":
+            return "0"
+
         hasil = cari_kategori_valid(masukan)
         if hasil:
-            return hasil[1]  # Mengembalikan nama kategori resmi (contoh: "Alat Kebersihan")
+            return hasil[1]
 
         print(f"⚠️ [PERINGATAN] Kategori '{masukan}' tidak ditemukan di daftar kategori valid!")
         if izin_tambah:
@@ -195,7 +245,7 @@ def pilih_kategori_valid(izin_tambah=True):
                 if kategori_baru:
                     return kategori_baru
             else:
-                print("❗ [INFO] Silakan ketik ulang kategori sesuai daftar yang tersedia (cek ejaan/typo).")
+                print("❗ [INFO] Silakan ketik ulang kategori sesuai daftar yang tersedia.")
         else:
             print("❗ [INFO] Pilih salah satu kategori yang tersedia di atas (hubungi Admin untuk tambah kategori).")
 
@@ -214,15 +264,6 @@ def muat_data():
         if len(kolom) >= 2:
             data_kategori[kolom[0].strip()] = kolom[1].strip()
 
-    if not data_kategori:
-        data_kategori = {
-            "KAT001": "Sembako",
-            "KAT002": "Makanan",
-            "KAT003": "Minuman",
-            "KAT004": "Snack",
-            "KAT005": "Alat Kebersihan",
-        }
-        simpan_kategori()
 
     pengguna_aktif = {}
     pengguna_arsip = {}
@@ -1048,6 +1089,9 @@ def laporan_penjualan_admin():
     nama_file = f"laporan_penjualan_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
     simpan_teks_laporan(nama_file, isi_laporan)
 
+    if konfirmasi_default("Jalankan analisis harga & laba satuan (SPLDV) dari paket penjualan?"):
+        analisis_spldv_harga_barang()
+
 def kelola_status_barang():
     lebar = 66
     while True:
@@ -1319,6 +1363,10 @@ def tambah_barang():
 
     laba = hitung_laba(harga_pabrik, harga_jual)
 
+    if not konfirmasi_default(f"Simpan barang baru '{nama}' ke database?"): 
+        print("❗ [INFO] Penambahan barang dibatalkan.")
+        return
+
     data_barang["barang"][id_barang] = {
         "nama_barang": nama,
         "kategori": kategori,
@@ -1354,50 +1402,25 @@ def edit_barang():
         print("⚠️[ERROR] ID barang tidak ditemukan.")
         return
 
-    print("\nKosongkan input jika tidak ingin mengubah data.")
-
     print("\nKosongkan input jika tidak ingin mengubah data (Ketik 0 untuk batal).")
+    print("ℹ️ [INFO] Perubahan harga pabrik & harga jual hanya dapat dilakukan melalui menu Barang Masuk.")
 
     nama = input(f"Nama barang [{barang['nama_barang']}]: ").strip()
     if nama == "0":
         print("❗[INFO] Edit barang dibatalkan.")
         return
 
-    if konfirmasi_default(f"Ubah kategori barang? (Saat ini: {barang.get('kategori', '-')})"):
-        barang["kategori"] = pilih_kategori_valid(izin_tambah=True)
-
-    harga_pabrik = input(f"Harga pabrik [{ambil_harga_pabrik(barang)}]: ").strip()
-    if harga_pabrik == "0":
-        print("❗[INFO] Edit barang dibatalkan.")
-        return
-
-    harga_jual = input(f"Harga jual [{ambil_harga_jual(barang)}]: ").strip()
-    if harga_jual == "0":
-        print("❗[INFO] Edit barang dibatalkan.")
-        return
+    kategori_baru = barang.get("kategori", "-")
+    if konfirmasi_default(f"Ubah kategori barang? (Saat ini: {kategori_baru})"):
+        kategori_pilih = pilih_kategori_valid(izin_tambah=True)
+        if kategori_pilih == "0":
+            print("❗[INFO] Edit barang dibatalkan.")
+            return
+        kategori_baru = kategori_pilih
 
     expired = input(f"Expired [{barang.get('expired', '')}]: ").strip()
     if expired == "0":
         print("❗[INFO] Edit barang dibatalkan.")
-        return
-    try:
-        pabrik_baru = (
-            int(harga_pabrik)
-            if harga_pabrik
-            else ambil_harga_pabrik(barang)
-        )
-
-        jual_baru = (
-            int(harga_jual)
-            if harga_jual
-            else ambil_harga_jual(barang)
-        )
-
-        if pabrik_baru < 1 or jual_baru < 1:
-            raise ValueError
-
-    except ValueError:
-        print("⚠️[ERROR] Data angka tidak valid.")
         return
 
     if expired:
@@ -1407,49 +1430,32 @@ def edit_barang():
             print("⚠️[ERROR] Format tanggal expired salah.")
             return
 
-    # Menyiapkan data baru untuk pratinjau
     nama_baru_final = nama or barang["nama_barang"]
     expired_baru_final = expired or barang.get("expired", "31-12-2099")
-    laba_baru = hitung_laba(pabrik_baru, jual_baru)
-    laba_lama = barang.get('laba_per_barang', hitung_laba(ambil_harga_pabrik(barang), ambil_harga_jual(barang)))
 
-    # --- INOVASI: Menampilkan Pratinjau dalam Bentuk Tabel ---
-    print("\n" + "="*65)
+    print("\n" + "=" * 65)
     print(f"📋 PRATINJAU PERUBAHAN DATA BARANG (ID: {id_barang})")
-    print("="*65)
-    print(f"{'Kategori':<15} | {'Data Lama':<20} | {'Data Baru':<20}")
+    print("=" * 65)
+    print(f"{'Atribut':<15} | {'Data Lama':<20} | {'Data Baru':<20}")
     print("-" * 65)
     print(f"{'Nama Barang':<15} | {str(barang['nama_barang']):<20} | {str(nama_baru_final):<20}")
-    print(f"{'Harga Pabrik':<15} | {str(ambil_harga_pabrik(barang)):<20} | {str(pabrik_baru):<20}")
-    print(f"{'Harga Jual':<15} | {str(ambil_harga_jual(barang)):<20} | {str(jual_baru):<20}")
-    print(f"{'Laba':<15} | {str(laba_lama):<20} | {str(laba_baru):<20}")
+    print(f"{'Kategori':<15} | {str(barang.get('kategori', '-')):<20} | {str(kategori_baru):<20}")
     print(f"{'Expired':<15} | {str(barang.get('expired', '')):<20} | {str(expired_baru_final):<20}")
-    print("="*65)
+    print("=" * 65)
 
-    kategori_baru = barang.get("kategori", "-")
-    if konfirmasi_default(f"Ubah kategori barang? (Saat ini: {barang.get('kategori', '-')})"):
-        kategori_pilih = pilih_kategori_valid(izin_tambah=True)
-        if kategori_pilih != "0":
-            kategori_baru = kategori_pilih
-    # --------------------------------------------------------
+    if not konfirmasi_default("Apakah Anda yakin ingin menyimpan perubahan ini?"):
+        print("❌ Perubahan dibatalkan.")
+        return
 
     data_lama = copy.deepcopy(barang)
-
-    harga_berubah = (pabrik_baru, jual_baru) != (ambil_harga_pabrik(barang), ambil_harga_jual(barang))  
-
     barang.update({
         "nama_barang": nama_baru_final,
-        "kategori": kategori_baru,                                                                
-        "harga_pabrik": pabrik_baru,
-        "harga_jual": jual_baru,
-        "harga": jual_baru,
-        "laba_lama": laba_lama if harga_berubah else barang.get("laba_lama", laba_lama),          
-        "laba_per_barang": laba_baru,
+        "kategori": kategori_baru,
         "expired": expired_baru_final
     })
 
     if simpan_data():
-        print("\n[SUKSES] Data barang berhasil diperbarui.")
+        print("\n✅ [SUKSES] Data barang berhasil diperbarui.")
     else:
         barang.clear()
         barang.update(data_lama)
@@ -1458,24 +1464,8 @@ def hapus_barang():
     tampilkan_barang()
     id_barang = input_wajib("ID barang yang dihapus: ").upper()
     if id_barang in data_barang["barang"]:
-
-      def barang_pernah_dipakai(id_barang):
-                  for trx in data_barang["transaksi"]:
-                      if any(item["id_barang"] == id_barang for item in trx.get("item", [])):
-                          return True
-                  for file_cek in (FILE_MASUK, FILE_KELUAR):
-                      if file_cek.exists():
-                          for baris in file_cek.read_text(encoding="utf-8").splitlines():
-                              kolom = baris.split("|")
-                              if len(kolom) >= 3 and kolom[2] == id_barang:
-                                  return True
-                  return False
       
-      if barang_pernah_dipakai(id_barang):
-                  print("⚠️[DITOLAK] Barang sudah pernah tercatat di transaksi atau riwayat gudang, tidak dapat dihapus!")
-                  return
-      
-      if konfirmasi_default("Yakin hapus barang?"):
+      if konfirmasi_default(f"Yakin hapus barang '{data_barang['barang'][id_barang]['nama_barang']}'?"):
         
         barang_dihapus = data_barang["barang"].pop(id_barang)
         barang_dihapus["status"] = "Nonaktif"
@@ -1953,24 +1943,49 @@ def catat_barang_masuk(id_login):
     jumlah = input_angka("Jumlah barang masuk (> 0): ", minimum=1)
     pemasok = input_wajib("Nama pemasok: ")
 
-
-    data_lama = copy.deepcopy(barang)                                                               
+    data_lama = copy.deepcopy(barang)
     pabrik_sekarang = ambil_harga_pabrik(barang)
     jual_sekarang = ambil_harga_jual(barang)
-    input_pabrik_baru = input(f"Harga pabrik terbaru [Enter jika tetap {rupiah(pabrik_sekarang)}]: ").strip()
-    if input_pabrik_baru:
-        if input_pabrik_baru.isdigit() and int(input_pabrik_baru) >= 1:
-            pabrik_baru = int(input_pabrik_baru)
-            if pabrik_baru != pabrik_sekarang:
-                barang["laba_lama"] = hitung_laba(pabrik_sekarang, jual_sekarang)
-                barang["harga_pabrik"] = pabrik_baru
-                barang["laba_per_barang"] = hitung_laba(pabrik_baru, jual_sekarang)
-        else:
-            print("⚠️[PERINGATAN] Harga pabrik tidak valid, tetap memakai harga lama.")   
+    laba_sekarang = hitung_laba(pabrik_sekarang, jual_sekarang)
+
+    # Menawarkan SPLDV di bagian pengaturan harga & laba barang masuk
+    if konfirmasi_default("Gunakan analisis SPLDV untuk menghitung harga satuan paket sebelum input harga?"):
+        analisis_spldv_harga_barang()
+
+    pabrik_baru = pabrik_sekarang
+    jual_baru = jual_sekarang
+
+    if konfirmasi_default(f"Apakah ada perubahan harga pabrik/jual untuk stok baru? (Saat ini Modal: {rupiah(pabrik_sekarang)}, Jual: {rupiah(jual_sekarang)})"):
+        pabrik_baru = input_angka(f"Harga pabrik baru (Rp) [Saat ini {pabrik_sekarang}]: ", minimum=1)
+        jual_baru = input_angka(f"Harga jual baru (Rp) [Saat ini {jual_sekarang}]: ", minimum=1)
+
+    if not konfirmasi_default(f"Konfirmasi catat barang masuk +{jumlah} unit untuk '{barang['nama_barang']}'?"):
+        print("❗ [INFO] Pencatatan barang masuk dibatalkan.")
+        return
+
+    # Konsep FIFO Laba:
+    # Stok lama tetap membawa laba_lama, sedangkan stok baru memakai laba_per_barang baru
+    if (pabrik_baru != pabrik_sekarang) or (jual_baru != jual_sekarang):
+        barang["stok_lama_fifo"] = stok_sebelum
+        barang["harga_pabrik_lama"] = pabrik_sekarang
+        barang["harga_jual_lama"] = jual_sekarang
+        barang["laba_lama"] = laba_sekarang
+
+        barang["harga_pabrik"] = pabrik_baru
+        barang["harga_jual"] = jual_baru
+        barang["harga"] = jual_baru
+        barang["laba_per_barang"] = hitung_laba(pabrik_baru, jual_baru)
+    else:
+        barang.setdefault("laba_lama", laba_sekarang)
+        barang["laba_per_barang"] = laba_sekarang
                   
     id_masuk = buat_id_file_otomatis(FILE_MASUK, "MASUK")
     tanggal_iso = datetime.now().strftime("%Y-%m-%d")
     petugas = data_pengguna["pengguna"][id_login]["username"]
+
+    if not konfirmasi_default(f"Konfirmasi catat barang masuk +{jumlah} unit untuk '{barang['nama_barang']}'?"):  
+        print("❗ [INFO] Pencatatan barang masuk dibatalkan.")
+        return
 
     barang["stok"] = stok_sebelum + jumlah
     if not simpan_data():
@@ -2030,6 +2045,10 @@ def catat_barang_keluar(id_login):
     id_keluar = buat_id_file_otomatis(FILE_KELUAR, "KELUAR")
     tanggal_iso = datetime.now().strftime("%Y-%m-%d")
     petugas = data_pengguna["pengguna"][id_login]["username"]
+
+    if not konfirmasi_default(f"Konfirmasi catat barang keluar -{jumlah} unit untuk '{barang['nama_barang']}' ({alasan})?"): 
+        print("❗ [INFO] Pencatatan barang keluar dibatalkan.")
+        return
 
     barang["stok"] = stok_sebelum - jumlah
     if not simpan_data():
@@ -2590,24 +2609,29 @@ def transaksi_penjualan(kasir):
         sisa_hari, potongan, harga_akhir = hitung_diskon_expired(barang)
         harga_normal = ambil_harga_jual(barang)
         subtotal = jumlah * harga_akhir
+        # ✅ HITUNG LABA KOTOR DENGAN KONSEP FIFO (STOK LAMA TERJUAL LEBIH DULU):
+        stok_lama_tersisa = int(barang.get("stok_lama_fifo", 0))
+        harga_pabrik_lama = int(barang.get("harga_pabrik_lama", ambil_harga_pabrik(barang)))
+        harga_pabrik_baru = int(ambil_harga_pabrik(barang))
+
+        jumlah_dari_stok_lama = min(jumlah, stok_lama_tersisa)
+        jumlah_dari_stok_baru = jumlah - jumlah_dari_stok_lama
+        total_modal_fifo = (jumlah_dari_stok_lama * harga_pabrik_lama) + (jumlah_dari_stok_baru * harga_pabrik_baru)
+
+        if stok_lama_tersisa > 0:
+            barang["stok_lama_fifo"] = max(0, stok_lama_tersisa - jumlah_dari_stok_lama)
+
         daftar_item.append({
-          "id_barang": id_barang,
-          "nama_barang": barang["nama_barang"],
-          "jumlah": jumlah,
-
-          # Harga jual dan modal saat transaksi
-          "harga_normal": harga_normal,
-          "harga_pabrik": ambil_harga_pabrik(barang),
-
-          "diskon_persen": 4 if potongan > 0 else 0,
-          "potongan": potongan,
-          "harga": harga_akhir,
-          "subtotal": subtotal,
-
-          # Laba kotor dari barang yang terjual
-          "laba_kotor": subtotal - (
-              ambil_harga_pabrik(barang) * jumlah
-)
+            "id_barang": id_barang,
+            "nama_barang": barang["nama_barang"],
+            "jumlah": jumlah,
+            "harga_normal": harga_normal,
+            "harga_pabrik": harga_pabrik_baru,
+            "diskon_persen": 4 if potongan > 0 else 0,
+            "potongan": potongan,
+            "harga": harga_akhir,
+            "subtotal": subtotal,
+            "laba_kotor": subtotal - total_modal_fifo  # <--- BERUBAH (Menggunakan modal FIFO)
         })
 
     data_transaksi = {
@@ -3083,12 +3107,22 @@ def submenu_kelola_barang_admin():
         elif pilih == "5":
             kelola_status_barang()
         elif pilih == "6":
-            tampilkan_daftar_kategori()
-            if konfirmasi_default("Tambah kategori baru?"):
-                tambah_kategori_baru(oleh_admin=True)
-        else:
-            print("Pilihan tidak valid.")
-
+            while True:
+                print("\n--- KELOLA KATEGORI (WEWENANG ADMIN) ---")
+                tampilkan_daftar_kategori()
+                print("1. Tambah Kategori Baru")
+                print("2. Hapus Kategori")
+                print("0. Kembali")
+                pilihan_kategori = input("Pilih menu kategori (0-2): ").strip()
+                if pilihan_kategori == "0":
+                    break
+                elif pilihan_kategori == "1":
+                    tambah_kategori_baru(oleh_admin=True)
+                elif pilihan_kategori == "2":
+                    hapus_kategori_admin(oleh_admin=True)
+                else:
+                    print("⚠️ [ERROR] Pilihan tidak valid.")
+        
 def submenu_lihat_cari_barang():
     while True:
         print("\n=== LIHAT & CARI BARANG ===")
